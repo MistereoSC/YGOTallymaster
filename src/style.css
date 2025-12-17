@@ -1,81 +1,153 @@
 @import 'tailwindcss';
+@custom-variant light (&:where(.light, .light *));
 
+/* Base styles */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+@theme {
+	/* Primary color scale (slate) */
+	--color-primary-50: #f8fafc;
+	--color-primary-100: #f1f5f9;
+	--color-primary-200: #e2e8f0;
+	--color-primary-300: #cbd5e1;
+	--color-primary-400: #94a3b8;
+	--color-primary-500: #64748b;
+	--color-primary-600: #475569;
+	--color-primary-700: #334155;
+	--color-primary-800: #1e293b;
+	--color-primary-900: #0f172a;
+
+	/* Accent color scale (blue) */
+	--color-accent-50: #eff6ff;
+	--color-accent-100: #dbeafe;
+	--color-accent-200: #bfdbfe;
+	--color-accent-300: #93c5fd;
+	--color-accent-400: #60a5fa;
+	--color-accent-500: #3b82f6;
+	--color-accent-600: #2563eb;
+	--color-accent-700: #1d4ed8;
+	--color-accent-800: #1e40af;
+	--color-accent-900: #1e3a8a;
+
+	/* Secondary accent scale (emerald) */
+	--color-secondary-50: #ecfdf5;
+	--color-secondary-100: #d1fae5;
+	--color-secondary-200: #a7f3d0;
+	--color-secondary-300: #6ee7b7;
+	--color-secondary-400: #34d399;
+	--color-secondary-500: #10b981;
+	--color-secondary-600: #059669;
+	--color-secondary-700: #047857;
+	--color-secondary-800: #065f46;
+	--color-secondary-900: #064e3b;
+
+	/* Tertiary accent scale (purple) */
+	--color-tertiary-50: #faf5ff;
+	--color-tertiary-100: #f3e8ff;
+	--color-tertiary-200: #e9d5ff;
+	--color-tertiary-300: #c4b5fd;
+	--color-tertiary-400: #a855f7;
+	--color-tertiary-500: #a855f7;
+	--color-tertiary-600: #9333ea;
+	--color-tertiary-700: #7e22ce;
+	--color-tertiary-800: #6b21a8;
+	--color-tertiary-900: #581c87;
+
+	/* Contrast color scale (white for dark theme) */
+	--color-contrast-50: #ffffff;
+	--color-contrast-100: #ffffff;
+	--color-contrast-200: #ffffff;
+	--color-contrast-300: #ffffff;
+	--color-contrast-400: #ffffff;
+	--color-contrast-500: #ffffff;
+	--color-contrast-600: #ffffff;
+	--color-contrast-700: #ffffff;
+	--color-contrast-800: #ffffff;
+	--color-contrast-900: #ffffff;
+	--color-contrast-950: #ffffff;
 }
 
+@layer theme {
+	:root,
+	:host {
+		@variant light {
+			/* Primary color scale (slate) - inverted for light theme */
+			--color-primary-50: #0f172a;
+			--color-primary-100: #1e293b;
+			--color-primary-200: #334155;
+			--color-primary-300: #475569;
+			--color-primary-400: #64748b;
+			--color-primary-500: #94a3b8;
+			--color-primary-600: #cbd5e1;
+			--color-primary-700: #e2e8f0;
+			--color-primary-800: #f1f5f9;
+			--color-primary-900: #f8fafc;
+
+			/* Accent color scale (blue) - darker for light theme */
+			--color-accent-50: #1e3a8a;
+			--color-accent-100: #1e40af;
+			--color-accent-200: #1d4ed8;
+			--color-accent-300: #2563eb;
+			--color-accent-400: #3b82f6;
+			--color-accent-500: #60a5fa;
+			--color-accent-600: #93c5fd;
+			--color-accent-700: #bfdbfe;
+			--color-accent-800: #dbeafe;
+			--color-accent-900: #eff6ff;
+
+			/* Secondary accent scale (emerald) - darker for light theme */
+			--color-secondary-50: #064e3b;
+			--color-secondary-100: #065f46;
+			--color-secondary-200: #047857;
+			--color-secondary-300: #059669;
+			--color-secondary-400: #10b981;
+			--color-secondary-500: #34d399;
+			--color-secondary-600: #6ee7b7;
+			--color-secondary-700: #a7f3d0;
+			--color-secondary-800: #d1fae5;
+			--color-secondary-900: #ecfdf5;
+
+			/* Tertiary accent scale (purple) - darker for light theme */
+			--color-tertiary-50: #581c87;
+			--color-tertiary-100: #6b21a8;
+			--color-tertiary-200: #7e22ce;
+			--color-tertiary-300: #9333ea;
+			--color-tertiary-400: #a855f7;
+			--color-tertiary-500: #c4b5fd;
+			--color-tertiary-600: #e9d5ff;
+			--color-tertiary-700: #f3e8ff;
+			--color-tertiary-800: #faf5ff;
+			--color-tertiary-900: #faf5ff;
+
+			/* Contrast color scale (black for light theme) */
+			--color-contrast-50: #000000;
+			--color-contrast-100: #000000;
+			--color-contrast-200: #000000;
+			--color-contrast-300: #000000;
+			--color-contrast-400: #000000;
+			--color-contrast-500: #000000;
+			--color-contrast-600: #000000;
+			--color-contrast-700: #000000;
+			--color-contrast-800: #000000;
+			--color-contrast-900: #000000;
+			--color-contrast-950: #000000;
+		}
+	}
+}
+/* Apply theme colors to body */
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  padding: 2em;
+	background-color: var(--color-primary-900);
+	color: var(--color-contrast-500);
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+	min-height: 100vh;
 }

@@ -1,8 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// Router will handle component loading now
+</script>
 
 <template>
 	<div>
-		<h3>Hello World</h3>
+		<RouterView />
 	</div>
 </template>
 

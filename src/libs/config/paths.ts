@@ -1,6 +1,3 @@
-// -----------------------------------------------------------
-// #region Paths
-// -----------------------------------------------------------
 const Path = {
 	/**
 	 * Gets the user data directory path (app-specific data)
@@ -8,25 +5,15 @@ const Path = {
 	 */
 	async AppRoot(): Promise<string | null> {
 		try {
-			const result = await window.electronApp.getPath('userData')
-			return result.success ? result.path! : null
+			const result = await _getPath('userData')
+			return result
 		} catch (error) {
-			console.error('Failed to get user data path:', error)
 			return null
 		}
 	},
-
-	/**
-	 * Gets various system paths
-	 */
 }
 
-// #endregion
-// -----------------------------------------------------------
-// #region Helper Functions
-// -----------------------------------------------------------
-
-async function getPath(
+async function _getPath(
 	pathName:
 		| 'home'
 		| 'appData'
@@ -54,11 +41,4 @@ async function getPath(
 	}
 }
 
-// #endregion
-// -----------------------------------------------------------
-
-const Config = {
-	Path,
-}
-
-export default Config
+export default Path

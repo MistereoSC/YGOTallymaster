@@ -1,14 +1,17 @@
 import {FSResult} from '../types/electron'
 import Path from './Paths'
 
-async function exists(path: string): Promise<boolean> {
+async function exists(path: string) {
 	const p = await Path.AppRoot()
-	if (!p) return false
+	if (!p) return {success: false, exists: false}
 	const subPath = path.startsWith('/') ? path : '/' + path
 	const result: FSResult<boolean> = await window.electronFS.exists(
 		p + subPath
 	)
-	return result.success && result.exists === true
+	return {
+		success: result.success,
+		exists: result.success ? result.exists! : false,
+	}
 }
 
 async function read<T>(path: string): Promise<T | null> {

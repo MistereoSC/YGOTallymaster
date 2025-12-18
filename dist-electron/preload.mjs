@@ -32,6 +32,10 @@ electron.contextBridge.exposeInMainWorld("electronFS", {
   showSaveDialog: (options) => electron.ipcRenderer.invoke("dialog:showSaveDialog", options),
   showOpenDialog: (options) => electron.ipcRenderer.invoke("dialog:showOpenDialog", options)
 });
+electron.contextBridge.exposeInMainWorld("electronImage", {
+  downloadImage: (url, localPath) => electron.ipcRenderer.invoke("image:download", url, localPath),
+  getDataUrl: (localPath) => electron.ipcRenderer.invoke("image:getDataUrl", localPath)
+});
 electron.contextBridge.exposeInMainWorld("electronApp", {
   getPath: (pathName) => electron.ipcRenderer.invoke("app:getPath", pathName)
 });

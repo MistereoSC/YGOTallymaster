@@ -43,6 +43,13 @@ export interface ElectronAPI {
 				| 'crashDumps'
 		) => Promise<AppPathResult>
 	}
+	electronImage: {
+		downloadImage: (
+			url: string,
+			localPath: string
+		) => Promise<FSResult<string>>
+		getDataUrl: (localPath: string) => Promise<FSResult<string>>
+	}
 }
 
 export interface FSResult<T> {
@@ -71,5 +78,6 @@ declare global {
 		ipcRenderer: ElectronAPI['ipcRenderer']
 		electronFS: ElectronAPI['electronFS']
 		electronApp: ElectronAPI['electronApp']
+		electronImage: ElectronAPI['electronImage']
 	}
 }

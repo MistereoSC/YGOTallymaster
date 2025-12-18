@@ -156,6 +156,36 @@ function setupIpcHandlers() {
       }
     }
   );
+  ipcMain.handle(
+    "image:download",
+    async (_, url, localPath) => {
+      try {
+        const dir = path.dirname(localPath);
+        await fs.mkdir(dir, { recursive: true });
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(
+            `HTTP ${response.status}: ${response.statusText}`
+          );
+        }
+        const buffer = Buffer.from(await response.arrayBuffer());
+        await fs.writeFile(localPath, buffer);
+        return { success: true, path: localPath };
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    }
+  );
+  ipcMain.handle("image:getDataUrl", async (_, localPath) => {
+    try {
+      const buffer = await fs.readFile(localPath);
+      const base64 = buffer.toString("base64");
+      const dataUrl = `data:image/jpeg;base64,${base64}`;
+      return { success: true, data: dataUrl };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
 }
 export {
   MAIN_DIST,

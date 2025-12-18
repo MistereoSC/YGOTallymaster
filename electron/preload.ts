@@ -39,6 +39,14 @@ contextBridge.exposeInMainWorld('electronFS', {
 		ipcRenderer.invoke('dialog:showOpenDialog', options),
 })
 
+// --------- Expose image API ---------
+contextBridge.exposeInMainWorld('electronImage', {
+	downloadImage: (url: string, localPath: string) =>
+		ipcRenderer.invoke('image:download', url, localPath),
+	getDataUrl: (localPath: string) =>
+		ipcRenderer.invoke('image:getDataUrl', localPath),
+})
+
 // --------- Expose app API ---------
 contextBridge.exposeInMainWorld('electronApp', {
 	getPath: (

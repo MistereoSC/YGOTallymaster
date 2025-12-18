@@ -9,7 +9,7 @@ let config = null as null | TConfig
 import Files from './Files'
 export async function getConfig(): Promise<TConfig | null> {
 	if (config) return config
-	const exists = await Files.exists('config.json')
+	const exists = (await Files.exists('config.json')).exists
 	if (!exists) {
 		const writeResult = await Files.write<TConfig>(
 			'config.json',

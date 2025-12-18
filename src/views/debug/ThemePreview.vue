@@ -3,7 +3,7 @@ import ThemeSwitcher from '../../components/ThemeSwitcher.vue'
 </script>
 
 <template>
-	<div class="p-4 bg-primary-900 min-h-screen">
+	<div class="p-4 min-h-screen">
 		<ThemeSwitcher />
 
 		<!-- Primary Colors -->

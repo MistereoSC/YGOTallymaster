@@ -144,10 +144,28 @@
 }
 /* Apply theme colors to body */
 body {
-	background-color: var(--color-primary-900);
+	background-color: var(--color-primary-800);
 	color: var(--color-contrast-500);
 }
 
 #app {
 	min-height: 100vh;
 }
+
+.scrollable::-webkit-scrollbar,
+body::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+.scrollable::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+	background-color: transparent;
+	margin: 8px 0;
+}
+.scrollable::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+	transition: background-color 0.3s ease-out;
+	background-color: var(--color-accent-500);
+	border-radius: 4px;
+}
+

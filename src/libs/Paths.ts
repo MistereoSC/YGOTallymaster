@@ -1,12 +1,26 @@
 const Path = {
-	/**
-	 * Gets the user data directory path (app-specific data)
-	 * This is typically used for app-specific configuration and data
-	 */
 	async AppRoot(): Promise<string | null> {
 		try {
 			const result = await _getPath('userData')
 			return result
+		} catch (error) {
+			return null
+		}
+	},
+
+	async AppData(): Promise<string | null> {
+		try {
+			const result = await _getPath('userData')
+			return result + '/data/'
+		} catch (error) {
+			return null
+		}
+	},
+
+	async AppConfig(): Promise<string | null> {
+		try {
+			const result = await _getPath('userData')
+			return result + '/config/'
 		} catch (error) {
 			return null
 		}

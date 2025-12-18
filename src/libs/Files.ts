@@ -1,0 +1,76 @@
+import {FSResult} from '../types/electron'
+import Path from './Paths'
+
+async function exists(path: string): Promise<boolean> {
+	const p = await Path.AppRoot()
+	if (!p) return false
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result: FSResult<boolean> = await window.electronFS.exists(
+		p + subPath
+	)
+	return result.success && result.exists === true
+}
+
+async function read<T>(path: string): Promise<T | null> {
+	const p = await Path.AppRoot()
+	if (!p) return null
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result: FSResult<T> = await window.electronFS.readJSON(p + subPath)
+	if (result.success && result.data) {
+		return result.data
+	} else {
+		console.error('Failed to read file:', result.error)
+		return null
+	}
+}
+
+async function write<T>(path: string, data: T): Promise<boolean> {
+	const p = await Path.AppRoot()
+	if (!p) return false
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result = await window.electronFS.writeJSON(p + subPath, data)
+	if (!result.success) {
+		console.error('Failed to write file:', result.error)
+		return false
+	}
+	return true
+}
+
+async function save(data: any, filename: string) {
+	const result = await window.electronFS.showSaveDialog({
+		defaultPath: filename,
+		filters: [
+			{name: 'JSON Files', extensions: ['json']},
+			{name: 'All Files', extensions: ['*']},
+		],
+	})
+	if (result.success && !result.canceled && result.filePath) {
+		return await window.electronFS.writeJSON(result.filePath, data)
+	}
+	return {success: false, error: 'Save canceled or failed'}
+}
+
+async function load() {
+	const result = await window.electronFS.showOpenDialog({
+		properties: ['openFile'],
+		filters: [
+			{name: 'JSON Files', extensions: ['json']},
+			{name: 'All Files', extensions: ['*']},
+		],
+	})
+
+	if (result.success && !result.canceled && result.filePaths?.length) {
+		return await window.electronFS.readJSON(result.filePaths[0])
+	}
+
+	return {success: false, error: 'Load canceled or failed'}
+}
+
+const Files = {
+	exists,
+	read,
+	write,
+	save,
+	load,
+}
+export default Files

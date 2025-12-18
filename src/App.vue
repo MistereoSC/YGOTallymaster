@@ -1,10 +1,13 @@
 <script setup lang="ts">
-// Router will handle component loading now
+import AppMainMenu from './components/navigation/AppMainMenu.vue'
 </script>
 
 <template>
-	<div>
-		<RouterView />
+	<div class="min-w-screen min-h-screen grid grid-cols-[auto_1fr]">
+		<AppMainMenu />
+		<div class="h-screen overflow-y-auto scrollable">
+			<RouterView />
+		</div>
 	</div>
 </template>
 

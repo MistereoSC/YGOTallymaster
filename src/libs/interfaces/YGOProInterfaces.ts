@@ -70,6 +70,10 @@ type TCardDataMisc = {
 
 export type TCardData = TGeneralCardData & Partial<TMonsterCardData>
 
+export type TDBVersionData = {
+	database_version: string
+	last_update: string
+}
 // endregion
 // -----------------------------------------------------------
 // region Type Definitions

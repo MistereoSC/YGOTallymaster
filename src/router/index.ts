@@ -1,17 +1,60 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import DefaultView from '../views/DefaultView.vue'
+import StartupUpdateView from '../views/StartupUpdateView.vue'
 
 const routes = [
+	// ---------------------------------------------------------
+	// #region Main Routes
+	// ---------------------------------------------------------
 	{
 		path: '/',
 		name: 'Home',
-		component: DefaultView,
+		component: StartupUpdateView,
 	},
 	{
-		path: '/debug/theme-preview',
+		path: '/Database',
+		name: 'Database',
+		component: () => import('../views/DatabaseView.vue'),
+	},
+	{
+		path: '/Collection',
+		name: 'Collection',
+		component: () => import('../views/DefaultView.vue'),
+	},
+	{
+		path: '/Decks',
+		name: 'Decks',
+		component: () => import('../views/DefaultView.vue'),
+	},
+	{
+		path: '/Sets',
+		name: 'Sets',
+		component: () => import('../views/DefaultView.vue'),
+	},
+	// #endregion
+	// ---------------------------------------------------------
+	// #region Option Routes
+	// ---------------------------------------------------------
+	{
+		path: '/About',
 		name: 'About',
+		component: () => import('../views/DefaultView.vue'),
+	},
+	{
+		path: '/Settings',
+		name: 'Settings',
+		component: () => import('../views/debug/APITest.vue'),
+	},
+	// #endregion
+	// ---------------------------------------------------------
+	// #region Debug Routes
+	// ---------------------------------------------------------
+	{
+		path: '/debug/theme-preview',
+		name: 'Debug/ThemePreview',
 		component: () => import('../views/debug/ThemePreview.vue'),
 	},
+	// #endregion
+	// ---------------------------------------------------------
 ]
 
 const router = createRouter({

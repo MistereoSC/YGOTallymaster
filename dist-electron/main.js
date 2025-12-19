@@ -19,8 +19,8 @@ function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname$1, "preload.mjs")
     },
-    width: 1024,
-    height: 768,
+    width: 1440,
+    height: 810,
     minWidth: 1024,
     minHeight: 768
   });

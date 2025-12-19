@@ -45,7 +45,9 @@ type TMonsterCardData = {
 	attribute: string
 	scale: number
 	linkval: number
-	linkmarkers: string[]
+	linkmarkers: TLinkMarkers[]
+	race: string
+	typeline: string[]
 }
 
 type TCardDataMisc = {
@@ -62,7 +64,15 @@ type TCardDataMisc = {
 	has_effect: boolean
 	genesys_points: number
 }
-
+export type TLinkMarkers =
+	| 'Top-Left'
+	| 'Top'
+	| 'Top-Right'
+	| 'Right'
+	| 'Bottom-Right'
+	| 'Bottom'
+	| 'Bottom-Left'
+	| 'Left'
 // endregion
 // -----------------------------------------------------------
 // region Public Interfaces

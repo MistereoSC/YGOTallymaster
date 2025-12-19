@@ -8,11 +8,12 @@ export interface ImageResult {
 
 export async function loadImage(
 	cardId: string | number,
-	size: 'small' | 'normal' = 'small'
+	size: 'small' | 'normal' | 'cropped' = 'small'
 ): Promise<ImageResult> {
 	try {
 		let imageUrl = 'https://images.ygoprodeck.com/images/cards'
 		if (size === 'small') imageUrl += '_small'
+		else if (size === 'cropped') imageUrl += '_cropped'
 		imageUrl += `/${cardId}.jpg`
 
 		const appPath = await Path.AppRoot()

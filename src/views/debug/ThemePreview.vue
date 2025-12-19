@@ -286,32 +286,128 @@ import ThemeSwitcher from '../../components/ThemeSwitcher.vue'
 			</div>
 		</div>
 
-		<!-- Interactive Elements -->
+		<!-- Card Colors -->
 		<div class="mt-8">
 			<h3 class="mb-4 text-xl font-bold text-contrast-500">
-				Interactive Elements
+				Card Colors
 			</h3>
-			<div class="flex flex-wrap gap-4">
-				<button
-					class="px-6 py-3 bg-accent-500 hover:bg-accent-600 text-contrast-50 rounded-lg transition-colors"
+			<div class="flex flex-wrap gap-2">
+				<div
+					class="h-16 w-16 bg-card-spell flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
 				>
-					Primary Button
-				</button>
-				<button
-					class="px-6 py-3 bg-secondary-500 hover:bg-secondary-600 text-contrast-50 rounded-lg transition-colors"
+					Spell
+				</div>
+				<div
+					class="h-16 w-16 bg-card-spelltext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
 				>
-					Secondary Button
-				</button>
-				<button
-					class="px-6 py-3 bg-tertiary-500 hover:bg-tertiary-600 text-contrast-50 rounded-lg transition-colors"
+					Spell
+				</div>
+				<div
+					class="h-16 w-16 bg-card-trap flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
 				>
-					Tertiary Button
-				</button>
-				<button
-					class="px-6 py-3 bg-primary-700 hover:bg-primary-600 text-contrast-50 rounded-lg border border-primary-600 transition-colors"
+					Trap
+				</div>
+				<div
+					class="h-16 w-16 bg-card-traptext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
 				>
-					Outline Button
-				</button>
+					Trap
+				</div>
+				<div
+					class="h-16 w-16 bg-card-normal flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Normal
+				</div>
+				<div
+					class="h-16 w-16 bg-card-normaltext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Normal
+				</div>
+				<div
+					class="h-16 w-16 bg-card-effect flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Effect
+				</div>
+				<div
+					class="h-16 w-16 bg-card-effecttext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Effect
+				</div>
+				<div
+					class="h-16 w-16 bg-card-ritual flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Ritual
+				</div>
+				<div
+					class="h-16 w-16 bg-card-ritualtext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Ritual
+				</div>
+
+				<div
+					class="h-16 w-16 bg-card-fusion flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Fusion
+				</div>
+				<div
+					class="h-16 w-16 bg-card-fusiontext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Fusion
+				</div>
+
+				<div
+					class="h-16 w-16 bg-card-synchro flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Synchro
+				</div>
+				<div
+					class="h-16 w-16 bg-card-synchrotext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Synchro
+				</div>
+
+				<div
+					class="h-16 w-16 bg-card-xyz flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					xyz
+				</div>
+				<div
+					class="h-16 w-16 bg-card-xyztext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					xyz
+				</div>
+
+				<div
+					class="h-16 w-16 bg-card-link flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Link
+				</div>
+				<div
+					class="h-16 w-16 bg-card-linktext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Link
+				</div>
+
+				<div
+					class="h-16 w-16 bg-card-token flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Token
+				</div>
+				<div
+					class="h-16 w-16 bg-card-tokentext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Token
+				</div>
+
+				<div
+					class="h-16 w-16 bg-card-skill flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Skill
+				</div>
+				<div
+					class="h-16 w-16 bg-card-skilltext flex items-center justify-center text-xs font-medium text-primary-900 border border-primary-600"
+				>
+					Skill
+				</div>
 			</div>
 		</div>
 	</div>

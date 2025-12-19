@@ -13,7 +13,6 @@
 }
 
 @theme {
-	/* Primary color scale (slate) */
 	--color-primary-50: #f8fafc;
 	--color-primary-100: #f1f5f9;
 	--color-primary-200: #e2e8f0;
@@ -25,7 +24,6 @@
 	--color-primary-800: #1e293b;
 	--color-primary-900: #0f172a;
 
-	/* Accent color scale (blue) */
 	--color-accent-50: #eff6ff;
 	--color-accent-100: #dbeafe;
 	--color-accent-200: #bfdbfe;
@@ -37,7 +35,6 @@
 	--color-accent-800: #1e40af;
 	--color-accent-900: #1e3a8a;
 
-	/* Secondary accent scale (emerald) */
 	--color-secondary-50: #ecfdf5;
 	--color-secondary-100: #d1fae5;
 	--color-secondary-200: #a7f3d0;
@@ -49,7 +46,6 @@
 	--color-secondary-800: #065f46;
 	--color-secondary-900: #064e3b;
 
-	/* Tertiary accent scale (purple) */
 	--color-tertiary-50: #faf5ff;
 	--color-tertiary-100: #f3e8ff;
 	--color-tertiary-200: #e9d5ff;
@@ -61,7 +57,6 @@
 	--color-tertiary-800: #6b21a8;
 	--color-tertiary-900: #581c87;
 
-	/* Contrast color scale (white for dark theme) */
 	--color-contrast-50: #ffffff;
 	--color-contrast-100: #ffffff;
 	--color-contrast-200: #ffffff;
@@ -73,13 +68,35 @@
 	--color-contrast-800: #ffffff;
 	--color-contrast-900: #ffffff;
 	--color-contrast-950: #ffffff;
+	
+	--color-card-spell: #46b5ac;
+	--color-card-spelltext: #b4d9d3;
+	--color-card-trap: #a01870;
+	--color-card-traptext: #eac3db;
+	--color-card-normal: #c8ab66;
+	--color-card-normaltext: #ecdec9;
+	--color-card-effect: #be7243;
+	--color-card-effecttext: #e8cdc3;
+	--color-card-ritual: #4f73b4;
+	--color-card-ritualtext: #c9d4ea;
+	--color-card-fusion: #9352a0;
+	--color-card-fusiontext: #d9c2de;
+	--color-card-synchro: #e9e5e6;
+	--color-card-synchrotext: #f6f7f5;
+	--color-card-xyz: #1a2120;
+	--color-card-xyztext: #bbbbbb;
+	--color-card-link: #145191;
+	--color-card-linktext: #ccd8ee;
+	--color-card-token: #787271;
+	--color-card-tokentext: #d6d5d6;
+	--color-card-skill: #20a5c5;
+	--color-card-skilltext: #c4d3d5;
 }
 
 @layer theme {
 	:root,
 	:host {
 		@variant light {
-			/* Primary color scale (slate) - inverted for light theme */
 			--color-primary-50: #0f172a;
 			--color-primary-100: #1e293b;
 			--color-primary-200: #334155;
@@ -91,7 +108,6 @@
 			--color-primary-800: #f1f5f9;
 			--color-primary-900: #f8fafc;
 
-			/* Accent color scale (blue) - darker for light theme */
 			--color-accent-50: #1e3a8a;
 			--color-accent-100: #1e40af;
 			--color-accent-200: #1d4ed8;
@@ -103,7 +119,6 @@
 			--color-accent-800: #dbeafe;
 			--color-accent-900: #eff6ff;
 
-			/* Secondary accent scale (emerald) - darker for light theme */
 			--color-secondary-50: #064e3b;
 			--color-secondary-100: #065f46;
 			--color-secondary-200: #047857;
@@ -115,7 +130,6 @@
 			--color-secondary-800: #d1fae5;
 			--color-secondary-900: #ecfdf5;
 
-			/* Tertiary accent scale (purple) - darker for light theme */
 			--color-tertiary-50: #581c87;
 			--color-tertiary-100: #6b21a8;
 			--color-tertiary-200: #7e22ce;
@@ -127,7 +141,6 @@
 			--color-tertiary-800: #faf5ff;
 			--color-tertiary-900: #faf5ff;
 
-			/* Contrast color scale (black for light theme) */
 			--color-contrast-50: #000000;
 			--color-contrast-100: #000000;
 			--color-contrast-200: #000000;
@@ -168,4 +181,3 @@ body::-webkit-scrollbar-thumb {
 	background-color: var(--color-accent-500);
 	border-radius: 4px;
 }
-

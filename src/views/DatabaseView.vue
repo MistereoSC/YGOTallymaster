@@ -3,6 +3,8 @@ import {onMounted, ref, computed, onUnmounted, nextTick} from 'vue'
 import {TCardData} from '../libs/interfaces/YGOProInterfaces'
 import {getCardList} from '../libs/CardData'
 import CardPreview from '../components/database/CardPreview.vue'
+import CardFullView from '../components/database/CardFullView.vue'
+import {Icon} from '@iconify/vue'
 
 const cardList = ref([] as TCardData[])
 const scrollContainer = ref<HTMLElement>()
@@ -17,13 +19,11 @@ const CARD_WIDTH = 173 // w-43.25 = 173px
 const CARD_HEIGHT = 258 // h-64.5 = 258px
 const GAP = 16 // gap-4 = 16px
 
-// Calculate how many cards fit per row
 const cardsPerRow = computed(() => {
 	if (containerWidth.value === 0) return 1
 	return Math.floor((containerWidth.value + GAP) / (CARD_WIDTH + GAP))
 })
 
-// Calculate total rows
 const totalRows = computed(() => {
 	return Math.ceil(cardList.value.length / cardsPerRow.value)
 })
@@ -64,16 +64,13 @@ const offsetY = computed(() => {
 	return visibleRange.value.startRow * (CARD_HEIGHT + GAP)
 })
 
-// Debounce timer
 let scrollDebounceTimer: NodeJS.Timeout | null = null
 
-// Handle scroll with debouncing
 const handleScroll = (event: Event) => {
 	const target = event.target as HTMLElement
 	scrollTop.value = target.scrollTop
 	isScrolling.value = true
 
-	// Clear existing timer
 	if (scrollDebounceTimer) {
 		clearTimeout(scrollDebounceTimer)
 	}
@@ -82,10 +79,9 @@ const handleScroll = (event: Event) => {
 	scrollDebounceTimer = setTimeout(() => {
 		debouncedScrollTop.value = scrollTop.value
 		isScrolling.value = false
-	}, 100) // Adjust delay as needed (100ms works well)
+	}, 100)
 }
 
-// Handle resize
 const handleResize = () => {
 	if (scrollContainer.value) {
 		containerWidth.value = scrollContainer.value.clientWidth
@@ -93,21 +89,15 @@ const handleResize = () => {
 	}
 }
 
-// ResizeObserver for container size changes
 let resizeObserver: ResizeObserver | null = null
-
 onMounted(async () => {
-	const t = await getCardList()
-	cardList.value = t
+	cardList.value = await getCardList()
 
-	// Initialize container dimensions
 	await nextTick()
 	handleResize()
 
-	// Initialize debounced scroll position
 	debouncedScrollTop.value = 0
 
-	// Set up resize observer
 	if (scrollContainer.value) {
 		resizeObserver = new ResizeObserver(handleResize)
 		resizeObserver.observe(scrollContainer.value)
@@ -122,16 +112,29 @@ onUnmounted(() => {
 		clearTimeout(scrollDebounceTimer)
 	}
 })
+
+const activeCard = ref<TCardData | null>(null)
+function onCardClick(card: TCardData) {
+	if (activeCard.value && activeCard.value.id === card.id) {
+		activeCard.value = null
+	} else {
+		activeCard.value = card
+	}
+	handleResize()
+}
 </script>
 
 <template>
 	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden">
-		<div class="w-full flex pl-8 py-1 bg-primary-600">
+		<!-- <div class="w-full flex pl-8 py-1 bg-primary-600">
 			{{ cardList.length }} Cards Total |
 			{{ visibleCards.length }} Rendered | Starting at #{{
 				visibleRange.startIndex + 1
 			}}
-		</div>
+			|
+			{{ activeCard ? activeCard.name : 'No Active Card' }}
+		</div> -->
+		<span></span>
 		<div class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden">
 			<div
 				ref="scrollContainer"
@@ -152,12 +155,36 @@ onUnmounted(() => {
 							v-for="{card} in visibleCards"
 							:key="card.id"
 							:card="card"
+							size="small"
+							@click="onCardClick(card)"
 						/>
 					</div>
 				</div>
 			</div>
 
-			<div></div>
+			<div
+				class="min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+			>
+				<div
+					class="w-full min-h-12 bg-primary-900 flex items-center p-2"
+				>
+					<span v-if="activeCard" class="flex justify-between w-full">
+						<button
+							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
+							@click="activeCard = null"
+						>
+							<Icon
+								icon="material-symbols:arrow-menu-open-rounded"
+								class="text-2xl"
+							/>
+						</button>
+						<span> </span>
+					</span>
+				</div>
+				<div class="h-full overflow-y-auto scrollable p-3">
+					<CardFullView v-if="activeCard" :card="activeCard" />
+				</div>
+			</div>
 		</div>
 	</div>
 </template>

@@ -39,3 +39,6 @@ electron.contextBridge.exposeInMainWorld("electronImage", {
 electron.contextBridge.exposeInMainWorld("electronApp", {
   getPath: (pathName) => electron.ipcRenderer.invoke("app:getPath", pathName)
 });
+electron.contextBridge.exposeInMainWorld("electronShell", {
+  openExternal: (url) => electron.ipcRenderer.invoke("shell:openExternal", url)
+});

@@ -69,3 +69,9 @@ contextBridge.exposeInMainWorld('electronApp', {
 			| 'crashDumps'
 	) => ipcRenderer.invoke('app:getPath', pathName),
 })
+
+// --------- Expose shell API ---------
+contextBridge.exposeInMainWorld('electronShell', {
+	openExternal: (url: string) =>
+		ipcRenderer.invoke('shell:openExternal', url),
+})

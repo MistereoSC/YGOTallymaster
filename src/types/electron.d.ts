@@ -50,6 +50,9 @@ export interface ElectronAPI {
 		) => Promise<FSResult<string>>
 		getDataUrl: (localPath: string) => Promise<FSResult<string>>
 	}
+	electronShell: {
+		openExternal: (url: string) => Promise<FSResult<void>>
+	}
 }
 
 export interface FSResult<T> {
@@ -79,5 +82,6 @@ declare global {
 		electronFS: ElectronAPI['electronFS']
 		electronApp: ElectronAPI['electronApp']
 		electronImage: ElectronAPI['electronImage']
+		electronShell: ElectronAPI['electronShell']
 	}
 }

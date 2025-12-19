@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, shell } from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -23,6 +23,10 @@ function createWindow() {
     height: 810,
     minWidth: 1024,
     minHeight: 768
+  });
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: "deny" };
   });
   win.webContents.on("did-finish-load", () => {
     win == null ? void 0 : win.webContents.send(
@@ -182,6 +186,14 @@ function setupIpcHandlers() {
       const base64 = buffer.toString("base64");
       const dataUrl = `data:image/jpeg;base64,${base64}`;
       return { success: true, data: dataUrl };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+  ipcMain.handle("shell:openExternal", async (_, url) => {
+    try {
+      await shell.openExternal(url);
+      return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
     }

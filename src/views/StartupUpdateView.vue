@@ -3,6 +3,8 @@ import {onMounted, ref} from 'vue'
 import {getConfig} from '../libs/Config'
 import {dbNeedsUpdating, performDBUpdate} from '../libs/Updater'
 import {useRouter} from 'vue-router'
+import ExternalLink from '@/components/common/ExternalLink.vue'
+
 onMounted(async () => {
 	await checkSetupState()
 })
@@ -81,8 +83,13 @@ function skipUpdate() {
 							database.
 						</p>
 						<p>
-							Card Data, Set Data, Price Data etc. will be fetched
-							from YGOProDeck's API.
+							Card Data, Price Data, Images etc. will be fetched
+							from the
+							<ExternalLink
+								url="https://db.ygoprodeck.com"
+								message="YGOProDeck"
+							/>
+							API.
 						</p>
 						<p>This Process should only take a few seconds.</p>
 						<div class="w-full grid place-items-center pt-4">

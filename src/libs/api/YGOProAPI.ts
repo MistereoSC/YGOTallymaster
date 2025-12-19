@@ -12,7 +12,6 @@ export async function fetchCardData(language: 'en' | 'de' = 'en') {
 		)
 	}
 	const data: {data: Array<TCardData>} = await res.json()
-	console.log(data)
 	return data
 }
 
@@ -25,7 +24,6 @@ export async function fetchCardSets() {
 		)
 	}
 	const data = await res.json()
-	console.log(data)
 	return data
 }
 
@@ -38,7 +36,6 @@ export async function fetchCardArchetypes() {
 		)
 	}
 	const data = await res.json()
-	console.log(data)
 	return data
 }
 

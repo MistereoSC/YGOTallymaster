@@ -95,7 +95,7 @@ function setupIpcHandlers() {
 		try {
 			const data = await fs.readFile(filePath, 'utf-8')
 			return {success: true, data}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
@@ -110,7 +110,7 @@ function setupIpcHandlers() {
 				await fs.mkdir(dir, {recursive: true})
 				await fs.writeFile(filePath, data, 'utf-8')
 				return {success: true}
-			} catch (error) {
+			} catch (error: any) {
 				return {success: false, error: error.message}
 			}
 		}
@@ -132,7 +132,7 @@ function setupIpcHandlers() {
 			const data = await fs.readFile(filePath, 'utf-8')
 			const json = JSON.parse(data)
 			return {success: true, data: json}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
@@ -144,7 +144,7 @@ function setupIpcHandlers() {
 			await fs.mkdir(dir, {recursive: true})
 			await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8')
 			return {success: true}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
@@ -154,7 +154,7 @@ function setupIpcHandlers() {
 		try {
 			await fs.mkdir(dirPath, {recursive: true})
 			return {success: true}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
@@ -164,7 +164,7 @@ function setupIpcHandlers() {
 		try {
 			const files = await fs.readdir(dirPath)
 			return {success: true, data: files}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
@@ -180,7 +180,7 @@ function setupIpcHandlers() {
 				...options,
 			})
 			return {success: true, ...result}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
@@ -197,7 +197,7 @@ function setupIpcHandlers() {
 				...options,
 			})
 			return {success: true, ...result}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
@@ -228,7 +228,7 @@ function setupIpcHandlers() {
 			try {
 				const pathValue = app.getPath(pathName)
 				return {success: true, path: pathValue}
-			} catch (error) {
+			} catch (error: any) {
 				return {success: false, error: error.message}
 			}
 		}
@@ -255,7 +255,7 @@ function setupIpcHandlers() {
 				await fs.writeFile(localPath, buffer)
 
 				return {success: true, path: localPath}
-			} catch (error) {
+			} catch (error: any) {
 				return {success: false, error: error.message}
 			}
 		}
@@ -268,7 +268,7 @@ function setupIpcHandlers() {
 			const base64 = buffer.toString('base64')
 			const dataUrl = `data:image/jpeg;base64,${base64}`
 			return {success: true, data: dataUrl}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
@@ -278,7 +278,7 @@ function setupIpcHandlers() {
 		try {
 			await shell.openExternal(url)
 			return {success: true}
-		} catch (error) {
+		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})

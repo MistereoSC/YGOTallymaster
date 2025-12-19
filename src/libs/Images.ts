@@ -27,7 +27,7 @@ export async function loadImage(
 		}
 
 		// Image doesn't exist, download it
-		console.log('Downloading image for card', cardId)
+		console.debug('Downloading image for card', cardId)
 		const downloadResult = await window.electronImage.downloadImage(
 			imageUrl,
 			fullLocalPath

@@ -1,12 +1,7 @@
 <script lang="ts" setup>
-import Paths from '../../libs/Paths'
-import {getConfig, setConfig} from '../../libs/Config'
-import {performDBUpdate} from '../../libs/Updater'
-
-import {onMounted, ref} from 'vue'
-onMounted(() => {
-	return
-})
+import {ref} from 'vue'
+import {getConfig} from '@/libs/Config'
+import Paths from '@/libs/Paths'
 
 async function onTestPath() {
 	const rootPath = await Paths.AppRoot()

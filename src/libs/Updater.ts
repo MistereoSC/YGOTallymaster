@@ -26,7 +26,7 @@ export async function performDBUpdate(
 
 	const updateProgress = (message: string) => {
 		currentStep++
-		console.log(`UPDATE::: Step ${currentStep}/${totalSteps}: ${message}`)
+		console.debug(`UPDATE::: Step ${currentStep}/${totalSteps}: ${message}`)
 		if (onProgress) {
 			onProgress(currentStep, totalSteps, message)
 		}
@@ -45,71 +45,6 @@ export async function performDBUpdate(
 	}
 
 	await setConfig({dbVer: dbVer.database_version})
-
-	return {
-		success: !hasError,
-		errors: errorMsgs,
-		totalSteps,
-		completedSteps: currentStep,
-	}
-}
-
-export async function testProgressUpdate(
-	onProgress?: (step: number, total: number, message: string) => void
-) {
-	let hasError = false
-	let errorMsgs: string[] = []
-	const totalSteps = 8
-	let currentStep = 0
-
-	const updateProgress = (message: string) => {
-		currentStep++
-		console.log(`TEST::: Step ${currentStep}/${totalSteps}: ${message}`)
-		if (onProgress) {
-			onProgress(currentStep, totalSteps, message)
-		}
-	}
-
-	console.log('TEST::: Starting Test Progress Update...')
-	const STEP_TIME_MS = 500
-	try {
-		// Step 1
-		updateProgress('Initializing test environment...')
-		await new Promise((resolve) => setTimeout(resolve, STEP_TIME_MS))
-
-		// Step 2
-		updateProgress('Loading test configuration...')
-		await new Promise((resolve) => setTimeout(resolve, STEP_TIME_MS))
-
-		// Step 3
-		updateProgress('Connecting to test database...')
-		await new Promise((resolve) => setTimeout(resolve, STEP_TIME_MS))
-
-		// Step 4
-		updateProgress('Validating test data...')
-		await new Promise((resolve) => setTimeout(resolve, STEP_TIME_MS))
-
-		// Step 5
-		updateProgress('Processing test batch 1...')
-		await new Promise((resolve) => setTimeout(resolve, STEP_TIME_MS))
-
-		// Step 6
-		updateProgress('Processing test batch 2...')
-		await new Promise((resolve) => setTimeout(resolve, STEP_TIME_MS))
-
-		// Step 7
-		updateProgress('Cleaning up temporary files...')
-		await new Promise((resolve) => setTimeout(resolve, STEP_TIME_MS))
-
-		// Step 8
-		updateProgress('Finalizing test results...')
-		await new Promise((resolve) => setTimeout(resolve, STEP_TIME_MS))
-
-		console.log('TEST::: Test Progress Update Complete.')
-	} catch (error) {
-		hasError = true
-		errorMsgs.push(`Test failed: ${error}`)
-	}
 
 	return {
 		success: !hasError,

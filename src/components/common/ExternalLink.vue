@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import {onMounted} from 'vue'
 import {useExternalLinks} from '@/composables/useExternalLinks'
 import {Icon} from '@iconify/vue'
 
@@ -11,15 +10,8 @@ interface IProps {
 const props = withDefaults(defineProps<IProps>(), {
 	showExternalIcon: true,
 })
-const emit = defineEmits<{
-	(e: 'click'): void
-}>()
 const {createLinkHandler} = useExternalLinks()
 const handleLinkClick = createLinkHandler(props.url)
-
-onMounted(() => {
-	return
-})
 </script>
 
 <template>

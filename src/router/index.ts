@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import StartupUpdateView from '../views/StartupUpdateView.vue'
+import StartupUpdateView from '@/views/StartupUpdateView.vue'
 
 const routes = [
 	// ---------------------------------------------------------

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import {onMounted, ref, watch} from 'vue'
-import {TCardData} from '../../libs/interfaces/YGOProInterfaces'
-import {loadImage} from '../../libs/Images'
+import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {loadImage} from '@/libs/Images'
+import {getCardStyles} from '@/libs/CardData'
 import {Icon} from '@iconify/vue'
-import {getCardStyles} from '../../libs/CardData'
 import CardReImageLinkmarkers from './CardReImageLinkmarkers.vue'
 
 const props = defineProps<{

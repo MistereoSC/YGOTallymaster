@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue'
-import {getConfig} from '../libs/Config'
-import {dbNeedsUpdating, performDBUpdate} from '../libs/Updater'
+import {getConfig} from '@/libs/Config'
+import {dbNeedsUpdating, performDBUpdate} from '@/libs/Updater'
 import {useRouter} from 'vue-router'
 import ExternalLink from '@/components/common/ExternalLink.vue'
 

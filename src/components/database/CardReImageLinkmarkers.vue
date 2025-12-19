@@ -1,14 +1,9 @@
 <script lang="ts" setup>
-import {onMounted} from 'vue'
-import {TLinkMarkers} from '../../libs/interfaces/YGOProInterfaces'
+import {TLinkMarkers} from '@/libs/interfaces/YGOProInterfaces'
 
 const props = defineProps<{
 	links: TLinkMarkers[]
 }>()
-const emit = defineEmits([])
-onMounted(() => {
-	return
-})
 </script>
 
 <template>

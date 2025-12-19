@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {onMounted, ref, watch} from 'vue'
-import {TCardData} from '../../libs/interfaces/YGOProInterfaces'
-import {loadImage} from '../../libs/Images'
+import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {loadImage} from '@/libs/Images'
 import {Icon} from '@iconify/vue'
 
 interface IProps {

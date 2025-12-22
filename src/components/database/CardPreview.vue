@@ -7,6 +7,7 @@ import {Icon} from '@iconify/vue'
 interface IProps {
 	card: TCardData
 	size: 'small' | 'normal' | 'cropped'
+	active?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'small',
@@ -70,14 +71,15 @@ function onClick() {
 
 <template>
 	<div
-		class="bg-primary-700 rounded-sm overflow-hidden relative outline-0 outline-accent-500 hover:outline-4"
+		class="bg-primary-700 rounded-sm overflow-hidden relative outline-0 hover:outline-accent-500 hover:outline-4"
 		:class="{
 			'w-43.25 h-64.5': props.size === 'small',
 			'w-96 h-144': props.size === 'normal',
 			'w-84 h-84': props.size === 'cropped',
+			'outline-4 outline-secondary-500': props.active,
 		}"
 		:style="{
-			transition: 'outline-width 0.1s ease',
+			transition: 'outline-width 0.1s ease, outline-color 0.1s ease',
 		}"
 	>
 		<!-- Error state -->

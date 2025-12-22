@@ -9,7 +9,7 @@ const emit = defineEmits<{
 	(e: 'submit', value: string): void
 }>()
 
-const {searchResults, search, resetSearch, activeQuery} = useCardSearch()
+const {search, resetSearch, activeQuery} = useCardSearch()
 const searchInput = ref(activeQuery.value.term || '')
 
 function onSearch() {
@@ -71,9 +71,7 @@ function onSearchInput(e: KeyboardEvent) {
 			</button>
 		</div>
 
-		<div class="rounded-md bg-primary-800 overflow-hidden p-2">
-			<div>{{ searchResults.length }} Results</div>
-		</div>
+		<div class="rounded-md bg-primary-800 overflow-hidden p-2"></div>
 	</div>
 </template>
 

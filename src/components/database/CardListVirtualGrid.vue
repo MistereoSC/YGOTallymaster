@@ -5,6 +5,7 @@ import CardPreview from '@/components/database/CardPreview.vue'
 
 const props = defineProps<{
 	cardList: TCardData[]
+	activeCardId?: number | null
 }>()
 const emit = defineEmits<{
 	(e: 'cardClicked', value: TCardData): void
@@ -168,6 +169,7 @@ defineExpose({
 					v-for="{card} in visibleCards"
 					:key="card.id"
 					:card="card"
+					:active="card.id === props.activeCardId"
 					size="small"
 					@click="onCardClick(card)"
 				/>

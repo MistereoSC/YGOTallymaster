@@ -29,60 +29,123 @@ watch(
 	{deep: true}
 )
 
+type TSidePanel = 'filter' | 'settings' | 'none' | 'card' | 'other'
+const activePanel = ref<TSidePanel>('filter')
+const previousPanel = ref<TSidePanel>('filter')
 const activeCard = ref<TCardData | null>(null)
 function onCardClick(card: TCardData) {
-	if (activeCard.value && activeCard.value.id === card.id) {
-		activeCard.value = null
-	} else {
+	if (activePanel.value !== 'card') {
+		previousPanel.value =
+			activePanel.value === 'none' ? 'other' : activePanel.value
 		activeCard.value = card
+		activePanel.value = 'card'
+		return
 	}
+	activeCard.value = null
+	activePanel.value =
+		previousPanel.value === 'none' ? 'other' : previousPanel.value
+}
+function toggleFilter() {
+	if (activePanel.value === 'filter') {
+		if (activeCard.value) {
+			activePanel.value = 'card'
+		} else {
+			activePanel.value = 'other'
+		}
+		previousPanel.value = 'filter'
+		return
+	}
+	activePanel.value = 'filter'
+}
+function toggleSettings() {
+	if (activePanel.value === 'settings') {
+		if (activeCard.value) {
+			activePanel.value = 'card'
+		} else {
+			activePanel.value = 'other'
+		}
+		previousPanel.value = 'settings'
+		return
+	}
+	activePanel.value = 'settings'
+}
+function closePanel() {
+	activePanel.value = 'none'
+	activeCard.value = null
+	previousPanel.value = 'other'
 }
 </script>
 
 <template>
 	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden">
-		<div class="w-full flex pl-8 py-1 bg-primary-600">
-			{{ cardList.length }} Cards Total |
-			{{
-				searchResults.length > 0
-					? searchResults.length + ' Search Results'
-					: 'No Active Search'
-			}}
-			<!-- {{ visibleCards.length }} Rendered | Starting at #{{
-				visibleRange.startIndex + 1
-			}}
-			| -->
-		</div>
-		<!-- <span></span> -->
-		<div class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden">
-			<CardListVirtualGrid
-				ref="cardGrid"
-				:cardList="searchResults.length > 0 ? searchResults : cardList"
-				@card-clicked="(card) => onCardClick(card)"
-			/>
-
-			<div
-				class="min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
-			>
-				<div
-					class="w-full min-h-12 bg-primary-900 flex items-center p-2"
-				>
-					<span v-if="activeCard" class="flex justify-between w-full">
+		<div class="w-full grid grid-cols-[1fr_auto] bg-primary-600">
+			<div class="flex gap-4 items-center px-4 py-2 text-sm font-bold">
+				<span>{{ cardList.length }} Cards Total</span>
+				<span v-if="searchResults !== null">
+					{{ searchResults.length }} Results
+				</span>
+			</div>
+			<div class="min-w-116 w-[33vw] max-w-174 px-2 py-1">
+				<span class="flex justify-between w-full">
+					<span></span>
+					<span class="flex gap-2">
 						<button
+							v-if="activePanel !== 'none'"
 							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
-							@click="activeCard = null"
+							@click="closePanel"
 						>
 							<Icon
 								icon="material-symbols:arrow-menu-open-rounded"
-								class="text-2xl"
+								class="text-xl"
 							/>
 						</button>
-						<span> </span>
+						<button
+							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
+							@click="toggleSettings"
+						>
+							<Icon
+								icon="material-symbols:settings-rounded"
+								class="text-xl"
+							/>
+						</button>
+						<button
+							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
+							@click="toggleFilter"
+						>
+							<Icon
+								icon="material-symbols:filter-alt"
+								class="text-xl"
+							/>
+						</button>
 					</span>
-				</div>
+				</span>
+			</div>
+		</div>
+		<div class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden">
+			<CardListVirtualGrid
+				ref="cardGrid"
+				:cardList="searchResults == null ? cardList : searchResults"
+				@card-clicked="(card) => onCardClick(card)"
+				:active-card-id="activeCard ? activeCard.id : null"
+			/>
+
+			<div
+				v-if="activePanel !== 'none'"
+				class="min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+			>
+				<span></span>
 				<div class="h-full overflow-y-auto scrollable p-3">
-					<CardFullView v-if="activeCard" :card="activeCard" />
-					<CardFilter :search-while-typing="true" v-else />
+					<CardFullView
+						v-if="activeCard && activePanel === 'card'"
+						:card="activeCard"
+					/>
+					<CardFilter
+						:search-while-typing="true"
+						v-else-if="activePanel === 'filter'"
+					/>
+					<div v-else-if="activePanel === 'settings'">
+						Card Settings
+					</div>
 				</div>
 			</div>
 		</div>

@@ -136,6 +136,19 @@ watch(
 function onCardClick(card: TCardData) {
 	emit('cardClicked', card)
 }
+
+function scrollToTop() {
+	if (scrollContainer.value) {
+		scrollContainer.value.scrollTop = 0
+		scrollTop.value = 0
+		debouncedScrollTop.value = 0
+	}
+}
+
+// Expose the scrollToTop method to parent components
+defineExpose({
+	scrollToTop,
+})
 </script>
 
 <template>

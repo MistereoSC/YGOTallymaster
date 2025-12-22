@@ -26,7 +26,7 @@ const emit = defineEmits<{
 			<Icon
 				v-if="props.icon"
 				:icon="props.icon"
-				class="text-2xl text-contrast-500 transition-colors"
+				class="text-2xl transition-colors"
 				:class="`${props.iconClass ?? ''}`"
 			/>
 			<span>{{ props.label }}</span>

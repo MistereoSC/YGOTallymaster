@@ -46,8 +46,7 @@ const emit = defineEmits([])
 						<Icon icon="material-symbols:star-rounded" />
 					</span>
 				</span>
-				<span
-					class="text-contrast-500 font-semibold mb-1 text-md leading-none"
+				<span class="font-semibold mb-1 text-md leading-none"
 					>({{ card.level }})</span
 				>
 			</div>

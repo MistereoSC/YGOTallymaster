@@ -52,20 +52,20 @@ function onSearchInput(e: KeyboardEvent) {
 				@keyup="(e) => onSearchInput(e)"
 				type="text"
 				placeholder="Search Cards..."
-				class="w-full p-2 rounded-md bg-primary-700 border border-primary-600 text-contrast-200 focus:outline-none focus:border-accent-500"
+				class="w-full p-2 rounded-md bg-primary-700 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-500"
 			/>
 		</div>
 
 		<div class="p-4 rounded-md bg-primary-800 flex gap-4">
 			<button
 				@click="onSearch"
-				class="w-full p-2 rounded-md bg-accent-500 text-contrast-200 hover:bg-accent-400"
+				class="w-full p-2 rounded-md bg-accent-500 hover:bg-accent-400"
 			>
 				Search
 			</button>
 			<button
 				@click="onReset"
-				class="w-full p-2 rounded-md bg-accent-500 text-contrast-200 hover:bg-accent-400"
+				class="w-full p-2 rounded-md bg-accent-500 hover:bg-accent-400"
 			>
 				Reset
 			</button>

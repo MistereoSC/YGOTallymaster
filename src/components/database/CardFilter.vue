@@ -71,7 +71,9 @@ function onSearchInput(e: KeyboardEvent) {
 			</button>
 		</div>
 
-		<div class="rounded-md bg-primary-800 overflow-hidden p-2"></div>
+		<div class="rounded-md bg-primary-800 overflow-hidden p-2">
+			{{ activeQuery }}
+		</div>
 	</div>
 </template>
 

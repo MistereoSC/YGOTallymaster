@@ -92,12 +92,12 @@ function closePanel() {
 	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden">
 		<div class="w-full grid grid-cols-[1fr_auto] bg-primary-600">
 			<div class="flex gap-4 items-center px-4 py-2 text-sm font-bold">
-				<span>{{ fullCardList.length }} Cards Total</span>
-				<span v-if="searchResults !== null">
-					{{ searchResults.length }} Results
-				</span>
-				<span v-if="activeCard !== null"
-					>Selected: {{ activeCard.name }}</span
+				<span>
+					Showing
+					<span v-if="searchResults !== null">
+						{{ searchResults.length }} /
+					</span>
+					{{ fullCardList.length }} Cards</span
 				>
 			</div>
 			<div class="min-w-116 w-[33vw] max-w-174 px-2 py-1">

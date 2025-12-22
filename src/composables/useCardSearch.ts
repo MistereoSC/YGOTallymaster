@@ -8,11 +8,14 @@ let initialized = false
 let searchResults = ref(null as TCardData[] | null)
 let activeQuery = ref<TSearchQuery>({})
 let fullCardList = ref([] as TCardData[])
+
 const useCardSearch = () => {
 	_init()
 
 	async function _init(force = false) {
 		if (initialized && !force) return
+		initialized = true
+
 		let stopWords = new Set([
 			'and',
 			'or',
@@ -87,13 +90,13 @@ const useCardSearch = () => {
 		})
 		miniSearch.addAll(cardData as TCardData[])
 		miniSearchIndex = miniSearch
-		initialized = true
 		activeQuery.value = {}
 		searchResults.value = null
 		return miniSearch
 	}
 	const search = (query: string, maxResults: number = 200) => {
 		if (!miniSearchIndex) return []
+		activeQuery.value = {term: query}
 
 		// First try exact phrase matching for better precision
 		const exactResults = miniSearchIndex.search(`"${query}"`, {
@@ -140,7 +143,6 @@ const useCardSearch = () => {
 		].slice(0, maxResults) as unknown as TSearchResultCardData[]
 
 		searchResults.value = combinedResults
-		activeQuery.value = {term: query}
 		return combinedResults
 	}
 	const resetSearch = () => {

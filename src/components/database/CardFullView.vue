@@ -71,9 +71,11 @@ const emit = defineEmits([])
 						>
 					</div>
 					<div class="h-full flex flex-row gap-4 px-4 pb-1 font-bold">
-						<span>Atk/ {{ card.atk }}</span>
+						<span>Atk/ {{ card.atk! > 0 ? card.atk : '?' }}</span>
 						<span v-if="card.linkval">LINK {{ card.linkval }}</span>
-						<span v-else>Def/ {{ card.def }}</span>
+						<span v-else
+							>Def/ {{ card.def! > 0 ? card.def : '?' }}</span
+						>
 					</div>
 				</div>
 				<div>

@@ -19,6 +19,8 @@ export async function getCardList(language = 'en' as 'en' | 'de') {
 }
 
 export function getCardStyles(card: TCardData): TCardStyles {
+	console.log('Getting styles for card:', card.name, card.frameType)
+
 	const styles: TCardStyles = {
 		vars: {
 			border: '',

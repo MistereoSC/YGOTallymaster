@@ -2,8 +2,9 @@ import {TCardData, TDBVersionData} from '../interfaces/YGOProInterfaces'
 
 export async function fetchCardData(language: 'en' | 'de' = 'en') {
 	let url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
+	url += '?misc=yes'
 	if (language !== 'en') {
-		url += `?language=${language}`
+		url += `&language=${language}`
 	}
 	const res = await fetch(url)
 	if (!res.ok) {

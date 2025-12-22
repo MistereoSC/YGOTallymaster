@@ -1,21 +1,17 @@
 <script lang="ts" setup>
 import {onMounted, ref, watch, nextTick} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
-import {getCardList} from '@/libs/CardData'
 import CardFullView from '@/components/database/CardFullView.vue'
 import {Icon} from '@iconify/vue'
 import CardListVirtualGrid from '@/components/database/CardListVirtualGrid.vue'
 import CardFilter from '@/components/database/CardFilter.vue'
 
 import {useCardSearch} from '@/composables/useCardSearch'
-const {searchResults} = useCardSearch()
+const {searchResults, fullCardList} = useCardSearch()
 
-const cardList = ref([] as TCardData[])
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
 
-onMounted(async () => {
-	cardList.value = await getCardList()
-})
+onMounted(async () => {})
 
 // Watch for changes in search results and scroll to top
 watch(
@@ -33,6 +29,17 @@ type TSidePanel = 'filter' | 'settings' | 'none' | 'card' | 'other'
 const activePanel = ref<TSidePanel>('filter')
 const previousPanel = ref<TSidePanel>('filter')
 const activeCard = ref<TCardData | null>(null)
+
+// Watch for side panel changes and trigger resize
+watch(activePanel, async (newVal, oldVal) => {
+	if (oldVal === 'none' || newVal === 'none') {
+		await nextTick()
+		if (cardGrid.value) {
+			cardGrid.value.handleResize()
+		}
+	}
+})
+
 function onCardClick(card: TCardData) {
 	if (activePanel.value !== 'card') {
 		previousPanel.value =
@@ -41,9 +48,14 @@ function onCardClick(card: TCardData) {
 		activePanel.value = 'card'
 		return
 	}
-	activeCard.value = null
-	activePanel.value =
-		previousPanel.value === 'none' ? 'other' : previousPanel.value
+	if (activeCard.value && activeCard.value.id === card.id) {
+		// Deselect card
+		activeCard.value = null
+		activePanel.value =
+			previousPanel.value === 'none' ? 'other' : previousPanel.value
+		return
+	}
+	activeCard.value = card
 }
 function toggleFilter() {
 	if (activePanel.value === 'filter') {
@@ -80,10 +92,13 @@ function closePanel() {
 	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden">
 		<div class="w-full grid grid-cols-[1fr_auto] bg-primary-600">
 			<div class="flex gap-4 items-center px-4 py-2 text-sm font-bold">
-				<span>{{ cardList.length }} Cards Total</span>
+				<span>{{ fullCardList.length }} Cards Total</span>
 				<span v-if="searchResults !== null">
 					{{ searchResults.length }} Results
 				</span>
+				<span v-if="activeCard !== null"
+					>Selected: {{ activeCard.name }}</span
+				>
 			</div>
 			<div class="min-w-116 w-[33vw] max-w-174 px-2 py-1">
 				<span class="flex justify-between w-full">
@@ -124,7 +139,7 @@ function closePanel() {
 		<div class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden">
 			<CardListVirtualGrid
 				ref="cardGrid"
-				:cardList="searchResults == null ? cardList : searchResults"
+				:cardList="searchResults == null ? fullCardList : searchResults"
 				@card-clicked="(card) => onCardClick(card)"
 				:active-card-id="activeCard ? activeCard.id : null"
 			/>

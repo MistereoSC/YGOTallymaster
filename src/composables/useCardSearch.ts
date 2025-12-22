@@ -1,5 +1,5 @@
 import {getCardList} from '@/libs/CardData'
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {TCardData, TFrameType} from '@/libs/interfaces/YGOProInterfaces'
 import MiniSearch from 'minisearch'
 import {ref} from 'vue'
 
@@ -33,11 +33,49 @@ const useCardSearch = () => {
 			'with',
 			'from',
 		])
-		const cardData = await getCardList()
+		const cardData = _filterCardData(await getCardList(), [
+			'token',
+			'skill',
+		])
 		fullCardList.value = cardData
+
 		const miniSearch = new MiniSearch({
 			fields: ['name', 'desc', 'archetype'],
-			// storeFields omitted - stores all fields from original documents
+			storeFields: [
+				// TGeneralCardData fields
+				'id',
+				'name',
+				'frameType',
+				'desc',
+				'ygoprodeck_url',
+				'images',
+				'card_sets',
+				'card_prices',
+				'archetype',
+				// TMonsterCardData fields (partial)
+				'atk',
+				'def',
+				'level',
+				'attribute',
+				'scale',
+				'linkval',
+				'linkmarkers',
+				'race',
+				'typeline',
+				// TCardDataMisc fields
+				'views',
+				'viewsweek',
+				'upvotes',
+				'downvotes',
+				'formats',
+				'treated_as',
+				'tcg_date',
+				'ocg_date',
+				'konami_id',
+				'md_rarity',
+				'has_effect',
+				'genesys_points',
+			],
 			searchOptions: {
 				fuzzy: 0.2,
 				prefix: true,
@@ -115,14 +153,18 @@ const useCardSearch = () => {
 
 	return {
 		search,
+		resetSearch,
 		searchResults,
 		activeQuery,
-		resetSearch,
+		fullCardList,
 		reinitializeIndex,
 	}
 }
-
 export {useCardSearch}
+
+// -----------------------------------------------------------
+// region Interfaces
+// -----------------------------------------------------------
 
 export type TSearchResultCardData = TCardData & {
 	score: number
@@ -132,4 +174,15 @@ export type TSearchResultCardData = TCardData & {
 }
 export type TSearchQuery = {
 	term?: string
+}
+
+// endregion
+// -----------------------------------------------------------
+// region Helper Functions
+// -----------------------------------------------------------
+
+function _filterCardData(cardData: TCardData[], filteredFields: TFrameType[]) {
+	return cardData.filter((card) => {
+		return !filteredFields.includes(card.frameType)
+	})
 }

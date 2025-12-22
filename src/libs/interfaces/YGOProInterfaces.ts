@@ -78,7 +78,9 @@ export type TLinkMarkers =
 // region Public Interfaces
 // -----------------------------------------------------------
 
-export type TCardData = TGeneralCardData & Partial<TMonsterCardData>
+export type TCardData = TGeneralCardData &
+	TCardDataMisc &
+	Partial<TMonsterCardData>
 
 export type TDBVersionData = {
 	database_version: string

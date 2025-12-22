@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
-import {getCardStyles} from '@/libs/CardData'
 import CardReImage from './CardReImage.vue'
 import {Icon} from '@iconify/vue'
 
@@ -9,13 +7,6 @@ const props = defineProps<{
 	card: TCardData
 }>()
 const emit = defineEmits([])
-const styles = ref(getCardStyles(props.card))
-watch(
-	() => props.card.id,
-	() => {
-		styles.value = getCardStyles(props.card)
-	}
-)
 </script>
 
 <template>

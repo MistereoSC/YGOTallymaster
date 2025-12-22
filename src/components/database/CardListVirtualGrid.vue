@@ -146,9 +146,10 @@ function scrollToTop() {
 	}
 }
 
-// Expose the scrollToTop method to parent components
+// Expose methods to parent components
 defineExpose({
 	scrollToTop,
+	handleResize,
 })
 </script>
 

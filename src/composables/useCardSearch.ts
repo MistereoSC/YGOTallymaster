@@ -95,8 +95,6 @@ const useCardSearch = () => {
 		return miniSearch
 	}
 	const search = (query: TSearchQuery, maxResults: number = 512) => {
-		console.log('SEARCHING')
-
 		if (!miniSearchIndex) return []
 		activeQuery.value = query
 		if (_searchQueryIsEmpty(query)) {
@@ -150,7 +148,10 @@ const useCardSearch = () => {
 			cOut = _searchLinkmarkers(query.links, cOut)
 		}
 
-		if (query.atk || query.def) {
+		if (
+			(query.atk && (query.atk.gte != null || query.atk.lte != null)) ||
+			(query.def && (query.def.gte != null || query.def.lte != null))
+		) {
 			cOut = _searchAtkAndDef(cOut, query.atk, query.def)
 		}
 
@@ -162,10 +163,7 @@ const useCardSearch = () => {
 		omittedResults.value = 0
 		if (cOut.length > maxResults) {
 			omittedResults.value = cOut.length - maxResults
-			console.log(
-				'More Results than items: omitting',
-				omittedResults.value
-			)
+			cOut = cOut.slice(0, maxResults)
 		}
 
 		searchResults.value = cOut
@@ -404,7 +402,7 @@ function _searchTerm(term: string, maxResults: number, cardList: TCardData[]) {
 		// If exact results are sufficient, return them
 		if (
 			exactCards.length >= 5 ||
-			exactResults.some((result) => result.score > 5)
+			exactResults.some((result) => result.score > 200)
 		) {
 			return exactCards
 		}

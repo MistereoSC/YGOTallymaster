@@ -127,9 +127,9 @@ onUnmounted(() => {
 })
 
 watch(
-	() => props.cardList.length,
-	() => {
-		cardList.value = props.cardList
+	() => props.cardList,
+	(newCardList) => {
+		cardList.value = newCardList
 	}
 )
 

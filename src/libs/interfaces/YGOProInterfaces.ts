@@ -43,7 +43,7 @@ type TMonsterCardData = {
 	atk: number
 	def: number
 	level: number
-	attribute: string
+	attribute: TMonsterAttribute
 	scale: number
 	linkval: number
 	linkmarkers: TLinkMarkers[]
@@ -108,5 +108,23 @@ export type TFrameType =
 	| 'token'
 	| 'skill'
 
+export type TMonsterAttribute =
+	| 'WIND'
+	| 'FIRE'
+	| 'WATER'
+	| 'EARTH'
+	| 'LIGHT'
+	| 'DARK'
+	| 'DIVINE'
 // endregion
 // -----------------------------------------------------------
+
+export enum EMonsterAttributes {
+	WIND = 'WIND',
+	FIRE = 'FIRE',
+	WATER = 'WATER',
+	EARTH = 'EARTH',
+	LIGHT = 'LIGHT',
+	DARK = 'DARK',
+	DIVINE = 'DIVINE',
+}

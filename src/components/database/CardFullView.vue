@@ -2,6 +2,7 @@
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardReImage from './CardReImage.vue'
 import {Icon} from '@iconify/vue'
+import AttributeIcon from './AttributeIcon.vue'
 
 const props = defineProps<{
 	card: TCardData
@@ -20,9 +21,11 @@ const emit = defineEmits([])
 					class="shadow-sm shadow-black/50"
 				/>
 			</div>
-			<div class="text-xl font-bold flex justify-between">
+			<div class="text-xl font-bold flex justify-between items-center">
 				<span>{{ card.name }}</span>
-				<span v-if="card.attribute">[{{ card.attribute }}]</span>
+				<span v-if="card.attribute">
+					<AttributeIcon :attribute="card.attribute" />
+				</span>
 				<span v-else>[{{ card.race }}]</span>
 			</div>
 			<div
@@ -46,7 +49,8 @@ const emit = defineEmits([])
 						<Icon icon="material-symbols:star-rounded" />
 					</span>
 				</span>
-				<span class="font-semibold mb-1 text-md leading-none"
+				<span
+					class="font-semibold mb-1 text-md leading-none text-contrast-500"
 					>({{ card.level }})</span
 				>
 			</div>

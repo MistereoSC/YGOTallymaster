@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import Button from '@/components/common/Button.vue'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 </script>
 
@@ -417,6 +418,45 @@ import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 					Skill
 				</div>
 			</div>
+		</div>
+
+		<!-- Card Colors -->
+		<div class="mt-8">
+			<h3 class="mb-4 text-xl font-bold">Components</h3>
+			<div class="flex items-center gap-2">
+				<Button
+					size="small"
+					icon="material-symbols:add-box-rounded"
+					label="SM"
+				/>
+				<Button
+					size="medium"
+					icon="material-symbols:add-box-rounded"
+					label="MD"
+				/>
+				<Button
+					size="large"
+					icon="material-symbols:add-box-rounded"
+					label="LG"
+				/>
+
+				<Button
+					size="small"
+					icon="material-symbols:add-box-rounded"
+					rounded
+				/>
+				<Button
+					size="medium"
+					icon="material-symbols:add-box-rounded"
+					rounded
+				/>
+				<Button
+					size="large"
+					icon="material-symbols:add-box-rounded"
+					rounded
+				/>
+			</div>
+			<div class="flex flex-wrap gap-2"></div>
 		</div>
 	</div>
 </template>

@@ -1,6 +1,18 @@
 <script lang="ts" setup>
-import {ref} from 'vue'
-import {useCardSearch} from '@/composables/useCardSearch'
+import {computed, onMounted, ref} from 'vue'
+import {
+	type TSearchQuery,
+	type TCoreCardType,
+	useCardSearch,
+} from '@/composables/useCardSearch'
+import ToggleButton from '../common/ToggleButton.vue'
+import {
+	EMonsterAttributes,
+	TMonsterAttribute,
+} from '@/libs/interfaces/YGOProInterfaces'
+import AttributeIcon from './AttributeIcon.vue'
+import Button from '../common/Button.vue'
+import {Icon} from '@iconify/vue'
 
 const props = defineProps<{
 	searchWhileTyping?: boolean
@@ -13,19 +25,13 @@ const {search, resetSearch, activeQuery} = useCardSearch()
 const searchInput = ref(activeQuery.value.term || '')
 
 function onSearch() {
-	const input = searchInput.value.trim()
-	if (input === '') {
-		resetSearch()
-		return
-	}
-	if (input.length < 2) {
-		return
-	}
-	search(input)
+	search(query.value)
 }
 
 function onReset() {
 	searchInput.value = ''
+	toggledAttributes.value = []
+	toggledCoreType.value = null
 	resetSearch()
 }
 
@@ -42,11 +48,52 @@ function onSearchInput(e: KeyboardEvent) {
 		onSearch()
 	}, DEBOUNCE_DELYAY)
 }
+
+const toggledAttributes = ref<TMonsterAttribute[]>([])
+function resetAttributes() {
+	toggledAttributes.value = []
+	onSearch()
+}
+function toggleAttribute(attribute: TMonsterAttribute) {
+	const index = toggledAttributes.value.indexOf(attribute)
+	if (index === -1) toggledAttributes.value.push(attribute)
+	else toggledAttributes.value.splice(index, 1)
+	onSearch()
+}
+const toggledCoreType = ref<TCoreCardType | null>(null)
+function resetCoreType() {
+	toggledCoreType.value = null
+	onSearch()
+}
+function toggleCoreType(type: TCoreCardType) {
+	if (toggledCoreType.value === type) {
+		toggledCoreType.value = null
+	} else {
+		toggledCoreType.value = type
+	}
+	onSearch()
+}
+
+onMounted(() => {
+	_applyActiveQuery()
+})
+function _applyActiveQuery() {
+	searchInput.value = activeQuery.value.term || ''
+	toggledAttributes.value = activeQuery.value.attributes || []
+	toggledCoreType.value = activeQuery.value.coreCardType || null
+}
+const query = computed<TSearchQuery>(() => {
+	return {
+		term: searchInput.value,
+		attributes: toggledAttributes.value,
+		coreCardType: toggledCoreType.value ?? undefined,
+	}
+})
 </script>
 
 <template>
 	<div class="max-w-2xl mx-auto flex flex-col gap-2">
-		<div class="p-4 rounded-md bg-primary-800">
+		<div class="p-2 rounded-md bg-primary-800">
 			<input
 				v-model="searchInput"
 				@keyup="(e) => onSearchInput(e)"
@@ -56,23 +103,76 @@ function onSearchInput(e: KeyboardEvent) {
 			/>
 		</div>
 
-		<div class="p-4 rounded-md bg-primary-800 flex gap-4">
-			<button
+		<div class="p-2 rounded-md bg-primary-800 flex gap-4">
+			<Button
+				disabled
+				label="Search"
 				@click="onSearch"
 				class="w-full p-2 rounded-md bg-accent-500 hover:bg-accent-400"
-			>
-				Search
-			</button>
-			<button
+			/>
+			<Button
+				label="Reset"
 				@click="onReset"
 				class="w-full p-2 rounded-md bg-accent-500 hover:bg-accent-400"
-			>
-				Reset
-			</button>
+			/>
 		</div>
 
-		<div class="rounded-md bg-primary-800 overflow-hidden p-2">
-			{{ activeQuery }}
+		<div class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col">
+			<h3 class="font-bold m-0 flex gap-2">
+				<span>Card Types</span>
+				<Button
+					@click="resetCoreType"
+					icon="material-symbols:reset-settings-outline-rounded"
+					rounded
+					size="small"
+				/>
+			</h3>
+			<div class="flex gap-3 flex-wrap items-center justify-center">
+				<ToggleButton
+					v-for="type in (['Monster', 'Spell', 'Trap'] as TCoreCardType[])"
+					:key="type"
+					:model-value="toggledCoreType === type"
+					@toggle="toggleCoreType(type)"
+				>
+					<Icon
+						icon="material-symbols:credit-card"
+						:class="{
+							'text-card-effect': type === 'Monster',
+							'text-card-spell': type === 'Spell',
+							'text-card-trap': type === 'Trap',
+						}"
+					/>
+					<span class="py-1 w-15 font-bold text-sm">{{ type }}</span>
+				</ToggleButton>
+			</div>
+		</div>
+
+		<div class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col">
+			<h3 class="font-bold m-0 flex gap-2">
+				<span>Attributes</span>
+				<span class="text-contrast-400">(OR)</span>
+				<Button
+					@click="resetAttributes"
+					icon="material-symbols:reset-settings-outline-rounded"
+					rounded
+					size="small"
+				/>
+			</h3>
+			<div class="flex gap-3 flex-wrap items-center justify-center">
+				<ToggleButton
+					v-for="attribute in Object.values(EMonsterAttributes)"
+					:key="attribute"
+					:model-value="toggledAttributes.includes(attribute)"
+					@toggle="toggleAttribute(attribute)"
+				>
+					<AttributeIcon size="small" :attribute="attribute" />
+					<span class="w-13 font-bold text-sm">{{ attribute }}</span>
+				</ToggleButton>
+			</div>
+		</div>
+
+		<div class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col">
+			{{ query }}
 		</div>
 	</div>
 </template>

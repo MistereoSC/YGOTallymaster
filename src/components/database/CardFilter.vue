@@ -2,7 +2,7 @@
 // -----------------------------------------
 // #region Imports, Emits, Props
 // -----------------------------------------
-import {computed, onMounted, ref, watch} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {
 	type TSearchQuery,
 	type TCoreCardType,
@@ -172,9 +172,6 @@ function toggleSpellType(type: TSpellTypes) {
 
 const atkFilter = ref<[number | null, number | null]>([null, null])
 const defFilter = ref<[number | null, number | null]>([null, null])
-watch([atkFilter, defFilter], () => {
-	onSearch()
-})
 function resetAtkDefFilters() {
 	atkFilter.value = [null, null]
 	defFilter.value = [null, null]
@@ -228,9 +225,6 @@ function toggleMonsterTypesOperandLinkMarkers() {
 		toggledLinkMarkersOperand.value === 'AND' ? 'OR' : 'AND'
 	if (toggledLinkMarkers.value.length > 0) onSearch()
 }
-watch(toggledLinkMarkers, () => {
-	onSearch()
-})
 
 // #endregion
 // -----------------------------------------
@@ -337,13 +331,13 @@ const query = computed<TSearchQuery>(() => {
 		<!-- Core Card Types -->
 		<div class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col">
 			<h3 class="font-bold m-0 flex gap-2">
-				<span>Monster/Spell/Trap</span>
 				<Button
 					@click="resetCoreType"
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 				/>
+				<span>Monster/Spell/Trap</span>
 			</h3>
 			<div class="flex gap-3 flex-wrap items-center justify-center">
 				<ToggleButton
@@ -370,15 +364,15 @@ const query = computed<TSearchQuery>(() => {
 			v-if="toggledCoreType === 'Monster'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
-				<span>Attributes</span>
-				<span class="text-contrast-400">(OR)</span>
+			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
 				<Button
 					@click="resetAttributes"
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 				/>
+				<span>Attributes</span>
+				<span class="text-contrast-400">(OR)</span>
 			</h3>
 			<div class="flex gap-3 flex-wrap items-center justify-center">
 				<ToggleButton
@@ -398,24 +392,22 @@ const query = computed<TSearchQuery>(() => {
 			v-if="toggledCoreType === 'Monster'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 grid grid-cols-[auto_auto_1fr] gap-2">
-				<span>Card Type</span>
+			<h3 class="font-bold m-0 grid grid-cols-[auto_1fr_auto] gap-2">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetMonsterTypes"
 				/>
-				<div class="flex justify-end">
-					<ToggleSwitch
-						:duo-labels="['AND', 'OR']"
-						:model-value="toggledMonsterTypesOperand === 'AND'"
-						@toggle="toggleMonsterTypesOperand"
-					/>
-				</div>
+				<span>Card Type</span>
+				<ToggleSwitch
+					:duo-labels="['AND', 'OR']"
+					:model-value="toggledMonsterTypesOperand === 'AND'"
+					@toggle="toggleMonsterTypesOperand"
+				/>
 			</h3>
 			<div class="">
-				<div class="flex gap-3 flex-wrap items-center">
+				<div class="flex gap-3 flex-wrap items-center justify-center">
 					<ToggleButton
 						v-for="type in Object.values(EMonsterType)"
 						:key="type"
@@ -433,19 +425,18 @@ const query = computed<TSearchQuery>(() => {
 			v-if="toggledCoreType === 'Monster'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
-				<span>Monster Type</span>
-				<span class="text-contrast-400">(OR)</span>
-
+			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetMonsterRaces"
 				/>
+				<span>Monster Type</span>
+				<span class="text-contrast-400">(OR)</span>
 			</h3>
 			<div class="">
-				<div class="flex gap-3 flex-wrap items-center">
+				<div class="flex gap-3 flex-wrap items-center justify-center">
 					<ToggleButton
 						v-for="race in Object.values(EMonsterRace)"
 						:key="race"
@@ -463,16 +454,15 @@ const query = computed<TSearchQuery>(() => {
 			v-if="toggledCoreType === 'Monster'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
-				<span>Level / Rank</span>
-				<span class="text-contrast-400">(OR)</span>
-
+			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetLevels"
 				/>
+				<span>Level / Rank</span>
+				<span class="text-contrast-400">(OR)</span>
 			</h3>
 			<div class="flex flex-wrap gap-2">
 				<ToggleButton
@@ -486,35 +476,43 @@ const query = computed<TSearchQuery>(() => {
 			</div>
 		</div>
 
-		<!-- Monster | Stats -->
+		<!-- Monster | ATK/DEF -->
 		<div
 			v-if="toggledCoreType === 'Monster'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
-				<span>Attack & Defense</span>
+			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetAtkDefFilters"
 				/>
+				<span>Attack & Defense</span>
+				<span class="text-contrast-400">(AND)</span>
 			</h3>
-			<div class="flex gap-2 items-center pl-4">
-				<span class="font-bold">ATK</span>
-				<NumberInputMinMax
-					v-model="atkFilter"
-					:min-val="-1"
-					:max-val="5000"
-				/>
-			</div>
-			<div class="flex gap-2 items-center pl-4">
-				<span class="font-bold">DEF</span>
-				<NumberInputMinMax
-					v-model="defFilter"
-					:min-val="-1"
-					:max-val="5000"
-				/>
+			<div class="flex items-center justify-center flex-col gap-2">
+				<div class="flex gap-2 items-center">
+					<span class="font-bold">ATK</span>
+					<NumberInputMinMax
+						v-model="atkFilter"
+						:min-val="-1"
+						:max-val="5000"
+						@change="onSearch"
+					/>
+				</div>
+				<div class="flex gap-2 items-center">
+					<span class="font-bold">DEF</span>
+					<NumberInputMinMax
+						v-model="defFilter"
+						:min-val="-1"
+						:max-val="5000"
+						@change="onSearch"
+					/>
+				</div>
+				<span class="text-xm text-contrast-400">
+					Enter '-1' for ?-Values
+				</span>
 			</div>
 		</div>
 
@@ -523,16 +521,15 @@ const query = computed<TSearchQuery>(() => {
 			v-if="toggledCoreType === 'Monster'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
-				<span>Pendulum Scale</span>
-				<span class="text-contrast-400">(OR)</span>
-
+			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetScales"
 				/>
+				<span>Pendulum Scale</span>
+				<span class="text-contrast-400">(OR)</span>
 			</h3>
 			<div class="flex flex-wrap gap-2">
 				<ToggleButton
@@ -545,21 +542,21 @@ const query = computed<TSearchQuery>(() => {
 				</ToggleButton>
 			</div>
 		</div>
+
 		<!-- Monster | Linkvals -->
 		<div
 			v-if="toggledCoreType === 'Monster'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
-				<span>Link Values</span>
-				<span class="text-contrast-400">(OR)</span>
-
+			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetLinkvals"
 				/>
+				<span>Link Values</span>
+				<span class="text-contrast-400">(OR)</span>
 			</h3>
 
 			<div>
@@ -574,26 +571,33 @@ const query = computed<TSearchQuery>(() => {
 					</ToggleButton>
 				</div>
 			</div>
-			<h3 class="font-bold m-0 grid grid-cols-[auto_auto_1fr] gap-2 mt-4">
-				<span>Links</span>
+		</div>
 
+		<!-- Monster | Linkmarkers -->
+		<div
+			v-if="toggledCoreType === 'Monster'"
+			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
+		>
+			<h3 class="font-bold m-0 grid grid-cols-[auto_1fr_auto] gap-2">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetLinkMarkers"
 				/>
-				<div class="flex justify-end">
-					<ToggleSwitch
-						:duo-labels="['AND', 'OR']"
-						:model-value="toggledLinkMarkersOperand === 'AND'"
-						@toggle="toggleMonsterTypesOperandLinkMarkers"
-					/>
-				</div>
+				<span>Links</span>
+				<ToggleSwitch
+					:duo-labels="['AND', 'OR']"
+					:model-value="toggledLinkMarkersOperand === 'AND'"
+					@toggle="toggleMonsterTypesOperandLinkMarkers"
+				/>
 			</h3>
 			<div class="flex justify-center">
 				<div class="bg-primary-700 rounded-md">
-					<CardLinkSelection v-model="toggledLinkMarkers" />
+					<CardLinkSelection
+						v-model="toggledLinkMarkers"
+						@change="onSearch"
+					/>
 				</div>
 			</div>
 		</div>
@@ -603,18 +607,18 @@ const query = computed<TSearchQuery>(() => {
 			v-if="toggledCoreType === 'Trap'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
-				<span>Trap Type</span>
-				<span class="text-contrast-400">(OR)</span>
+			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetTrapTypes"
 				/>
+				<span>Trap Type</span>
+				<span class="text-contrast-400">(OR)</span>
 			</h3>
 			<div class="">
-				<div class="flex gap-3 flex-wrap items-center">
+				<div class="flex gap-3 flex-wrap items-center justify-center">
 					<ToggleButton
 						v-for="type in Object.values(ETrapTypes)"
 						:key="type"
@@ -632,18 +636,18 @@ const query = computed<TSearchQuery>(() => {
 			v-if="toggledCoreType === 'Spell'"
 			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
-				<span>Spell Type</span>
-				<span class="text-contrast-400">(OR)</span>
+			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
 					size="small"
 					@click="resetSpellTypes"
 				/>
+				<span>Spell Type</span>
+				<span class="text-contrast-400">(OR)</span>
 			</h3>
 			<div class="">
-				<div class="flex gap-3 flex-wrap items-center">
+				<div class="flex gap-3 flex-wrap items-center justify-center">
 					<ToggleButton
 						v-for="type in Object.values(ESpellTypes)"
 						:key="type"

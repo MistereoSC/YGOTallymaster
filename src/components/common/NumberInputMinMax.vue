@@ -8,6 +8,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: [number | null, number | null]): void
+	(e: 'change', value: [number | null, number | null]): void
 }>()
 onMounted(() => {
 	_initialSet()
@@ -121,6 +122,7 @@ watch([minInput, maxInput], ([newMin, newMax]) => {
 	}
 
 	emit('update:modelValue', [clampedMin, clampedMax])
+	emit('change', [clampedMin, clampedMax])
 })
 </script>
 

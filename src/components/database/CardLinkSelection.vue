@@ -7,6 +7,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
 	(e: 'update:model-value', value: TLinkMarkers[]): void
+	(e: 'change', value: TLinkMarkers[]): void
 }>()
 
 function toggleMarker(marker: TLinkMarkers) {
@@ -18,6 +19,7 @@ function toggleMarker(marker: TLinkMarkers) {
 		newValue = props.modelValue.filter((m) => m !== marker)
 	}
 	emit('update:model-value', newValue)
+	emit('change', newValue)
 }
 </script>
 

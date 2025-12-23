@@ -3,6 +3,8 @@ import {
 	TCardData,
 	TFrameType,
 	TMonsterAttribute,
+	TMonsterRace,
+	TMonsterType,
 } from '@/libs/interfaces/YGOProInterfaces'
 import MiniSearch from 'minisearch'
 import {ref} from 'vue'
@@ -12,23 +14,6 @@ let initialized = false
 let searchResults = ref(null as TCardData[] | null)
 let activeQuery = ref<TSearchQuery>({})
 let fullCardList = ref([] as TCardData[])
-
-// Pre-computed sets for optimal performance
-const MONSTER_FRAME_TYPES = new Set([
-	'normal',
-	'effect',
-	'ritual',
-	'fusion',
-	'synchro',
-	'xyz',
-	'link',
-	'normal_pendulum',
-	'effect_pendulum',
-	'ritual_pendulum',
-	'fusion_pendulum',
-	'synchro_pendulum',
-	'xyz_pendulum',
-])
 
 const useCardSearch = () => {
 	_init()
@@ -114,21 +99,35 @@ const useCardSearch = () => {
 
 		let cOut = fullCardList.value
 
+		// Apply Core Type Filter
+		if (query.coreCardType) {
+			cOut = _searchCoreCardType(query.coreCardType, cOut)
+		}
+
 		//  Apply Attribute Filters
-		if (query.attributes && query.attributes.length > 0) {
+		if (
+			query.attributes &&
+			query.attributes.length > 0 &&
+			!['Spell', 'Trap'].includes(query.coreCardType || '')
+		) {
 			cOut = _searchAttribute(query.attributes, cOut)
 		}
-		// Apply Type Filter
-		if (query.coreCardType) {
-			if (
-				query.attributes &&
-				query.attributes.length > 0 &&
-				query.coreCardType !== 'Monster'
-			) {
-				searchResults.value = []
-				return []
-			}
-			cOut = _searchCoreCardType(query.coreCardType, cOut)
+
+		// Apply Monster Type Filter
+		if (
+			query.monsterType &&
+			query.monsterType.terms.length > 0 &&
+			!['Spell', 'Trap'].includes(query.coreCardType || '')
+		) {
+			cOut = _searchMonsterType(query.monsterType, cOut)
+		}
+
+		// Apply Monster Race Filter
+		if (
+			query.monsterRace &&
+			!['Spell', 'Trap'].includes(query.coreCardType || '')
+		) {
+			cOut = _searchMonsterRace(query.monsterRace, cOut)
 		}
 
 		// Apply Term Search
@@ -171,8 +170,10 @@ export type TSearchResultCardData = TCardData & {
 }
 export type TSearchQuery = {
 	term?: string
+	coreCardType?: TCoreCardType
 	attributes?: TMonsterAttribute[]
-	coreCardType?: TCoreCardType // Changed from array to single type
+	monsterType?: {terms: TMonsterType[]; operand: 'AND' | 'OR'}
+	monsterRace?: TMonsterRace
 }
 export type TCoreCardType = 'Monster' | 'Spell' | 'Trap'
 
@@ -191,7 +192,9 @@ function _searchQueryIsEmpty(query: TSearchQuery) {
 	return (
 		!query.term &&
 		(!query.attributes || query.attributes.length === 0) &&
-		!query.coreCardType
+		!query.coreCardType &&
+		(!query.monsterType || query.monsterType.terms.length === 0) &&
+		!query.monsterRace
 	)
 }
 
@@ -225,6 +228,32 @@ function _searchAttribute(
 			return attributes.includes(card.attribute as TMonsterAttribute)
 		}
 		return false
+	})
+}
+
+function _searchMonsterType(
+	monsterType: {terms: TMonsterType[]; operand: 'AND' | 'OR'},
+	cardList: TCardData[]
+) {
+	if (!monsterType || monsterType.terms.length === 0) return cardList
+	if (monsterType.operand === 'OR') {
+		return cardList.filter((card) => {
+			return card.typeline?.some((line) =>
+				monsterType.terms.includes(line as TMonsterType)
+			)
+		})
+	}
+	// 'AND'
+	return cardList.filter((card) => {
+		return monsterType.terms.every((term) => card.typeline?.includes(term))
+	})
+}
+
+function _searchMonsterRace(monsterRace: TMonsterRace, cardList: TCardData[]) {
+	if (!monsterRace) return cardList
+
+	return cardList.filter((card) => {
+		return card.typeline?.includes(monsterRace)
 	})
 }
 

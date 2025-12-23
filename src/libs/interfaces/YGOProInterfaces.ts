@@ -89,6 +89,49 @@ export type TDBVersionData = {
 // -----------------------------------------------------------
 // region Type Definitions
 // -----------------------------------------------------------
+export type TMonsterType =
+	| 'Normal'
+	| 'Effect'
+	| 'Ritual'
+	| 'Fusion'
+	| 'Synchro'
+	| 'Xyz'
+	| 'Link'
+	| 'Pendulum'
+	| 'Flip'
+	| 'Gemini'
+	| 'Toon'
+	| 'Spirit'
+	| 'Union'
+	| 'Tuner'
+
+export type TMonsterRace =
+	| 'Spellcaster'
+	| 'Dragon'
+	| 'Zombie'
+	| 'Warrior'
+	| 'Beast-Warrior'
+	| 'Beast'
+	| 'Winged Beast'
+	| 'Fiend'
+	| 'Fairy'
+	| 'Insect'
+	| 'Dinosaur'
+	| 'Fish'
+	| 'Reptile'
+	| 'Sea Serpent'
+	| 'Aqua'
+	| 'Pyro'
+	| 'Thunder'
+	| 'Rock'
+	| 'Plant'
+	| 'Machine'
+	| 'Psychic'
+	| 'Divine-Beast'
+	| 'Wyrm'
+	| 'Cyberse'
+	| 'Illusion'
+
 export type TFrameType =
 	| 'normal'
 	| 'effect'
@@ -116,8 +159,6 @@ export type TMonsterAttribute =
 	| 'LIGHT'
 	| 'DARK'
 	| 'DIVINE'
-// endregion
-// -----------------------------------------------------------
 
 export enum EMonsterAttributes {
 	WIND = 'WIND',
@@ -128,3 +169,51 @@ export enum EMonsterAttributes {
 	DARK = 'DARK',
 	DIVINE = 'DIVINE',
 }
+
+export enum EMonsterType {
+	NORMAL = 'Normal',
+	EFFECT = 'Effect',
+	RITUAL = 'Ritual',
+	FUSION = 'Fusion',
+	SYNCHRO = 'Synchro',
+	XYZ = 'Xyz',
+	LINK = 'Link',
+	PENDULUM = 'Pendulum',
+	FLIP = 'Flip',
+	GEMINI = 'Gemini',
+	TOON = 'Toon',
+	SPIRIT = 'Spirit',
+	UNION = 'Union',
+	TUNER = 'Tuner',
+}
+
+export enum EMonsterRace {
+	SPELLCASTER = 'Spellcaster',
+	DRAGON = 'Dragon',
+	ZOMBIE = 'Zombie',
+	WARRIOR = 'Warrior',
+	BEAST_WARRIOR = 'Beast-Warrior',
+	BEAST = 'Beast',
+	WINGED_BEAST = 'Winged Beast',
+	FIEND = 'Fiend',
+	FAIRY = 'Fairy',
+	INSECT = 'Insect',
+	DINOSAUR = 'Dinosaur',
+	FISH = 'Fish',
+	REPTILE = 'Reptile',
+	SEA_SERPENT = 'Sea Serpent',
+	AQUA = 'Aqua',
+	PYRO = 'Pyro',
+	THUNDER = 'Thunder',
+	ROCK = 'Rock',
+	PLANT = 'Plant',
+	MACHINE = 'Machine',
+	PSYCHIC = 'Psychic',
+	DIVINE_BEAST = 'Divine-Beast',
+	WYRM = 'Wyrm',
+	CYBERSE = 'Cyberse',
+	ILLUSION = 'Illusion',
+}
+
+// endregion
+// -----------------------------------------------------------

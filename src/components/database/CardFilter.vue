@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+// -----------------------------------------
+// #region Imports, Emits, Props
+// -----------------------------------------
 import {computed, onMounted, ref} from 'vue'
 import {
 	type TSearchQuery,
@@ -8,7 +11,11 @@ import {
 import ToggleButton from '../common/ToggleButton.vue'
 import {
 	EMonsterAttributes,
+	EMonsterRace,
+	EMonsterType,
 	TMonsterAttribute,
+	TMonsterRace,
+	TMonsterType,
 } from '@/libs/interfaces/YGOProInterfaces'
 import AttributeIcon from './AttributeIcon.vue'
 import Button from '../common/Button.vue'
@@ -21,6 +28,11 @@ const emit = defineEmits<{
 	(e: 'submit', value: string): void
 }>()
 
+// #endregion
+// -----------------------------------------
+// #region Search
+// -----------------------------------------
+
 const {search, resetSearch, activeQuery} = useCardSearch()
 const searchInput = ref(activeQuery.value.term || '')
 
@@ -32,6 +44,9 @@ function onReset() {
 	searchInput.value = ''
 	toggledAttributes.value = []
 	toggledCoreType.value = null
+	toggledMonsterRace.value = null
+	toggledMonsterTypes.value = []
+	toggledMonsterTypesOperand.value = 'AND'
 	resetSearch()
 }
 
@@ -48,6 +63,10 @@ function onSearchInput(e: KeyboardEvent) {
 		onSearch()
 	}, DEBOUNCE_DELYAY)
 }
+// #endregion
+// -----------------------------------------
+// #region Filter Fields
+// -----------------------------------------
 
 const toggledAttributes = ref<TMonsterAttribute[]>([])
 function resetAttributes() {
@@ -60,6 +79,34 @@ function toggleAttribute(attribute: TMonsterAttribute) {
 	else toggledAttributes.value.splice(index, 1)
 	onSearch()
 }
+
+const toggledMonsterTypesOperand = ref<'AND' | 'OR'>('AND')
+const toggledMonsterTypes = ref<TMonsterType[]>([])
+function resetMonsterTypes() {
+	toggledMonsterTypes.value = []
+	onSearch()
+}
+function toggleMonsterType(type: TMonsterType) {
+	const index = toggledMonsterTypes.value.indexOf(type)
+	if (index === -1) toggledMonsterTypes.value.push(type)
+	else toggledMonsterTypes.value.splice(index, 1)
+	onSearch()
+}
+
+const toggledMonsterRace = ref<TMonsterRace | null>(null)
+function resetMonsterRaces() {
+	toggledMonsterRace.value = null
+	onSearch()
+}
+function toggleMonsterRace(race: TMonsterRace) {
+	if (toggledMonsterRace.value === race) {
+		toggledMonsterRace.value = null
+	} else {
+		toggledMonsterRace.value = race
+	}
+	onSearch()
+}
+
 const toggledCoreType = ref<TCoreCardType | null>(null)
 function resetCoreType() {
 	toggledCoreType.value = null
@@ -71,9 +118,16 @@ function toggleCoreType(type: TCoreCardType) {
 	} else {
 		toggledCoreType.value = type
 	}
+	if (toggledCoreType.value !== 'Monster') {
+		toggledAttributes.value = []
+	}
 	onSearch()
 }
 
+// #endregion
+// -----------------------------------------
+// #region Setup
+// -----------------------------------------
 onMounted(() => {
 	_applyActiveQuery()
 })
@@ -81,18 +135,36 @@ function _applyActiveQuery() {
 	searchInput.value = activeQuery.value.term || ''
 	toggledAttributes.value = activeQuery.value.attributes || []
 	toggledCoreType.value = activeQuery.value.coreCardType || null
+	toggledMonsterRace.value = activeQuery.value.monsterRace || null
+	toggledMonsterTypes.value = activeQuery.value.monsterType
+		? activeQuery.value.monsterType.terms
+		: []
+	toggledMonsterTypesOperand.value = activeQuery.value.monsterType
+		? activeQuery.value.monsterType.operand
+		: 'AND'
 }
 const query = computed<TSearchQuery>(() => {
 	return {
 		term: searchInput.value,
 		attributes: toggledAttributes.value,
 		coreCardType: toggledCoreType.value ?? undefined,
+		monsterRace: toggledMonsterRace.value ?? undefined,
+		monsterType:
+			toggledMonsterTypes.value.length > 0
+				? {
+						terms: toggledMonsterTypes.value,
+						operand: toggledMonsterTypesOperand.value,
+				  }
+				: undefined,
 	}
 })
+// #endregion
+// -----------------------------------------
 </script>
 
 <template>
 	<div class="max-w-2xl mx-auto flex flex-col gap-2">
+		<!-- Text Input -->
 		<div class="p-2 rounded-md bg-primary-800">
 			<input
 				v-model="searchInput"
@@ -103,6 +175,7 @@ const query = computed<TSearchQuery>(() => {
 			/>
 		</div>
 
+		<!-- Controls -->
 		<div class="p-2 rounded-md bg-primary-800 flex gap-4">
 			<Button
 				disabled
@@ -117,9 +190,10 @@ const query = computed<TSearchQuery>(() => {
 			/>
 		</div>
 
+		<!-- Core Card Types -->
 		<div class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col">
 			<h3 class="font-bold m-0 flex gap-2">
-				<span>Card Types</span>
+				<span>Monster/Spell/Trap</span>
 				<Button
 					@click="resetCoreType"
 					icon="material-symbols:reset-settings-outline-rounded"
@@ -147,7 +221,11 @@ const query = computed<TSearchQuery>(() => {
 			</div>
 		</div>
 
-		<div class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col">
+		<!-- Monster | Attributes -->
+		<div
+			v-if="toggledCoreType === 'Monster'"
+			class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col"
+		>
 			<h3 class="font-bold m-0 flex gap-2">
 				<span>Attributes</span>
 				<span class="text-contrast-400">(OR)</span>
@@ -171,6 +249,62 @@ const query = computed<TSearchQuery>(() => {
 			</div>
 		</div>
 
+		<!-- Monster | Type -->
+		<div
+			v-if="toggledCoreType === 'Monster'"
+			class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col"
+		>
+			<h3 class="font-bold m-0 flex gap-2">
+				<span>Card Type</span>
+				<Button
+					icon="material-symbols:reset-settings-outline-rounded"
+					rounded
+					size="small"
+					@click="resetMonsterTypes"
+				/>
+			</h3>
+			<div class="">
+				<div>AND / OR</div>
+				<div class="flex gap-3 flex-wrap items-center">
+					<ToggleButton
+						v-for="type in Object.values(EMonsterType)"
+						:key="type"
+						:model-value="toggledMonsterTypes.includes(type)"
+						@toggle="toggleMonsterType(type)"
+					>
+						<span class="font-bold text-sm">{{ type }}</span>
+					</ToggleButton>
+				</div>
+			</div>
+		</div>
+
+		<!-- Monster | Race -->
+		<div
+			v-if="toggledCoreType === 'Monster'"
+			class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col"
+		>
+			<h3 class="font-bold m-0 flex gap-2">
+				<span>Monster Type</span>
+				<Button
+					icon="material-symbols:reset-settings-outline-rounded"
+					rounded
+					size="small"
+					@click="resetMonsterRaces"
+				/>
+			</h3>
+			<div class="">
+				<div class="flex gap-3 flex-wrap items-center">
+					<ToggleButton
+						v-for="race in Object.values(EMonsterRace)"
+						:key="race"
+						:model-value="toggledMonsterRace === race"
+						@toggle="toggleMonsterRace(race)"
+					>
+						<span class="font-bold text-sm">{{ race }}</span>
+					</ToggleButton>
+				</div>
+			</div>
+		</div>
 		<div class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col">
 			{{ query }}
 		</div>

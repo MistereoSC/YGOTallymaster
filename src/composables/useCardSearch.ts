@@ -2,6 +2,7 @@ import {getCardList} from '@/libs/CardData'
 import {
 	TCardData,
 	TFrameType,
+	TLinkMarkers,
 	TMonsterAttribute,
 	TMonsterRace,
 	TMonsterType,
@@ -134,11 +135,11 @@ const useCardSearch = () => {
 
 		// Apply Monster Type Filter
 		if (
-			query.monsterType &&
-			query.monsterType.terms.length > 0 &&
+			query.monsterTypes &&
+			query.monsterTypes.terms.length > 0 &&
 			!['Spell', 'Trap'].includes(query.coreCardType || '')
 		) {
-			cOut = _searchMonsterType(query.monsterType, cOut)
+			cOut = _searchMonsterType(query.monsterTypes, cOut)
 		}
 
 		// Apply Monster Race Filter
@@ -148,6 +149,46 @@ const useCardSearch = () => {
 			!['Spell', 'Trap'].includes(query.coreCardType || '')
 		) {
 			cOut = _searchMonsterRace(query.monsterRaces, cOut)
+		}
+
+		// Apply Pendulum Scale Filters
+		if (
+			query.scales &&
+			query.scales.length > 0 &&
+			!['Spell', 'Trap'].includes(query.coreCardType || '')
+		) {
+			cOut = _searchPendulumScales(query.scales, cOut)
+		}
+
+		// Apply Linkval Filters
+		if (
+			query.linkvals &&
+			query.linkvals.length > 0 &&
+			!['Spell', 'Trap'].includes(query.coreCardType || '')
+		) {
+			cOut = _searchLinkvals(query.linkvals, cOut)
+		}
+		// Apply Linkmarker Filters
+		if (
+			query.links &&
+			query.links.terms.length > 0 &&
+			!['Spell', 'Trap'].includes(query.coreCardType || '')
+		) {
+			cOut = _searchLinkmarkers(query.links, cOut)
+		}
+
+		// Apply Level Filters
+		if (
+			query.levels &&
+			query.levels.length > 0 &&
+			!['Spell', 'Trap'].includes(query.coreCardType || '')
+		) {
+			cOut = _searchMonsterLevels(query.levels, cOut)
+		}
+
+		// Apply ATK and Def Filters
+		if (query.atk || query.def) {
+			cOut = _searchAtkAndDef(cOut, query.atk, query.def)
 		}
 
 		// Apply Term Search
@@ -192,7 +233,15 @@ export type TSearchQuery = {
 	term?: string
 	coreCardType?: TCoreCardType
 	attributes?: TMonsterAttribute[]
-	monsterType?: {terms: TMonsterType[]; operand: 'AND' | 'OR'}
+	monsterTypes?: {terms: TMonsterType[]; operand: 'AND' | 'OR'}
+
+	atk?: {lte?: number | null; gte?: number | null}
+	def?: {lte?: number | null; gte?: number | null}
+	levels?: number[]
+	scales?: number[]
+	linkvals?: number[]
+	links?: {terms: TLinkMarkers[]; operand: 'AND' | 'OR'}
+
 	monsterRaces?: TMonsterRace[]
 	spellTypes?: TSpellTypes[]
 	trapTypes?: TTrapTypes[]
@@ -215,11 +264,69 @@ function _searchQueryIsEmpty(query: TSearchQuery) {
 		!query.term &&
 		!query.coreCardType &&
 		(!query.attributes || query.attributes.length === 0) &&
-		(!query.monsterType || query.monsterType.terms.length === 0) &&
+		(!query.monsterTypes || query.monsterTypes.terms.length === 0) &&
 		(!query.monsterRaces || query.monsterRaces.length === 0) &&
 		(!query.spellTypes || query.spellTypes.length === 0) &&
-		(!query.trapTypes || query.trapTypes.length === 0)
+		(!query.trapTypes || query.trapTypes.length === 0) &&
+		(!query.levels || query.levels.length === 0) &&
+		(!query.links || query.links.terms.length === 0) &&
+		(!query.linkvals || query.linkvals.length === 0) &&
+		(!query.scales || query.scales.length === 0) &&
+		(!query.atk ||
+			(query.atk.lte === undefined && query.atk.gte === undefined)) &&
+		(!query.def ||
+			(query.def.lte === undefined && query.def.gte === undefined))
 	)
+}
+
+function _searchAtkAndDef(
+	cardList: TCardData[],
+	atk?: {lte?: number | null; gte?: number | null},
+	def?: {lte?: number | null; gte?: number | null}
+) {
+	if ((!atk || (!atk.gte && !atk.lte)) && (!def || (!def.gte && !def.lte)))
+		return cardList
+
+	return cardList.filter((card) => {
+		const cardAtk = card.atk || 0
+		const cardDef = card.def || 0
+
+		if (atk) {
+			if (atk.lte != null && cardAtk > atk.lte) return false
+			if (atk.gte != null && cardAtk < atk.gte) return false
+		}
+
+		if (def) {
+			if (def.lte != null && cardDef > def.lte) return false
+			if (def.gte != null && cardDef < def.gte) return false
+		}
+
+		return true
+	})
+}
+
+function _searchMonsterLevels(levels: number[], cardList: TCardData[]) {
+	if (!levels || levels.length === 0) return cardList
+
+	return cardList.filter((card) => {
+		return card.level && levels.includes(card.level)
+	})
+}
+
+function _searchPendulumScales(scales: number[], cardList: TCardData[]) {
+	if (!scales || scales.length === 0) return cardList
+
+	return cardList.filter((card) => {
+		return card.scale && scales.includes(card.scale)
+	})
+}
+
+function _searchLinkvals(linkvals: number[], cardList: TCardData[]) {
+	if (!linkvals || linkvals.length === 0) return cardList
+
+	return cardList.filter((card) => {
+		return card.linkval && linkvals.includes(card.linkval)
+	})
 }
 
 function _searchCoreCardType(type: TCoreCardType, cardList: TCardData[]) {
@@ -247,7 +354,6 @@ function _searchAttribute(
 	if (!attributes || attributes.length === 0) return cardList
 
 	return cardList.filter((card) => {
-		// Only monster cards have attributes
 		if ('attribute' in card && card.attribute) {
 			return attributes.includes(card.attribute as TMonsterAttribute)
 		}
@@ -270,6 +376,24 @@ function _searchMonsterType(
 	// 'AND'
 	return cardList.filter((card) => {
 		return monsterType.terms.every((term) => card.typeline?.includes(term))
+	})
+}
+
+function _searchLinkmarkers(
+	links: {terms: TLinkMarkers[]; operand: 'AND' | 'OR'},
+	cardList: TCardData[]
+) {
+	if (!links || links.terms.length === 0) return cardList
+	if (links.operand === 'OR') {
+		return cardList.filter((card) => {
+			return card.linkmarkers?.some((marker) =>
+				links.terms.includes(marker as TLinkMarkers)
+			)
+		})
+	}
+	// 'AND'
+	return cardList.filter((card) => {
+		return links.terms.every((term) => card.linkmarkers?.includes(term))
 	})
 }
 

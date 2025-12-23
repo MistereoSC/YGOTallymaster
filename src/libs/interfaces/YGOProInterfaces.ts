@@ -65,15 +65,7 @@ type TCardDataMisc = {
 	has_effect: boolean
 	genesys_points: number
 }
-export type TLinkMarkers =
-	| 'Top-Left'
-	| 'Top'
-	| 'Top-Right'
-	| 'Right'
-	| 'Bottom-Right'
-	| 'Bottom'
-	| 'Bottom-Left'
-	| 'Left'
+
 // endregion
 // -----------------------------------------------------------
 // region Public Interfaces
@@ -89,6 +81,27 @@ export type TDBVersionData = {
 // -----------------------------------------------------------
 // region Type Definitions
 // -----------------------------------------------------------
+export type TLinkMarkers =
+	| 'Top-Left'
+	| 'Top'
+	| 'Top-Right'
+	| 'Right'
+	| 'Bottom-Right'
+	| 'Bottom'
+	| 'Bottom-Left'
+	| 'Left'
+
+export enum ELinkMarkers {
+	TOP_LEFT = 'Top-Left',
+	TOP = 'Top',
+	TOP_RIGHT = 'Top-Right',
+	RIGHT = 'Right',
+	BOTTOM_RIGHT = 'Bottom-Right',
+	BOTTOM = 'Bottom',
+	BOTTOM_LEFT = 'Bottom-Left',
+	LEFT = 'Left',
+}
+
 export type TMonsterType =
 	| 'Normal'
 	| 'Effect'

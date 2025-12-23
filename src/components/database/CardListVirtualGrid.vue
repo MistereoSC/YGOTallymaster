@@ -25,10 +25,12 @@ const isScrolling = ref(false)
 const CARD_WIDTH = 173 // w-43.25 = 173px
 const CARD_HEIGHT = 258 // h-64.5 = 258px
 const GAP = 16 // gap-4 = 16px
+const CONTAINER_PADDING = 32 // p-4 = 16px * 2 = 32px (left + right)
 
 const cardsPerRow = computed(() => {
 	if (containerWidth.value === 0) return 1
-	return Math.floor((containerWidth.value + GAP) / (CARD_WIDTH + GAP))
+	const availableWidth = containerWidth.value - CONTAINER_PADDING
+	return Math.max(1, Math.floor((availableWidth + GAP) / (CARD_WIDTH + GAP)))
 })
 
 const totalRows = computed(() => {

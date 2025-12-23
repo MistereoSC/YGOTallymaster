@@ -215,5 +215,27 @@ export enum EMonsterRace {
 	ILLUSION = 'Illusion',
 }
 
+export type TTrapTypes = 'Normal' | 'Continuous' | 'Counter'
+
+export type TSpellTypes =
+	| 'Normal'
+	| 'Continuous'
+	| 'Quick-Play'
+	| 'Field'
+	| 'Ritual'
+
+export enum ETrapTypes {
+	NORMAL = 'Normal',
+	CONTINUOUS = 'Continuous',
+	COUNTER = 'Counter',
+}
+export enum ESpellTypes {
+	NORMAL = 'Normal',
+	CONTINUOUS = 'Continuous',
+	QUICK_PLAY = 'Quick-Play',
+	FIELD = 'Field',
+	RITUAL = 'Ritual',
+}
+
 // endregion
 // -----------------------------------------------------------

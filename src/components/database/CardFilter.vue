@@ -13,13 +13,18 @@ import {
 	EMonsterAttributes,
 	EMonsterRace,
 	EMonsterType,
+	ESpellTypes,
+	ETrapTypes,
 	TMonsterAttribute,
 	TMonsterRace,
 	TMonsterType,
+	TSpellTypes,
+	TTrapTypes,
 } from '@/libs/interfaces/YGOProInterfaces'
 import AttributeIcon from './AttributeIcon.vue'
 import Button from '../common/Button.vue'
 import {Icon} from '@iconify/vue'
+import ToggleSwitch from '../common/ToggleSwitch.vue'
 
 const props = defineProps<{
 	searchWhileTyping?: boolean
@@ -44,9 +49,11 @@ function onReset() {
 	searchInput.value = ''
 	toggledAttributes.value = []
 	toggledCoreType.value = null
-	toggledMonsterRace.value = null
+	toggledMonsterRaces.value = []
 	toggledMonsterTypes.value = []
 	toggledMonsterTypesOperand.value = 'AND'
+	toggledSpellTypes.value = []
+	toggledTrapTypes.value = []
 	resetSearch()
 }
 
@@ -84,6 +91,7 @@ const toggledMonsterTypesOperand = ref<'AND' | 'OR'>('AND')
 const toggledMonsterTypes = ref<TMonsterType[]>([])
 function resetMonsterTypes() {
 	toggledMonsterTypes.value = []
+	toggledMonsterTypesOperand.value = 'AND'
 	onSearch()
 }
 function toggleMonsterType(type: TMonsterType) {
@@ -92,18 +100,21 @@ function toggleMonsterType(type: TMonsterType) {
 	else toggledMonsterTypes.value.splice(index, 1)
 	onSearch()
 }
+function toggleMonsterTypesOperand() {
+	toggledMonsterTypesOperand.value =
+		toggledMonsterTypesOperand.value === 'AND' ? 'OR' : 'AND'
+	if (toggledMonsterTypes.value.length > 0) onSearch()
+}
 
-const toggledMonsterRace = ref<TMonsterRace | null>(null)
+const toggledMonsterRaces = ref<TMonsterRace[]>([])
 function resetMonsterRaces() {
-	toggledMonsterRace.value = null
+	toggledMonsterRaces.value = []
 	onSearch()
 }
 function toggleMonsterRace(race: TMonsterRace) {
-	if (toggledMonsterRace.value === race) {
-		toggledMonsterRace.value = null
-	} else {
-		toggledMonsterRace.value = race
-	}
+	const index = toggledMonsterRaces.value.indexOf(race)
+	if (index === -1) toggledMonsterRaces.value.push(race)
+	else toggledMonsterRaces.value.splice(index, 1)
 	onSearch()
 }
 
@@ -118,12 +129,39 @@ function toggleCoreType(type: TCoreCardType) {
 	} else {
 		toggledCoreType.value = type
 	}
-	if (toggledCoreType.value !== 'Monster') {
-		toggledAttributes.value = []
-	}
+	toggledAttributes.value = []
+	toggledMonsterRaces.value = []
+	toggledMonsterTypes.value = []
+	toggledMonsterTypesOperand.value = 'AND'
+	toggledSpellTypes.value = []
+	toggledTrapTypes.value = []
+
 	onSearch()
 }
 
+const toggledTrapTypes = ref<TTrapTypes[]>([])
+function resetTrapTypes() {
+	toggledTrapTypes.value = []
+	onSearch()
+}
+function toggleTrapType(type: TTrapTypes) {
+	const index = toggledTrapTypes.value.indexOf(type)
+	if (index === -1) toggledTrapTypes.value.push(type)
+	else toggledTrapTypes.value.splice(index, 1)
+	onSearch()
+}
+
+const toggledSpellTypes = ref<TSpellTypes[]>([])
+function resetSpellTypes() {
+	toggledSpellTypes.value = []
+	onSearch()
+}
+function toggleSpellType(type: TSpellTypes) {
+	const index = toggledSpellTypes.value.indexOf(type)
+	if (index === -1) toggledSpellTypes.value.push(type)
+	else toggledSpellTypes.value.splice(index, 1)
+	onSearch()
+}
 // #endregion
 // -----------------------------------------
 // #region Setup
@@ -135,26 +173,39 @@ function _applyActiveQuery() {
 	searchInput.value = activeQuery.value.term || ''
 	toggledAttributes.value = activeQuery.value.attributes || []
 	toggledCoreType.value = activeQuery.value.coreCardType || null
-	toggledMonsterRace.value = activeQuery.value.monsterRace || null
+	toggledMonsterRaces.value = activeQuery.value.monsterRaces || []
 	toggledMonsterTypes.value = activeQuery.value.monsterType
 		? activeQuery.value.monsterType.terms
 		: []
 	toggledMonsterTypesOperand.value = activeQuery.value.monsterType
 		? activeQuery.value.monsterType.operand
 		: 'AND'
+	toggledSpellTypes.value = activeQuery.value.spellTypes || []
+	toggledTrapTypes.value = activeQuery.value.trapTypes || []
 }
 const query = computed<TSearchQuery>(() => {
 	return {
 		term: searchInput.value,
 		attributes: toggledAttributes.value,
 		coreCardType: toggledCoreType.value ?? undefined,
-		monsterRace: toggledMonsterRace.value ?? undefined,
+		monsterRaces:
+			toggledMonsterRaces.value.length > 0
+				? toggledMonsterRaces.value
+				: undefined,
 		monsterType:
 			toggledMonsterTypes.value.length > 0
 				? {
 						terms: toggledMonsterTypes.value,
 						operand: toggledMonsterTypesOperand.value,
 				  }
+				: undefined,
+		spellTypes:
+			toggledSpellTypes.value.length > 0
+				? toggledSpellTypes.value
+				: undefined,
+		trapTypes:
+			toggledTrapTypes.value.length > 0
+				? toggledTrapTypes.value
 				: undefined,
 	}
 })
@@ -254,7 +305,7 @@ const query = computed<TSearchQuery>(() => {
 			v-if="toggledCoreType === 'Monster'"
 			class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col"
 		>
-			<h3 class="font-bold m-0 flex gap-2">
+			<h3 class="font-bold m-0 grid grid-cols-[auto_auto_1fr] gap-2">
 				<span>Card Type</span>
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
@@ -262,9 +313,15 @@ const query = computed<TSearchQuery>(() => {
 					size="small"
 					@click="resetMonsterTypes"
 				/>
+				<div class="flex justify-end">
+					<ToggleSwitch
+						:duo-labels="['AND', 'OR']"
+						:model-value="toggledMonsterTypesOperand === 'AND'"
+						@toggle="toggleMonsterTypesOperand"
+					/>
+				</div>
 			</h3>
 			<div class="">
-				<div>AND / OR</div>
 				<div class="flex gap-3 flex-wrap items-center">
 					<ToggleButton
 						v-for="type in Object.values(EMonsterType)"
@@ -285,6 +342,8 @@ const query = computed<TSearchQuery>(() => {
 		>
 			<h3 class="font-bold m-0 flex gap-2">
 				<span>Monster Type</span>
+				<span class="text-contrast-400">(OR)</span>
+
 				<Button
 					icon="material-symbols:reset-settings-outline-rounded"
 					rounded
@@ -297,7 +356,7 @@ const query = computed<TSearchQuery>(() => {
 					<ToggleButton
 						v-for="race in Object.values(EMonsterRace)"
 						:key="race"
-						:model-value="toggledMonsterRace === race"
+						:model-value="toggledMonsterRaces.includes(race)"
 						@toggle="toggleMonsterRace(race)"
 					>
 						<span class="font-bold text-sm">{{ race }}</span>
@@ -305,8 +364,73 @@ const query = computed<TSearchQuery>(() => {
 				</div>
 			</div>
 		</div>
-		<div class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col">
-			{{ query }}
+
+		<!-- Trap Type -->
+		<div
+			v-if="toggledCoreType === 'Trap'"
+			class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col"
+		>
+			<h3 class="font-bold m-0 flex gap-2">
+				<span>Trap Type</span>
+				<span class="text-contrast-400">(OR)</span>
+				<Button
+					icon="material-symbols:reset-settings-outline-rounded"
+					rounded
+					size="small"
+					@click="resetTrapTypes"
+				/>
+			</h3>
+			<div class="">
+				<div class="flex gap-3 flex-wrap items-center">
+					<ToggleButton
+						v-for="type in Object.values(ETrapTypes)"
+						:key="type"
+						:model-value="toggledTrapTypes.includes(type)"
+						@toggle="toggleTrapType(type)"
+					>
+						<span class="font-bold text-sm">{{ type }}</span>
+					</ToggleButton>
+				</div>
+			</div>
+		</div>
+
+		<!-- Spell Type -->
+		<div
+			v-if="toggledCoreType === 'Spell'"
+			class="p-4 rounded-md bg-primary-800 gap-2 flex flex-col"
+		>
+			<h3 class="font-bold m-0 flex gap-2">
+				<span>Spell Type</span>
+				<span class="text-contrast-400">(OR)</span>
+				<Button
+					icon="material-symbols:reset-settings-outline-rounded"
+					rounded
+					size="small"
+					@click="resetSpellTypes"
+				/>
+			</h3>
+			<div class="">
+				<div class="flex gap-3 flex-wrap items-center">
+					<ToggleButton
+						v-for="type in Object.values(ESpellTypes)"
+						:key="type"
+						:model-value="toggledSpellTypes.includes(type)"
+						@toggle="toggleSpellType(type)"
+					>
+						<span class="font-bold text-sm">{{ type }}</span>
+					</ToggleButton>
+				</div>
+			</div>
+		</div>
+
+		<!-- Info -->
+		<div
+			v-if="!toggledCoreType"
+			class="text-sm font-semibold p-4 rounded-md bg-primary-800"
+		>
+			Select a Card Type
+			<span class="text-contrast-500"> (Monster / Spell / Trap) </span>
+			for more Filters.
 		</div>
 	</div>
 </template>

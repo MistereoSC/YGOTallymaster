@@ -5,6 +5,8 @@ import {
 	TMonsterAttribute,
 	TMonsterRace,
 	TMonsterType,
+	TSpellTypes,
+	TTrapTypes,
 } from '@/libs/interfaces/YGOProInterfaces'
 import MiniSearch from 'minisearch'
 import {ref} from 'vue'
@@ -104,6 +106,23 @@ const useCardSearch = () => {
 			cOut = _searchCoreCardType(query.coreCardType, cOut)
 		}
 
+		//  Apply Spell/Trap Type Filters
+		if (
+			query.spellTypes &&
+			query.spellTypes.length > 0 &&
+			!['Monster'].includes(query.coreCardType || '')
+		) {
+			cOut = _searchSpellTrapType(query.spellTypes, cOut)
+		}
+
+		if (
+			query.trapTypes &&
+			query.trapTypes.length > 0 &&
+			!['Monster'].includes(query.coreCardType || '')
+		) {
+			cOut = _searchSpellTrapType(query.trapTypes, cOut)
+		}
+
 		//  Apply Attribute Filters
 		if (
 			query.attributes &&
@@ -124,10 +143,11 @@ const useCardSearch = () => {
 
 		// Apply Monster Race Filter
 		if (
-			query.monsterRace &&
+			query.monsterRaces &&
+			query.monsterRaces.length > 0 &&
 			!['Spell', 'Trap'].includes(query.coreCardType || '')
 		) {
-			cOut = _searchMonsterRace(query.monsterRace, cOut)
+			cOut = _searchMonsterRace(query.monsterRaces, cOut)
 		}
 
 		// Apply Term Search
@@ -173,7 +193,9 @@ export type TSearchQuery = {
 	coreCardType?: TCoreCardType
 	attributes?: TMonsterAttribute[]
 	monsterType?: {terms: TMonsterType[]; operand: 'AND' | 'OR'}
-	monsterRace?: TMonsterRace
+	monsterRaces?: TMonsterRace[]
+	spellTypes?: TSpellTypes[]
+	trapTypes?: TTrapTypes[]
 }
 export type TCoreCardType = 'Monster' | 'Spell' | 'Trap'
 
@@ -191,10 +213,12 @@ function _filterCardData(cardData: TCardData[], filteredFields: TFrameType[]) {
 function _searchQueryIsEmpty(query: TSearchQuery) {
 	return (
 		!query.term &&
-		(!query.attributes || query.attributes.length === 0) &&
 		!query.coreCardType &&
+		(!query.attributes || query.attributes.length === 0) &&
 		(!query.monsterType || query.monsterType.terms.length === 0) &&
-		!query.monsterRace
+		(!query.monsterRaces || query.monsterRaces.length === 0) &&
+		(!query.spellTypes || query.spellTypes.length === 0) &&
+		(!query.trapTypes || query.trapTypes.length === 0)
 	)
 }
 
@@ -249,11 +273,26 @@ function _searchMonsterType(
 	})
 }
 
-function _searchMonsterRace(monsterRace: TMonsterRace, cardList: TCardData[]) {
-	if (!monsterRace) return cardList
+function _searchMonsterRace(
+	monsterRaces: TMonsterRace[],
+	cardList: TCardData[]
+) {
+	if (!monsterRaces || monsterRaces.length === 0) return cardList
+	return cardList.filter((card) => {
+		return card.race && monsterRaces.includes(card.race as TMonsterRace)
+	})
+}
+
+function _searchSpellTrapType(
+	types: TSpellTypes[] | TTrapTypes[],
+	cardList: TCardData[]
+) {
+	if (!types || types.length === 0) return cardList
 
 	return cardList.filter((card) => {
-		return card.typeline?.includes(monsterRace)
+		return (
+			card.race && types.includes(card.race as TSpellTypes & TTrapTypes)
+		)
 	})
 }
 

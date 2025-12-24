@@ -98,6 +98,10 @@ const emit = defineEmits([])
 				{{ card.desc }}
 			</span>
 		</div>
+
+		<div class="p-4 rounded-md bg-primary-800">
+			{{ card.misc_info[0].tcg_date }}
+		</div>
 	</div>
 </template>
 

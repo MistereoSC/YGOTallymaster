@@ -36,7 +36,7 @@ type TGeneralCardData = {
 	card_prices: TCardPriceData[]
 
 	archetype?: string
-	misc_info?: TCardDataMisc
+	misc_info: TCardDataMisc[]
 }
 
 type TMonsterCardData = {

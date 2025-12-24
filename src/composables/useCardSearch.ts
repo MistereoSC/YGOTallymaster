@@ -12,12 +12,20 @@ import {
 import MiniSearch from 'minisearch'
 import {ref} from 'vue'
 
+export enum ESortBy {
+	Name_Asc = 'Name (Ascending)',
+	Name_Desc = 'Name (Descending)',
+	TCG_Date_Asc = 'TCG Date (Ascending)',
+	TCG_Date_Desc = 'TCG Date (Descending)',
+}
+
 let miniSearchIndex = null as null | MiniSearch<TCardData>
 let initialized = false
 let searchResults = ref(null as TCardData[] | null)
 let activeQuery = ref<TSearchQuery>({})
 let fullCardList = ref([] as TCardData[])
 let omittedResults = ref(0)
+let sortedBy = ref(ESortBy.Name_Asc)
 
 const useCardSearch = () => {
 	_init()
@@ -177,6 +185,16 @@ const useCardSearch = () => {
 		_init(true)
 	}
 
+	function sort(by?: ESortBy) {
+		fullCardList.value = _sort(by ?? ESortBy.Name_Asc, fullCardList.value)
+		if (searchResults.value) {
+			searchResults.value = _sort(
+				by ?? ESortBy.Name_Asc,
+				searchResults.value
+			)
+		}
+	}
+
 	return {
 		search,
 		resetSearch,
@@ -185,13 +203,15 @@ const useCardSearch = () => {
 		fullCardList,
 		omittedResults,
 		reinitializeIndex,
+		sort,
+		sortedBy,
 	}
 }
 
 export {useCardSearch}
 
 // -----------------------------------------------------------
-// region Interfaces
+// #region Interfaces
 // -----------------------------------------------------------
 
 export type TSearchResultCardData = TCardData & {
@@ -219,9 +239,9 @@ export type TSearchQuery = {
 }
 export type TCoreCardType = 'Monster' | 'Spell' | 'Trap'
 
-// endregion
+// #endregion
 // -----------------------------------------------------------
-// region Helper Functions
+// #region Helper Functions
 // -----------------------------------------------------------
 
 function _filterCardData(cardData: TCardData[], filteredFields: TFrameType[]) {
@@ -229,6 +249,11 @@ function _filterCardData(cardData: TCardData[], filteredFields: TFrameType[]) {
 		return !filteredFields.includes(card.frameType)
 	})
 }
+
+// #endregion
+// -----------------------------------------------------------
+// #region Search Functions
+// -----------------------------------------------------------
 
 function _searchQueryIsEmpty(query: TSearchQuery) {
 	return !(
@@ -431,3 +456,60 @@ function _searchTerm(term: string, maxResults: number, cardList: TCardData[]) {
 	].slice(0, maxResults) as unknown as TSearchResultCardData[]
 	return combinedResults
 }
+
+function _sort(by: ESortBy, cardList: TCardData[]) {
+	switch (by) {
+		case ESortBy.Name_Asc:
+			return cardList.sort((a, b) => a.name.localeCompare(b.name))
+		case ESortBy.Name_Desc:
+			return cardList.sort((a, b) => b.name.localeCompare(a.name))
+		case ESortBy.TCG_Date_Asc:
+			return cardList.sort((a, b) => {
+				const dateA =
+					a.misc_info[0]?.tcg_date || a.misc_info[0]?.ocg_date
+				const dateB =
+					b.misc_info[0]?.tcg_date || b.misc_info[0]?.ocg_date
+
+				// Handle missing dates - put them at the end for ascending order
+				if (!dateA && !dateB) return a.name.localeCompare(b.name) // Sort by name when both dates missing
+				if (!dateA) return 1
+				if (!dateB) return -1
+
+				// Compare dates lexicographically (YYYY-MM-DD format works with string comparison)
+				const dateComparison = dateA.localeCompare(dateB)
+				// If dates are equal, sort by name as secondary criteria
+				return dateComparison === 0
+					? a.name.localeCompare(b.name)
+					: dateComparison
+			})
+		case ESortBy.TCG_Date_Desc:
+			return cardList.sort((a, b) => {
+				const dateA =
+					a.misc_info[0]?.tcg_date || a.misc_info[0]?.ocg_date
+				const dateB =
+					b.misc_info[0]?.tcg_date || b.misc_info[0]?.ocg_date
+
+				// Handle missing dates - put them at the end for descending order
+				if (!dateA && !dateB) return a.name.localeCompare(b.name) // Sort by name when both dates missing
+				if (!dateA) return 1
+				if (!dateB) return -1
+
+				// Compare dates lexicographically in reverse order
+				const dateComparison = dateB.localeCompare(dateA)
+				// If dates are equal, sort by name as secondary criteria
+				return dateComparison === 0
+					? a.name.localeCompare(b.name)
+					: dateComparison
+			})
+		default:
+			return cardList
+	}
+}
+
+// #endregion
+// -----------------------------------------------------------
+// #region Sort Functions
+// -----------------------------------------------------------
+
+// #endregion
+// -----------------------------------------------------------

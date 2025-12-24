@@ -6,6 +6,7 @@ import {computed, onMounted, ref} from 'vue'
 import {
 	type TSearchQuery,
 	type TCoreCardType,
+	ESortBy,
 	useCardSearch,
 } from '@/composables/useCardSearch'
 import ToggleButton from '../common/ToggleButton.vue'
@@ -41,7 +42,7 @@ const emit = defineEmits<{
 // #region Search
 // -----------------------------------------
 
-const {search, resetSearch, activeQuery} = useCardSearch()
+const {search, resetSearch, activeQuery, sortedBy, sort} = useCardSearch()
 const searchInput = ref(activeQuery.value.term || '')
 
 function onSearch() {
@@ -304,12 +305,33 @@ const query = computed<TSearchQuery>(() => {
 		def: {lte: defFilter.value[0], gte: defFilter.value[1]},
 	}
 })
+
+const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 // #endregion
 // -----------------------------------------
 </script>
 
 <template>
 	<div class="max-w-2xl mx-auto flex flex-col gap-2">
+		<div
+			class="p-2 rounded-md bg-primary-800 grid grid-cols-[auto_1fr] gap-2 items-center"
+		>
+			<span>Sort By</span>
+			<select
+				v-model="selectedSort"
+				@change="sort(selectedSort)"
+				class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+			>
+				<option
+					v-for="(label, key) in ESortBy"
+					:key="key"
+					:value="label"
+				>
+					{{ label }}
+				</option>
+			</select>
+		</div>
+
 		<!-- Text Input / Reset -->
 		<div
 			class="p-2 rounded-md bg-primary-800 grid grid-cols-[1fr_auto] gap-2"

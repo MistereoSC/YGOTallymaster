@@ -99,6 +99,10 @@ const useCardSearch = () => {
 				// Custom tokenizer with bigram support that preserves D/D/D/D patterns
 				const baseTokens = text
 					.toLowerCase()
+					// Normalize special characters and symbols to common equivalents
+					.replace(/☆/g, '-_star-') // Star symbol to "star"
+					.replace(/★/g, '-_star-') // Filled star to "star"
+
 					// First, protect D/D/D/D patterns by replacing slashes with a placeholder
 					.replace(/\bd(\/d)+\b/g, (match) =>
 						match.replace(/\//g, '___SLASH___')

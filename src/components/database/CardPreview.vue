@@ -81,6 +81,7 @@ function onClick() {
 		:style="{
 			transition: 'outline-width 0.1s ease, outline-color 0.1s ease',
 		}"
+		@click="onClick"
 	>
 		<!-- Error state -->
 		<div
@@ -108,11 +109,7 @@ function onClick() {
 		</div>
 
 		<!-- Image loaded -->
-		<div
-			v-else
-			class="w-full h-full relative cursor-pointer"
-			@click="onClick"
-		>
+		<div v-else class="w-full h-full relative cursor-pointer">
 			<img
 				:src="imageUrl!"
 				:alt="card.name"

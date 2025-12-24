@@ -12,6 +12,8 @@ import {
 import MiniSearch from 'minisearch'
 import {ref, markRaw} from 'vue'
 
+const MIN_SCORE_THRESHOLD: Readonly<number> = 1
+
 export enum ESortBy {
 	Name_Asc = 'Name (Ascending)',
 	Name_Desc = 'Name (Descending)',
@@ -88,11 +90,40 @@ const useCardSearch = () => {
 			searchOptions: {
 				fuzzy: 0.2,
 				prefix: true,
-				boost: {name: 10, archetype: 3, desc: 1},
+				boost: {name: 8, archetype: 2, desc: 1},
 				combineWith: 'AND',
 			},
 			processTerm: (term, _fieldName) =>
 				stopWords.has(term) ? null : term.toLowerCase(),
+			tokenize: (text) => {
+				// Custom tokenizer with bigram support that preserves D/D/D/D patterns
+				const baseTokens = text
+					.toLowerCase()
+					// First, protect D/D/D/D patterns by replacing slashes with a placeholder
+					.replace(/\bd(\/d)+\b/g, (match) =>
+						match.replace(/\//g, '___SLASH___')
+					)
+					// Also protect other slash-separated terms that might be important
+					.replace(/\b\w+\/\w+(?:\/\w+)*\b/g, (match) =>
+						match.replace(/\//g, '___SLASH___')
+					)
+					// Split on whitespace and hyphens
+					.split(/[\s-]+/)
+					// Restore the slashes
+					.map((token) => token.replace(/___SLASH___/g, '/'))
+					// Filter out empty tokens
+					.filter((token) => token.length > 0)
+
+				const tokens = [...baseTokens] // Start with individual tokens
+
+				// Add bigrams (pairs of adjacent tokens)
+				for (let i = 0; i < baseTokens.length - 1; i++) {
+					const bigram = `${baseTokens[i]} ${baseTokens[i + 1]}`
+					tokens.push(bigram)
+				}
+
+				return tokens
+			},
 		})
 		miniSearch.addAll(cardData as TCardData[])
 		miniSearchIndex = miniSearch
@@ -101,7 +132,7 @@ const useCardSearch = () => {
 		sortedBy.value = ESortBy.Name_Asc
 		return miniSearch
 	}
-	const search = (query: TSearchQuery, maxResults: number = 512) => {
+	const search = (query: TSearchQuery) => {
 		if (!miniSearchIndex) return []
 		activeQuery.value = query
 		if (_searchQueryIsEmpty(query)) {
@@ -112,7 +143,7 @@ const useCardSearch = () => {
 		let cOut = fullCardList.value
 
 		if (query.term && query.term.length > 0) {
-			cOut = _searchTerm(query.term, maxResults, cOut)
+			cOut = _searchTerm(query.term)
 		}
 
 		// Apply Core Type Filter
@@ -395,61 +426,20 @@ function _searchSpellTrapType(
 	})
 }
 
-function _searchTerm(term: string, maxResults: number, cardList: TCardData[]) {
+function _searchTerm(term: string, cardList?: TCardData[]) {
 	if (!miniSearchIndex) return []
 
-	// Create a set of IDs from the filtered card list for quick lookup
-	const filteredCardIds = new Set(cardList.map((card) => card.id))
+	let results = miniSearchIndex
+		.search(term)
+		.filter((result) => result.score >= MIN_SCORE_THRESHOLD)
 
-	// First try exact phrase matching for better precision
-	const exactResults = miniSearchIndex
-		.search(`"${term}"`, {
-			fuzzy: false,
-			prefix: false,
-			boost: {name: 20, archetype: 5, desc: 1},
-		})
-		.filter((result) => filteredCardIds.has(result.id)) // Filter by pre-filtered cards
-
-	// If we have good exact matches, prioritize them
-	if (exactResults.length > 0) {
-		const exactCards = exactResults.slice(
-			0,
-			maxResults
-		) as unknown as TSearchResultCardData[]
-
-		// If exact results are sufficient, return them
-		if (
-			exactCards.length >= 5 ||
-			exactResults.some((result) => result.score > 200)
-		) {
-			return exactCards
-		}
+	if (cardList && cardList.length > 0) {
+		const filteredCardIds = new Set(cardList.map((card) => card.id))
+		results = results.filter((result) => filteredCardIds.has(result.id))
 	}
 
-	// Otherwise, fall back to fuzzy search with stricter filtering
-	const fuzzyResults = miniSearchIndex
-		.search(term, {
-			fuzzy: 0.1,
-			prefix: true,
-			boost: {name: 10, archetype: 3, desc: 1},
-			combineWith: 'AND',
-		})
-		.filter((result) => filteredCardIds.has(result.id)) // Filter by pre-filtered cards
-
-	// Filter out results with very low scores to reduce noise
-	const filteredResults = fuzzyResults
-		.filter((result) => result.score > 0.5)
-		.slice(0, maxResults)
-
-	// Combine exact and fuzzy results, removing duplicates
-	const exactIds = new Set(exactResults.map((r) => r.id))
-	const combinedResults = [
-		...exactResults,
-		...filteredResults.filter((r) => !exactIds.has(r.id)),
-	].slice(0, maxResults) as unknown as TSearchResultCardData[]
-	return combinedResults
+	return results as unknown as TSearchResultCardData[]
 }
-
 // #endregion
 // -----------------------------------------------------------
 // #region Sort Functions

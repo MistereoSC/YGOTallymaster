@@ -7,23 +7,19 @@ import CardListVirtualGrid from '@/components/database/CardListVirtualGrid.vue'
 import CardFilter from '@/components/database/CardFilter.vue'
 
 import {useCardSearch} from '@/composables/useCardSearch'
-const {searchResults, fullCardList, omittedResults} = useCardSearch()
+const {searchResults, fullCardList} = useCardSearch()
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
 
 onMounted(async () => {})
 
 // Watch for changes in search results and scroll to top
-watch(
-	searchResults,
-	async () => {
-		await nextTick()
-		if (cardGrid.value) {
-			cardGrid.value.scrollToTop()
-		}
-	},
-	{deep: true}
-)
+watch(searchResults, async () => {
+	await nextTick()
+	if (cardGrid.value) {
+		cardGrid.value.scrollToTop()
+	}
+})
 
 type TSidePanel = 'filter' | 'settings' | 'none' | 'card' | 'other'
 const activePanel = ref<TSidePanel>('filter')
@@ -98,9 +94,6 @@ function closePanel() {
 						{{ searchResults.length }} /
 					</span>
 					{{ fullCardList.length }} Cards
-					<span v-if="omittedResults > 0" class="text-contrast-500">
-						({{ omittedResults }} omitted)
-					</span>
 				</span>
 			</div>
 			<div class="min-w-116 w-[33vw] max-w-174 px-2 py-1">

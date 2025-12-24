@@ -10,7 +10,7 @@ import {
 	TTrapTypes,
 } from '@/libs/interfaces/YGOProInterfaces'
 import MiniSearch from 'minisearch'
-import {ref} from 'vue'
+import {ref, markRaw} from 'vue'
 
 export enum ESortBy {
 	Name_Asc = 'Name (Ascending)',
@@ -24,7 +24,6 @@ let initialized = false
 let searchResults = ref(null as TCardData[] | null)
 let activeQuery = ref<TSearchQuery>({})
 let fullCardList = ref([] as TCardData[])
-let omittedResults = ref(0)
 let sortedBy = ref(ESortBy.Name_Asc)
 
 const useCardSearch = () => {
@@ -99,7 +98,6 @@ const useCardSearch = () => {
 		miniSearchIndex = miniSearch
 		activeQuery.value = {}
 		searchResults.value = null
-		omittedResults.value = 0
 		sortedBy.value = ESortBy.Name_Asc
 		return miniSearch
 	}
@@ -108,13 +106,16 @@ const useCardSearch = () => {
 		activeQuery.value = query
 		if (_searchQueryIsEmpty(query)) {
 			searchResults.value = null
-			omittedResults.value = 0
 			return []
 		}
 
 		let cOut = fullCardList.value
 
-		// Apply Core Type Filter first
+		if (query.term && query.term.length > 0) {
+			cOut = _searchTerm(query.term, maxResults, cOut)
+		}
+
+		// Apply Core Type Filter
 		if (query.coreCardType) {
 			cOut = _searchCoreCardType(query.coreCardType, cOut)
 		}
@@ -129,6 +130,14 @@ const useCardSearch = () => {
 		}
 
 		// Apply Monster Filters
+		if (query.scales && query.scales.length > 0) {
+			cOut = _searchPendulumScales(query.scales, cOut)
+		}
+
+		if (query.linkvals && query.linkvals.length > 0) {
+			cOut = _searchLinkvals(query.linkvals, cOut)
+		}
+
 		if (query.attributes && query.attributes.length > 0) {
 			cOut = _searchAttribute(query.attributes, cOut)
 		}
@@ -145,14 +154,6 @@ const useCardSearch = () => {
 			cOut = _searchMonsterLevels(query.levels, cOut)
 		}
 
-		if (query.scales && query.scales.length > 0) {
-			cOut = _searchPendulumScales(query.scales, cOut)
-		}
-
-		if (query.linkvals && query.linkvals.length > 0) {
-			cOut = _searchLinkvals(query.linkvals, cOut)
-		}
-
 		if (query.links && query.links.terms.length > 0) {
 			cOut = _searchLinkmarkers(query.links, cOut)
 		}
@@ -164,17 +165,7 @@ const useCardSearch = () => {
 			cOut = _searchAtkAndDef(cOut, query.atk, query.def)
 		}
 
-		if (query.term && query.term.length > 0) {
-			cOut = _searchTerm(query.term, maxResults, cOut)
-		}
-
-		omittedResults.value = 0
-		if (cOut.length > maxResults) {
-			omittedResults.value = cOut.length - maxResults
-			cOut = cOut.slice(0, maxResults)
-		}
-
-		searchResults.value = cOut
+		searchResults.value = markRaw(cOut)
 		return cOut
 	}
 	const resetSearch = () => {
@@ -192,9 +183,8 @@ const useCardSearch = () => {
 
 		fullCardList.value = _sort(by ?? ESortBy.Name_Asc, fullCardList.value)
 		if (searchResults.value) {
-			searchResults.value = _sort(
-				by ?? ESortBy.Name_Asc,
-				searchResults.value
+			searchResults.value = markRaw(
+				_sort(by ?? ESortBy.Name_Asc, [...searchResults.value])
 			)
 		}
 	}
@@ -205,7 +195,6 @@ const useCardSearch = () => {
 		searchResults,
 		activeQuery,
 		fullCardList,
-		omittedResults,
 		reinitializeIndex,
 		sort,
 		sortedBy,

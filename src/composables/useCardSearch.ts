@@ -100,6 +100,7 @@ const useCardSearch = () => {
 		activeQuery.value = {}
 		searchResults.value = null
 		omittedResults.value = 0
+		sortedBy.value = ESortBy.Name_Asc
 		return miniSearch
 	}
 	const search = (query: TSearchQuery, maxResults: number = 512) => {
@@ -163,9 +164,8 @@ const useCardSearch = () => {
 			cOut = _searchAtkAndDef(cOut, query.atk, query.def)
 		}
 
-		// Apply term search LAST (after all other filters have reduced the set)
 		if (query.term && query.term.length > 0) {
-			cOut = _searchTerm(query.term, maxResults * 2, cOut) // Get extra results for final trimming
+			cOut = _searchTerm(query.term, maxResults, cOut)
 		}
 
 		omittedResults.value = 0
@@ -186,6 +186,10 @@ const useCardSearch = () => {
 	}
 
 	function sort(by?: ESortBy) {
+		if (!by && sortedBy.value === ESortBy.Name_Asc) return
+		else if (by === sortedBy.value) return
+		sortedBy.value = by ?? ESortBy.Name_Asc
+
 		fullCardList.value = _sort(by ?? ESortBy.Name_Asc, fullCardList.value)
 		if (searchResults.value) {
 			searchResults.value = _sort(
@@ -457,6 +461,11 @@ function _searchTerm(term: string, maxResults: number, cardList: TCardData[]) {
 	return combinedResults
 }
 
+// #endregion
+// -----------------------------------------------------------
+// #region Sort Functions
+// -----------------------------------------------------------
+
 function _sort(by: ESortBy, cardList: TCardData[]) {
 	switch (by) {
 		case ESortBy.Name_Asc:
@@ -505,11 +514,6 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 			return cardList
 	}
 }
-
-// #endregion
-// -----------------------------------------------------------
-// #region Sort Functions
-// -----------------------------------------------------------
 
 // #endregion
 // -----------------------------------------------------------

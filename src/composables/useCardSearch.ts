@@ -12,13 +12,19 @@ import {
 import MiniSearch from 'minisearch'
 import {ref, markRaw} from 'vue'
 
-const MIN_SCORE_THRESHOLD: Readonly<number> = 1
+const MIN_SCORE_THRESHOLD: Readonly<number> = 0.5
 
 export enum ESortBy {
 	Name_Asc = 'Name (Ascending)',
 	Name_Desc = 'Name (Descending)',
 	TCG_Date_Asc = 'TCG Date (Ascending)',
 	TCG_Date_Desc = 'TCG Date (Descending)',
+	Search_Score = 'Text Search Score',
+	ATK_Asc = 'ATK (Ascending)',
+	ATK_Desc = 'ATK (Descending)',
+	DEF_Asc = 'DEF (Ascending)',
+	DEF_Desc = 'DEF (Descending)',
+	Type = 'Card Type',
 }
 
 let miniSearchIndex = null as null | MiniSearch<TCardData>
@@ -88,9 +94,9 @@ const useCardSearch = () => {
 				'misc_info',
 			],
 			searchOptions: {
-				fuzzy: 0.2,
+				fuzzy: 0.3,
 				prefix: true,
-				boost: {name: 8, archetype: 2, desc: 1},
+				boost: {name: 6, archetype: 2, desc: 1},
 				combineWith: 'AND',
 			},
 			processTerm: (term, _fieldName) =>
@@ -100,8 +106,8 @@ const useCardSearch = () => {
 				const baseTokens = text
 					.toLowerCase()
 					// Normalize special characters and symbols to common equivalents
-					.replace(/☆/g, '-_star-') // Star symbol to "star"
-					.replace(/★/g, '-_star-') // Filled star to "star"
+					.replace(/☆/g, '-') // Star symbol to "star"
+					.replace(/★/g, '-') // Filled star to "star"
 
 					// First, protect D/D/D/D patterns by replacing slashes with a placeholder
 					.replace(/\bd(\/d)+\b/g, (match) =>
@@ -148,6 +154,9 @@ const useCardSearch = () => {
 
 		if (query.term && query.term.length > 0) {
 			cOut = _searchTerm(query.term)
+			if (sortedBy.value !== ESortBy.Search_Score) {
+				_sort(sortedBy.value, cOut)
+			}
 		}
 
 		// Apply Core Type Filter
@@ -451,6 +460,10 @@ function _searchTerm(term: string, cardList?: TCardData[]) {
 
 function _sort(by: ESortBy, cardList: TCardData[]) {
 	switch (by) {
+		case ESortBy.Search_Score:
+			if (activeQuery.value.term)
+				return _sortBySearchScore(cardList as TSearchResultCardData[])
+			return cardList.sort((a, b) => a.name.localeCompare(b.name))
 		case ESortBy.Name_Asc:
 			return cardList.sort((a, b) => a.name.localeCompare(b.name))
 		case ESortBy.Name_Desc:
@@ -462,12 +475,10 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 				const dateB =
 					b.misc_info[0]?.tcg_date || b.misc_info[0]?.ocg_date
 
-				// Handle missing dates - put them at the end for ascending order
 				if (!dateA && !dateB) return a.name.localeCompare(b.name) // Sort by name when both dates missing
 				if (!dateA) return 1
 				if (!dateB) return -1
 
-				// Compare dates lexicographically (YYYY-MM-DD format works with string comparison)
 				const dateComparison = dateA.localeCompare(dateB)
 				// If dates are equal, sort by name as secondary criteria
 				return dateComparison === 0
@@ -481,22 +492,98 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 				const dateB =
 					b.misc_info[0]?.tcg_date || b.misc_info[0]?.ocg_date
 
-				// Handle missing dates - put them at the end for descending order
 				if (!dateA && !dateB) return a.name.localeCompare(b.name) // Sort by name when both dates missing
 				if (!dateA) return 1
 				if (!dateB) return -1
 
-				// Compare dates lexicographically in reverse order
 				const dateComparison = dateB.localeCompare(dateA)
 				// If dates are equal, sort by name as secondary criteria
 				return dateComparison === 0
 					? a.name.localeCompare(b.name)
 					: dateComparison
 			})
+		case ESortBy.ATK_Asc:
+			return cardList.sort((a, b) => {
+				const atkA = a.atk !== undefined ? a.atk : 9999
+				const atkB = b.atk !== undefined ? b.atk : 9999
+
+				const atkComparison = atkA - atkB
+				// If ATK values are equal, sort by name as secondary criteria
+				return atkComparison === 0
+					? a.name.localeCompare(b.name)
+					: atkComparison
+			}) // Use -2 for cards without ATK
+		case ESortBy.ATK_Desc:
+			return cardList.sort((a, b) => {
+				const atkA = a.atk !== undefined ? a.atk : -2
+				const atkB = b.atk !== undefined ? b.atk : -2
+
+				const atkComparison = atkB - atkA
+				// If ATK values are equal, sort by name as secondary criteria
+				return atkComparison === 0
+					? a.name.localeCompare(b.name)
+					: atkComparison
+			})
+		case ESortBy.DEF_Asc:
+			return cardList.sort((a, b) => {
+				const defA = a.linkval
+					? 9900
+					: a.def !== undefined
+					? a.def
+					: 9999
+				const defB = b.linkval
+					? 9900
+					: b.def !== undefined
+					? b.def
+					: 9999
+
+				const defComparison = defA - defB
+				// If DEF values are equal, sort by name as secondary criteria
+				return defComparison === 0
+					? a.name.localeCompare(b.name)
+					: defComparison
+			})
+		case ESortBy.DEF_Desc:
+			return cardList.sort((a, b) => {
+				const defA = a.linkval ? -2 : a.def !== undefined ? a.def : -3
+				const defB = b.linkval ? -2 : b.def !== undefined ? b.def : -3
+
+				const defComparison = defB - defA
+				// If DEF values are equal, sort by name as secondary criteria
+				return defComparison === 0
+					? a.name.localeCompare(b.name)
+					: defComparison
+			})
+		case ESortBy.Type:
+			return cardList.sort((a, b) => {
+				const isMonsterA = a.attribute ? true : false
+				const isMonsterB = b.attribute ? true : false
+				const isSpellA = a.frameType === 'spell'
+				const isSpellB = b.frameType === 'spell'
+
+				if (isMonsterA && !isMonsterB) return -1
+				if (!isMonsterA && isMonsterB) return 1
+				if (isSpellA && !isSpellB) return -1
+				if (!isSpellA && isSpellB) return 1
+
+				// If both are the same type, sort by race
+				const raceComparison = a.race?.localeCompare(b.race ?? '') ?? 0
+				return raceComparison === 0
+					? a.name.localeCompare(b.name)
+					: raceComparison
+			})
+
 		default:
 			return cardList
 	}
 }
 
+function _sortBySearchScore(cardList: TSearchResultCardData[]) {
+	return cardList.sort((a, b) => {
+		const scoreA = a.score !== undefined ? a.score : -1
+		const scoreB = b.score !== undefined ? b.score : -1
+		return scoreB - scoreA
+	}) as TCardData[]
+}
 // #endregion
 // -----------------------------------------------------------

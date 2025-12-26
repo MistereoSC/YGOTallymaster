@@ -24,7 +24,7 @@ const isScrolling = ref(false)
 const CARD_WIDTH = 173 // w-43.25 = 173px
 const CARD_HEIGHT = 258 // h-64.5 = 258px
 const GAP = 16 // gap-4 = 16px
-const CONTAINER_PADDING = 32 // p-4 = 16px * 2 = 32px (left + right)
+const CONTAINER_PADDING = 16 // p-2 = 2 * 8px
 const BUFFER_ROWS = 2
 
 const cardsPerRow = computed(() => {
@@ -158,7 +158,7 @@ defineExpose({
 <template>
 	<div
 		ref="scrollContainer"
-		class="w-full h-full overflow-y-scroll scrollable p-4"
+		class="w-full h-full overflow-y-scroll scrollable p-2"
 		@scroll="handleScroll"
 	>
 		<!-- Virtual scroll container -->

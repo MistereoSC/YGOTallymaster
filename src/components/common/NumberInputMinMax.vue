@@ -129,24 +129,6 @@ watch([minInput, maxInput], ([newMin, newMax]) => {
 <template>
 	<div class="flex gap-2">
 		<div
-			@click="focusMinInput"
-			class="rounded-sm bg-primary-700 flex gap-1 items-center"
-		>
-			<div class="bg-primary-600 px-2 mr-1">
-				<i class="font-bold text-lg">≤</i>
-			</div>
-			<input
-				v-model="minInput"
-				@blur="onMinInputBlur"
-				class="border-none outline-none w-16"
-				type="number"
-				ref="minInputRef"
-				:min="props.minVal ?? -1"
-				:max="props.maxVal ?? 5000"
-			/>
-		</div>
-
-		<div
 			@click="focusMaxInput"
 			class="rounded-sm bg-primary-700 flex gap-1 items-center"
 		>
@@ -159,6 +141,23 @@ watch([minInput, maxInput], ([newMin, newMax]) => {
 				class="border-none outline-none w-16"
 				type="number"
 				ref="maxInputRef"
+				:min="props.minVal ?? -1"
+				:max="props.maxVal ?? 5000"
+			/>
+		</div>
+		<div
+			@click="focusMinInput"
+			class="rounded-sm bg-primary-700 flex gap-1 items-center"
+		>
+			<div class="bg-primary-600 px-2 mr-1">
+				<i class="font-bold text-lg">≤</i>
+			</div>
+			<input
+				v-model="minInput"
+				@blur="onMinInputBlur"
+				class="border-none outline-none w-16"
+				type="number"
+				ref="minInputRef"
 				:min="props.minVal ?? -1"
 				:max="props.maxVal ?? 5000"
 			/>

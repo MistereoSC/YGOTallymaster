@@ -3,15 +3,17 @@ import {onMounted, ref, watch} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {loadImage} from '@/libs/Images'
 import {Icon} from '@iconify/vue'
+import {getCardStyles} from '@/libs/CardData'
 
 interface IProps {
 	card: TCardData
-	size?: 'small' | 'medium' | 'large' | 'tiny'
 	active?: boolean
+	size?: 'small' | 'medium' | 'large' | 'tiny'
 }
 const props = withDefaults(defineProps<IProps>(), {
-	size: 'small',
+	size: 'medium',
 })
+
 const emit = defineEmits<{
 	(e: 'click', value: TCardData): void
 }>()
@@ -24,10 +26,7 @@ onMounted(async () => {
 })
 async function getPreviewImage() {
 	try {
-		const result = await loadImage(
-			props.card.id,
-			props.size === 'large' ? 'normal' : 'small'
-		)
+		const result = await loadImage(props.card.id, 'cropped')
 		if (result.success && result.localPath) {
 			// Get image as data URL to avoid file:// protocol issues
 			const dataUrlResult = await window.electronImage.getDataUrl(
@@ -70,63 +69,67 @@ watch(
 function onClick() {
 	emit('click', props.card)
 }
+const styles = getCardStyles(props.card)
 </script>
 
 <template>
 	<div
-		class="bg-primary-700 rounded-sm overflow-hidden relative outline-0 hover:outline-accent-500 hover:outline-4"
+		class="overflow-hidden select-none rounded-sm w-full px-1 hover:outline-2 hover:outline-accent-500 cursor-pointer"
 		:class="{
-			'w-21.75 h-32': props.size === 'tiny',
-			'w-29.5 h-43': props.size === 'small',
-			'w-43.25 h-64.5': props.size === 'medium',
-			'w-59 h-86': props.size === 'large',
-			'outline-4 outline-secondary-500': props.active,
+			'outline-secondary-500 outline-2': props.active,
 		}"
 		:style="{
-			transition: 'outline-width 0.1s ease, outline-color 0.1s ease',
+			background: styles.vars.border2
+				? `linear-gradient(180deg, ${styles.vars.border} 35%, ${styles.vars.border2} 65%)`
+				: styles.vars.border,
 		}"
 		@click="onClick"
 	>
-		<!-- Error state -->
 		<div
-			v-if="hasError"
-			class="w-full h-full flex flex-col items-center justify-center p-2"
+			class="bg-primary-900 w-full grid grid-cols-[auto_1fr] gap-2"
+			:class="{
+				'h-8': props.size === 'tiny',
+				'h-12': props.size === 'small',
+				'h-16': props.size === 'medium',
+				'h-20': props.size === 'large',
+			}"
 		>
-			<Icon
-				icon="material-symbols:imagesmode-outline"
-				class="text-4xl text-red-400"
-			/>
-			<div class="text-sm text-center font-semibold">
-				{{ card.name }}
-			</div>
-			<div class="text-xs text-center">
-				{{ card.id }}
-			</div>
-		</div>
-
-		<!-- Loading state -->
-		<div
-			v-else-if="isLoading"
-			class="w-full h-full flex items-center justify-center"
-		>
-			<i class="animate-spin text-4xl"><Icon icon="tabler:loader-2" /></i>
-		</div>
-
-		<!-- Image loaded -->
-		<div v-else class="w-full h-full relative cursor-pointer">
-			<img
-				:src="imageUrl!"
-				:alt="card.name"
-				class="w-full h-full object-cover"
-			/>
-			<!-- Optional overlay with card name -->
-			<!-- <div
-				class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2"
+			<!-- Image Preview -->
+			<div
+				class="bg-primary-700 rounded-sm overflow-hidden relative h-full aspect-square"
 			>
-				<div class="text-white text-xs font-medium">
-					{{ card.id }}
+				<!-- Error state -->
+				<div
+					v-if="hasError"
+					class="w-full h-full flex flex-col items-center justify-center p-2"
+				>
+					<Icon
+						icon="material-symbols:imagesmode-outline"
+						class="text-4xl text-red-400"
+					/>
 				</div>
-			</div> -->
+				<!-- Loading state -->
+				<div
+					v-else-if="isLoading"
+					class="w-full h-full flex items-center justify-center"
+				>
+					<i class="animate-spin text-4xl"
+						><Icon icon="tabler:loader-2"
+					/></i>
+				</div>
+				<!-- Image loaded -->
+				<div v-else class="w-full h-full relative cursor-pointer">
+					<img
+						:src="imageUrl!"
+						:alt="card.name"
+						class="w-full h-full object-cover object-top"
+					/>
+				</div>
+			</div>
+
+			<div class="">
+				<div>{{ props.card.name }}</div>
+			</div>
 		</div>
 	</div>
 </template>

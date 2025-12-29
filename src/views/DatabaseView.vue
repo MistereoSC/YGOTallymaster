@@ -110,7 +110,7 @@ function closePanel() {
 								class="text-xl"
 							/>
 						</button>
-						<button
+						<!-- <button
 							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
 							@click="toggleSettings"
 						>
@@ -118,7 +118,7 @@ function closePanel() {
 								icon="material-symbols:settings-rounded"
 								class="text-xl"
 							/>
-						</button>
+						</button> -->
 						<button
 							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
 							@click="toggleFilter"
@@ -138,6 +138,7 @@ function closePanel() {
 				:cardList="searchResults == null ? fullCardList : searchResults"
 				@card-clicked="(card) => onCardClick(card)"
 				:active-card-id="activeCard ? activeCard.id : null"
+				item-size="medium"
 			/>
 
 			<div

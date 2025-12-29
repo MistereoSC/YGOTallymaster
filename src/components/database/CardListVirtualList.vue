@@ -1,27 +1,21 @@
 <script lang="ts" setup>
-import {onMounted, ref, computed, onUnmounted, nextTick, watch} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
-import CardPreview from '@/components/database/CardPreview.vue'
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
+import CardPreviewListitem from './CardPreviewListitem.vue'
+
+const emit = defineEmits<{
+	(e: 'cardClicked', value: TCardData): void
+}>()
 
 interface IProps {
 	cardList: TCardData[]
 	activeCardId?: number | null
 	itemSize?: 'small' | 'medium' | 'large' | 'tiny'
-	itemGapPx?: number
-	containerPaddingPx?: number
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
-	itemGapPx: 16,
-	containerPaddingPx: 8,
 })
 
-const emit = defineEmits<{
-	(e: 'cardClicked', value: TCardData): void
-}>()
-// ----------------------------------------------
-// #region Virtual Scroll
-// ----------------------------------------------
 const scrollContainer = ref<HTMLElement>()
 const containerWidth = ref(0)
 const containerHeight = ref(0)
@@ -29,51 +23,39 @@ const scrollTop = ref(0)
 const debouncedScrollTop = ref(0)
 const isScrolling = ref(false)
 
-// Card dimensions
-let CARD_WIDTH = 173 // w-43.25 = 173px
-let CARD_HEIGHT = 258 // h-64.5 = 258px
-const BUFFER_ROWS = 2
-
-const cardsPerRow = computed(() => {
-	if (containerWidth.value === 0) return 1
-	const availableWidth = containerWidth.value - props.containerPaddingPx * 2
-	return Math.max(
-		1,
-		Math.floor(
-			(availableWidth + props.itemGapPx) / (CARD_WIDTH + props.itemGapPx)
-		)
-	)
+const BUFFER_ROWS = 4
+const GAP = 6 // gap-1.5
+const CARD_HEIGHT = computed(() => {
+	return props.itemSize === 'small'
+		? 48
+		: props.itemSize === 'large'
+		? 80
+		: props.itemSize === 'tiny'
+		? 32
+		: 64
 })
 
-const totalRows = computed(() => {
-	return Math.ceil(props.cardList.length / cardsPerRow.value)
-})
-
-// Calculate visible range (using debounced scroll position)
 const visibleRange = computed(() => {
 	const scrollPosition = debouncedScrollTop.value
 	const startRow = Math.max(
 		0,
-		Math.floor(scrollPosition / (CARD_HEIGHT + props.itemGapPx)) -
-			BUFFER_ROWS
+		Math.floor(scrollPosition / (CARD_HEIGHT.value + GAP)) - BUFFER_ROWS
 	)
 	const endRow = Math.min(
-		totalRows.value,
+		props.cardList.length,
 		Math.ceil(
-			(scrollPosition + containerHeight.value) /
-				(CARD_HEIGHT + props.itemGapPx)
+			(scrollPosition + containerHeight.value) / (CARD_HEIGHT.value + GAP)
 		) +
 			1 +
 			BUFFER_ROWS
 	)
 
-	const startIndex = Math.max(0, startRow * cardsPerRow.value)
-	const endIndex = Math.min(props.cardList.length, endRow * cardsPerRow.value)
+	const startIndex = Math.max(0, startRow)
+	const endIndex = Math.min(props.cardList.length, endRow)
 
 	return {startIndex, endIndex, startRow}
 })
 
-// Get visible cards
 const visibleCards = computed(() => {
 	const {startIndex, endIndex} = visibleRange.value
 	const result = []
@@ -88,12 +70,12 @@ const visibleCards = computed(() => {
 
 // Calculate total height for scrolling
 const totalHeight = computed(() => {
-	return totalRows.value * (CARD_HEIGHT + props.itemGapPx) - props.itemGapPx
+	return props.cardList.length * (CARD_HEIGHT.value + GAP) - GAP
 })
 
 // Calculate offset for visible items
 const offsetY = computed(() => {
-	return visibleRange.value.startRow * (CARD_HEIGHT + props.itemGapPx)
+	return visibleRange.value.startRow * (CARD_HEIGHT.value + GAP)
 })
 
 let scrollDebounceTimer: NodeJS.Timeout | null = null
@@ -120,15 +102,20 @@ const handleResize = () => {
 		containerHeight.value = scrollContainer.value.clientHeight
 	}
 }
-
-let resizeObserver: ResizeObserver | null = null
+watch(
+	() => props.itemSize,
+	() => {
+		handleResize()
+		scrollToTop()
+	}
+)
 
 // #endregion
 // ----------------------------------------------
 // #region Setup
 // ----------------------------------------------
+let resizeObserver: ResizeObserver | null = null
 onMounted(async () => {
-	setCardSizes(props.itemSize)
 	await nextTick()
 	handleResize()
 
@@ -148,35 +135,6 @@ onUnmounted(() => {
 		clearTimeout(scrollDebounceTimer)
 	}
 })
-
-function setCardSizes(size: 'small' | 'medium' | 'large' | 'tiny') {
-	switch (size) {
-		case 'tiny':
-			CARD_WIDTH = 87 // w-21.75
-			CARD_HEIGHT = 128 // h-32
-			break
-		case 'small':
-			CARD_WIDTH = 118 // w-29.5
-			CARD_HEIGHT = 172 // h-43
-			break
-		case 'medium':
-			CARD_WIDTH = 173 // w-43.25
-			CARD_HEIGHT = 258 // h-64.5
-			break
-		case 'large':
-			CARD_WIDTH = 236 // w-59
-			CARD_HEIGHT = 344 // h-86
-			break
-	}
-}
-watch(
-	() => props.itemSize,
-	(newVal) => {
-		setCardSizes(newVal || 'medium')
-		handleResize()
-		scrollToTop()
-	}
-)
 
 // #endregion
 // ----------------------------------------------
@@ -202,21 +160,17 @@ defineExpose({
 <template>
 	<div
 		ref="scrollContainer"
-		class="w-full h-full overflow-y-scroll scrollable"
-		:style="{padding: props.containerPaddingPx + 'px'}"
+		class="w-full h-full overflow-y-scroll scrollable p-4"
 		@scroll="handleScroll"
 	>
 		<!-- Virtual scroll container -->
 		<div class="relative w-full" :style="{height: totalHeight + 'px'}">
 			<!-- Visible cards container -->
 			<div
-				class="absolute w-full flex flex-wrap justify-center"
-				:style="{
-					transform: `translateY(${offsetY}px)`,
-					gap: props.itemGapPx + 'px',
-				}"
+				class="absolute w-full flex flex-col gap-1.5"
+				:style="{transform: `translateY(${offsetY}px)`}"
 			>
-				<CardPreview
+				<CardPreviewListitem
 					v-for="{card} in visibleCards"
 					:key="card.id"
 					:card="card"

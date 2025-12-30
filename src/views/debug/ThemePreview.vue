@@ -425,6 +425,11 @@ import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 			<h3 class="mb-4 text-xl font-bold">Components</h3>
 			<div class="flex items-center gap-2">
 				<Button
+					size="tiny"
+					icon="material-symbols:add-box-rounded"
+					label="SM"
+				/>
+				<Button
 					size="small"
 					icon="material-symbols:add-box-rounded"
 					label="SM"
@@ -438,6 +443,12 @@ import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 					size="large"
 					icon="material-symbols:add-box-rounded"
 					label="LG"
+				/>
+
+				<Button
+					size="tiny"
+					icon="material-symbols:add-box-rounded"
+					rounded
 				/>
 
 				<Button
@@ -455,6 +466,10 @@ import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 					icon="material-symbols:add-box-rounded"
 					rounded
 				/>
+				<Button variant="primary" label="Primary" />
+				<Button variant="secondary" label="Secondary" />
+				<Button variant="tertiary" label="Tertiary" />
+				<Button variant="transparent" label="Transparent" />
 			</div>
 			<div class="flex flex-wrap gap-2"></div>
 		</div>

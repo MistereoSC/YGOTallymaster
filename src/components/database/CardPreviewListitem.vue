@@ -1,14 +1,19 @@
 <script lang="ts" setup>
-import {onMounted, ref, watch} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {loadImage} from '@/libs/Images'
 import {Icon} from '@iconify/vue'
 import {getCardStyles} from '@/libs/CardData'
+import AttributeIcon from './AttributeIcon.vue'
+import {useOwnedCards} from '@/composables/useOwnedCards'
+import CardOwnHeart from '@/components/cards/CardOwnHeart.vue'
 
 interface IProps {
 	card: TCardData
 	active?: boolean
-	size?: 'small' | 'medium' | 'large' | 'tiny'
+	size?: 'tiny' | 'small' | 'medium' | 'large'
+	grayUnowned?: boolean
+	showOwnedHeart?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'medium',
@@ -21,8 +26,13 @@ const imageUrl = ref<string | null>(null)
 const isLoading = ref(true)
 const hasError = ref(false)
 
+const ownedStore = useOwnedCards()
 onMounted(async () => {
 	await getPreviewImage()
+})
+
+const numOwned = computed(() => {
+	return ownedStore.ownedCards.value?.[props.card.id] ?? 0
 })
 async function getPreviewImage() {
 	try {
@@ -86,7 +96,8 @@ const styles = getCardStyles(props.card)
 		@click="onClick"
 	>
 		<div
-			class="bg-primary-900 w-full grid grid-cols-[auto_1fr] gap-2"
+			class="cardItemFrame bg-primary-900/90 hover:bg-primary-900 w-full grid grid-cols-[auto_1fr_auto] gap-2"
+			:grayscale="props.grayUnowned && numOwned === 0 ? 'true' : 'false'"
 			:class="{
 				'h-8': props.size === 'tiny',
 				'h-12': props.size === 'small',
@@ -96,7 +107,13 @@ const styles = getCardStyles(props.card)
 		>
 			<!-- Image Preview -->
 			<div
-				class="bg-primary-700 rounded-sm overflow-hidden relative h-full aspect-square"
+				class="bg-primary-700 rounded-sm overflow-hidden relative aspect-square"
+				:class="{
+					'h-8': props.size === 'tiny',
+					'h-12': props.size === 'small',
+					'h-16': props.size === 'medium',
+					'h-20': props.size === 'large',
+				}"
 			>
 				<!-- Error state -->
 				<div
@@ -122,16 +139,59 @@ const styles = getCardStyles(props.card)
 					<img
 						:src="imageUrl!"
 						:alt="card.name"
-						class="w-full h-full object-cover object-top"
+						class="w-full h-full object-cover object-top cardItemImage"
 					/>
 				</div>
 			</div>
 
-			<div class="">
-				<div>{{ props.card.name }}</div>
+			<!-- Card Info -->
+			<div
+				class=""
+				:class="{
+					'grid grid-rows-[auto_1fr] py-1': props.size !== 'tiny',
+					'flex items-center gap-4': props.size === 'tiny',
+				}"
+			>
+				<div class="flex gap-2 items-center">
+					<AttributeIcon
+						:attribute="props.card.attribute ?? props.card.race"
+						:size="
+							props.size === 'tiny' || props.size === 'small'
+								? 'tiny'
+								: 'small'
+						"
+					/>
+					<div class="line-clamp-1">
+						{{ props.card.name }}
+					</div>
+				</div>
+				<div class=""></div>
+			</div>
+
+			<!-- Controls -->
+			<div class="flex flex-col justify-evenly items-center">
+				<CardOwnHeart :card-id="props.card.id" />
 			</div>
 		</div>
 	</div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.cardItemFrame[grayscale='true'] {
+	background-color: color-mix(
+		in srgb,
+		var(--color-primary-600) 90%,
+		transparent
+	);
+
+	.cardItemImage {
+		filter: grayscale(1);
+		transition: filter 0.2s ease;
+	}
+	&:hover {
+		.cardItemImage {
+			filter: grayscale(0);
+		}
+	}
+}
+</style>

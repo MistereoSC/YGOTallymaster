@@ -10,7 +10,10 @@ const emit = defineEmits<{
 interface IProps {
 	cardList: TCardData[]
 	activeCardId?: number | null
-	itemSize?: 'small' | 'medium' | 'large' | 'tiny'
+	itemSize?: 'tiny' | 'small' | 'medium' | 'large'
+	showOwnedHeart?: boolean
+	showOwnedNumber?: boolean
+	grayUnowned?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
@@ -177,6 +180,9 @@ defineExpose({
 					:active="card.id === props.activeCardId"
 					:size="props.itemSize"
 					@click="onCardClick(card)"
+					:show-owned-heart="props.showOwnedHeart"
+					:show-owned-number="props.showOwnedNumber"
+					:gray-unowned="props.grayUnowned"
 				/>
 			</div>
 		</div>

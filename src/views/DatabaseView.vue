@@ -7,8 +7,9 @@ import CardListVirtualGrid from '@/components/database/CardListVirtualGrid.vue'
 import CardFilter from '@/components/database/CardFilter.vue'
 
 import {useCardSearch} from '@/composables/useCardSearch'
-import Checkbox from '@/components/common/Checkbox.vue'
 import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
+import DisplaySettings from '@/components/database/DisplaySettings.vue'
+import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 const {searchResults, fullCardList} = useCardSearch()
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
@@ -88,9 +89,7 @@ function closePanel() {
 // ----------------------------------------------
 // #region Settings
 // ----------------------------------------------
-const grayOutUnowned = ref(false)
-const alwaysShowOwnedNumbers = ref(false)
-const displayAsList = ref(false)
+const settingsStore = useDatabaseSettings()
 
 // #endregion
 // ----------------------------------------------
@@ -145,18 +144,20 @@ const displayAsList = ref(false)
 			</div>
 		</div>
 		<div class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden">
-			<CardListVirtualGrid
-				v-if="!displayAsList"
+			<CardListVirtualList
+				v-if="settingsStore.settings.value?.displayAsList"
 				ref="cardGrid"
 				:cardList="searchResults == null ? fullCardList : searchResults"
 				@card-clicked="(card) => onCardClick(card)"
 				:active-card-id="activeCard ? activeCard.id : null"
-				item-size="medium"
+				:item-size="settingsStore.settings.value?.listSize || 'medium'"
 				:show-owned-heart="true"
-				:show-owned-number="alwaysShowOwnedNumbers"
-				:gray-out-unowned="grayOutUnowned"
+				:show-owned-number="
+					settingsStore.settings.value?.showOwnedNumbers
+				"
+				:gray-unowned="settingsStore.settings.value?.grayUnowned"
 			/>
-			<CardListVirtualList
+			<CardListVirtualGrid
 				v-else
 				ref="cardGrid"
 				:cardList="searchResults == null ? fullCardList : searchResults"
@@ -164,8 +165,10 @@ const displayAsList = ref(false)
 				:active-card-id="activeCard ? activeCard.id : null"
 				item-size="medium"
 				:show-owned-heart="true"
-				:show-owned-number="alwaysShowOwnedNumbers"
-				:gray-out-unowned="grayOutUnowned"
+				:show-owned-number="
+					settingsStore.settings.value?.showOwnedNumbers
+				"
+				:gray-unowned="settingsStore.settings.value?.grayUnowned"
 			/>
 
 			<div
@@ -181,21 +184,8 @@ const displayAsList = ref(false)
 						:search-while-typing="true"
 						v-else-if="activePanel === 'filter'"
 					/>
-					<div v-else-if="activePanel === 'settings'">
-						<h3 class="font-bold text-xl">Settings</h3>
-						<Checkbox
-							label="Gray Out Unowned Cards"
-							v-model="grayOutUnowned"
-						/>
-						<Checkbox
-							label="Always Show Owned Numbers"
-							v-model="alwaysShowOwnedNumbers"
-						/>
-						<Checkbox
-							label="Display as List"
-							v-model="displayAsList"
-						/>
-					</div>
+
+					<DisplaySettings v-else-if="activePanel === 'settings'" />
 				</div>
 			</div>
 		</div>

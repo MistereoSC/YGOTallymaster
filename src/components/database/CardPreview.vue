@@ -10,13 +10,13 @@ interface IProps {
 	card: TCardData
 	size?: 'small' | 'medium' | 'large' | 'tiny'
 	active?: boolean
-	grayed?: boolean
+	grayUnowned?: boolean
 	showOwnedHeart?: boolean
 	showOwnedNumber?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'small',
-	grayed: false,
+	grayUnowned: false,
 	showOwnedHeart: false,
 	active: false,
 	showOwnedNumber: false,
@@ -100,7 +100,7 @@ function onClick() {
 			transition:
 				'outline-width 0.1s ease-out, outline-color 0.1s ease-out',
 		}"
-		:grayscale="props.grayed && numOwned === 0 ? 'true' : 'false'"
+		:grayscale="props.grayUnowned && numOwned === 0 ? 'true' : 'false'"
 		@click="onClick"
 	>
 		<!-- Error state -->
@@ -146,7 +146,7 @@ function onClick() {
 			/>
 		</div>
 		<div
-			v-if="showOwnedNumber"
+			v-if="showOwnedNumber && numOwned > 0"
 			class="absolute bottom-0 left-0 w-12 h-12 bg-[radial-gradient(circle_at_bottom_left,rgba(0,0,0,0.8),transparent_70%)]"
 		>
 			<div

@@ -23,10 +23,9 @@ const emit = defineEmits([])
 			</div>
 			<div class="text-xl font-bold flex justify-between items-center">
 				<span>{{ card.name }}</span>
-				<span v-if="card.attribute">
-					<AttributeIcon :attribute="card.attribute" />
+				<span>
+					<AttributeIcon :attribute="card.attribute ?? card.race" />
 				</span>
-				<span v-else>[{{ card.race }}]</span>
 			</div>
 			<div
 				v-if="card.level"

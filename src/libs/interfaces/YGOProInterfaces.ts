@@ -32,6 +32,7 @@ type TGeneralCardData = {
 	type: string
 	desc: string
 	ygoprodeck_url: string
+	race: string
 
 	card_images: TCardImageData[]
 	card_sets: TCardSetData[]
@@ -49,7 +50,6 @@ type TMonsterCardData = {
 	scale: number
 	linkval: number
 	linkmarkers: TLinkMarkers[]
-	race: string
 	typeline: string[]
 }
 
@@ -175,6 +175,14 @@ export type TMonsterAttribute =
 	| 'LIGHT'
 	| 'DARK'
 	| 'DIVINE'
+
+export type TSpellTrapAttribute =
+	| 'Normal'
+	| 'Continuous'
+	| 'Counter'
+	| 'Quick-Play'
+	| 'Field'
+	| 'Ritual'
 
 export enum EMonsterAttributes {
 	WIND = 'WIND',

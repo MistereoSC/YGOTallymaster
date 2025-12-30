@@ -1,35 +1,72 @@
 <script lang="ts" setup>
-import {onMounted} from 'vue'
+import {Icon} from '@iconify/vue'
 
-const props = defineProps<{
-	modelValue: boolean
+interface IProps {
+	modelValue: boolean | null | undefined
 	label?: string
-}>()
+	disabled?: boolean
+	size?: 'small' | 'medium' | 'large'
+}
+const props = withDefaults(defineProps<IProps>(), {
+	disabled: false,
+	size: 'medium',
+})
+
 const emit = defineEmits<{
 	(e: 'change', value: boolean): void
 	(e: 'update:modelValue', value: boolean): void
 }>()
 
 function onToggle() {
+	if (props.disabled || props.modelValue == null) return
 	emit('update:modelValue', !props.modelValue)
 	emit('change', !props.modelValue)
 }
 </script>
 
 <template>
-	<div class="flex items-center gap-2">
-		<input
-			type="checkbox"
-			:checked="modelValue"
-			@change="onToggle"
-			class="w-4 h-4 rounded border-tertiary-500 bg-primary-600 text-accent-500 focus:ring-accent-400 focus:ring-2"
-		/>
+	<div
+		class="flex items-center gap-2 cursor-pointer select-none"
+		:class="{
+			'opacity-50 cursor-not-allowed!':
+				props.disabled || props.modelValue == null,
+		}"
+		@click="onToggle"
+	>
+		<div
+			class="flex items-center justify-center rounded-sm border-2 transition-colors"
+			:class="{
+				'w-4 h-4': props.size === 'small',
+				'w-5 h-5': props.size === 'medium',
+				'w-6 h-6': props.size === 'large',
+				'bg-accent-500 border-accent-500': modelValue,
+				'bg-primary-700 border-primary-500 hover:border-accent-400':
+					!modelValue,
+			}"
+		>
+			<Icon
+				v-if="modelValue"
+				icon="material-symbols:check-rounded"
+				class="text-white"
+				:class="{
+					'text-xs': props.size === 'small',
+					'text-sm': props.size === 'medium',
+					'text-base': props.size === 'large',
+				}"
+			/>
+		</div>
 		<label
 			v-if="label"
-			class="font-semibold select-none text-md text-contrast-800"
+			class="font-semibold cursor-pointer"
+			:class="{
+				'text-sm': props.size === 'small',
+				'text-base': props.size === 'medium',
+				'text-lg': props.size === 'large',
+			}"
 		>
 			{{ label }}
 		</label>
+		<slot></slot>
 	</div>
 </template>
 

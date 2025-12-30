@@ -11,7 +11,7 @@ interface IProps {
 	containerPaddingPx?: number
 	showOwnedHeart?: boolean
 	showOwnedNumber?: boolean
-	grayOutUnowned?: boolean
+	grayUnowned?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
@@ -228,7 +228,7 @@ defineExpose({
 					@click="onCardClick(card)"
 					:show-owned-heart="props.showOwnedHeart"
 					:show-owned-number="props.showOwnedNumber"
-					:grayed="props.grayOutUnowned"
+					:gray-unowned="props.grayUnowned"
 				/>
 			</div>
 		</div>

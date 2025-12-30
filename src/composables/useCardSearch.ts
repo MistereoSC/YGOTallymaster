@@ -304,8 +304,6 @@ const useListSearch = (cardIdInput: TCardIdInput) => {
 	}
 
 	function indexCard(cardId: number) {
-		console.log('INDEXING', cardId)
-
 		if (!l_miniSearchIndex) return
 		if (l_miniSearchIndex.has(cardId)) return
 		const card = fullCardList.value.find((c) => c.id === cardId)
@@ -315,8 +313,6 @@ const useListSearch = (cardIdInput: TCardIdInput) => {
 		}
 	}
 	function deindexCard(cardId: number) {
-		console.log('DEINDEXING', cardId)
-
 		if (!l_miniSearchIndex) return
 		if (!l_miniSearchIndex.has(cardId)) return
 		l_fullCardList.value = l_fullCardList.value.filter(
@@ -326,7 +322,7 @@ const useListSearch = (cardIdInput: TCardIdInput) => {
 	}
 }
 
-export {useCardSearch, useListSearch}
+export {useCardSearch, useListSearch, __getAllViableValues}
 
 // -----------------------------------------------------------
 // #region Interfaces
@@ -592,6 +588,38 @@ function _searchTerm(term: string, cardList?: TCardData[]) {
 	}
 
 	return results as unknown as TSearchResultCardData[]
+}
+
+function __getAllViableValues<K extends keyof TCardData>(
+	key: K,
+	cardList: TCardData[] = fullCardList.value
+): Array<
+	NonNullable<TCardData[K]> extends Array<infer U>
+		? U
+		: NonNullable<TCardData[K]>
+> {
+	const valuesSet = new Set<unknown>()
+	for (const card of cardList) {
+		const value = card[key]
+		if (value === undefined || value === null) continue
+
+		if (Array.isArray(value)) {
+			// For array fields like 'linkmarkers' or 'typeline', add each element
+			for (const item of value) {
+				if (item !== undefined && item !== null) {
+					valuesSet.add(item)
+				}
+			}
+		} else {
+			valuesSet.add(value)
+		}
+	}
+
+	return Array.from(valuesSet) as Array<
+		NonNullable<TCardData[K]> extends Array<infer U>
+			? U
+			: NonNullable<TCardData[K]>
+	>
 }
 // #endregion
 // -----------------------------------------------------------

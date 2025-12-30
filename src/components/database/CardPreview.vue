@@ -1,16 +1,25 @@
 <script lang="ts" setup>
-import {onMounted, ref, watch} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {loadImage} from '@/libs/Images'
 import {Icon} from '@iconify/vue'
+import CardOwnHeart from '@/components/cards/CardOwnHeart.vue'
+import {useOwnedCards} from '@/composables/useOwnedCards'
 
 interface IProps {
 	card: TCardData
 	size?: 'small' | 'medium' | 'large' | 'tiny'
 	active?: boolean
+	grayed?: boolean
+	showOwnedHeart?: boolean
+	showOwnedNumber?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'small',
+	grayed: false,
+	showOwnedHeart: false,
+	active: false,
+	showOwnedNumber: false,
 })
 const emit = defineEmits<{
 	(e: 'click', value: TCardData): void
@@ -18,6 +27,11 @@ const emit = defineEmits<{
 const imageUrl = ref<string | null>(null)
 const isLoading = ref(true)
 const hasError = ref(false)
+const ownedStore = useOwnedCards()
+
+const numOwned = computed(() => {
+	return ownedStore.ownedCards.value?.[props.card.id] ?? 0
+})
 
 onMounted(async () => {
 	await getPreviewImage()
@@ -74,7 +88,7 @@ function onClick() {
 
 <template>
 	<div
-		class="bg-primary-700 rounded-sm overflow-hidden relative outline-0 hover:outline-accent-500 hover:outline-4"
+		class="cardItemFrame bg-primary-700 rounded-sm overflow-hidden relative outline-0 outline-accent-500 hover:outline-4"
 		:class="{
 			'w-21.75 h-32': props.size === 'tiny',
 			'w-29.5 h-43': props.size === 'small',
@@ -83,8 +97,10 @@ function onClick() {
 			'outline-4 outline-secondary-500': props.active,
 		}"
 		:style="{
-			transition: 'outline-width 0.1s ease, outline-color 0.1s ease',
+			transition:
+				'outline-width 0.1s ease-out, outline-color 0.1s ease-out',
 		}"
+		:grayscale="props.grayed && numOwned === 0 ? 'true' : 'false'"
 		@click="onClick"
 	>
 		<!-- Error state -->
@@ -117,18 +133,46 @@ function onClick() {
 			<img
 				:src="imageUrl!"
 				:alt="card.name"
-				class="w-full h-full object-cover"
+				class="w-full h-full object-cover cardItemImage"
 			/>
+
 			<!-- Optional overlay with card name -->
-			<!-- <div
-				class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2"
+		</div>
+
+		<div class="absolute bottom-1 right-1" v-if="showOwnedHeart">
+			<CardOwnHeart
+				:card-id="props.card.id"
+				class="opacity-0 transition-opacity duration-300"
+			/>
+		</div>
+		<div
+			v-if="showOwnedNumber"
+			class="absolute bottom-0 left-0 w-12 h-12 bg-[radial-gradient(circle_at_bottom_left,rgba(0,0,0,0.8),transparent_70%)]"
+		>
+			<div
+				class="text-shadow-contrast-900 text-md font-bold absolute bottom-0.5 left-1.5"
 			>
-				<div class="text-white text-xs font-medium">
-					{{ card.id }}
-				</div>
-			</div> -->
+				{{ numOwned }}
+			</div>
 		</div>
 	</div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.cardItemFrame[grayscale='true'] {
+	.cardItemImage {
+		filter: grayscale(1);
+		transition: filter 0.3s ease;
+	}
+	&:hover {
+		.cardItemImage {
+			filter: grayscale(0);
+		}
+	}
+}
+.cardItemFrame:hover {
+	.cardOwnHeart {
+		opacity: 1;
+	}
+}
+</style>

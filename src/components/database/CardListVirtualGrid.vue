@@ -9,6 +9,9 @@ interface IProps {
 	itemSize?: 'small' | 'medium' | 'large' | 'tiny'
 	itemGapPx?: number
 	containerPaddingPx?: number
+	showOwnedHeart?: boolean
+	showOwnedNumber?: boolean
+	grayOutUnowned?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
@@ -223,6 +226,9 @@ defineExpose({
 					:active="card.id === props.activeCardId"
 					:size="props.itemSize"
 					@click="onCardClick(card)"
+					:show-owned-heart="props.showOwnedHeart"
+					:show-owned-number="props.showOwnedNumber"
+					:grayed="props.grayOutUnowned"
 				/>
 			</div>
 		</div>

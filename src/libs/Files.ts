@@ -31,7 +31,9 @@ async function write<T>(path: string, data: T): Promise<boolean> {
 	const p = await Path.AppRoot()
 	if (!p) return false
 	const subPath = path.startsWith('/') ? path : '/' + path
-	const result = await window.electronFS.writeJSON(p + subPath, data)
+	// Convert to plain object to avoid Vue Proxy cloning issues with IPC
+	const plainData = JSON.parse(JSON.stringify(data))
+	const result = await window.electronFS.writeJSON(p + subPath, plainData)
 	if (!result.success) {
 		console.error('Failed to write file:', result.error)
 		return false

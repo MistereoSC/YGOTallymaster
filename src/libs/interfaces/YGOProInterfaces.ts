@@ -28,10 +28,12 @@ type TGeneralCardData = {
 	id: number
 	name: string
 	frameType: TFrameType
+	humanReadableCardType: string
+	type: string
 	desc: string
 	ygoprodeck_url: string
 
-	images: TCardImageData[]
+	card_images: TCardImageData[]
 	card_sets: TCardSetData[]
 	card_prices: TCardPriceData[]
 
@@ -57,13 +59,14 @@ type TCardDataMisc = {
 	upvotes: number
 	downvotes: number
 	formats: string[]
-	treated_as: string
+	treated_as?: string
 	tcg_date: string
 	ocg_date: string
-	konami_id: string
-	md_rarity: string
-	has_effect: boolean
-	genesys_points: number
+	konami_id: number
+	beta_name?: string
+	md_rarity?: string
+	has_effect: number
+	genesys_points?: number
 }
 
 // endregion

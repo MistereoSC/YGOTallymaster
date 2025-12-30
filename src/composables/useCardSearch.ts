@@ -1,7 +1,6 @@
 import {getCardList} from '@/libs/CardData'
 import {
 	TCardData,
-	TFrameType,
 	TLinkMarkers,
 	TMonsterAttribute,
 	TMonsterRace,
@@ -12,7 +11,86 @@ import {
 import MiniSearch from 'minisearch'
 import {ref, markRaw} from 'vue'
 
-const MIN_SCORE_THRESHOLD: Readonly<number> = 0.5
+// -----------------------------------------------------------
+// #region Constants
+// -----------------------------------------------------------
+
+const MIN_SCORE_THRESHOLD: Readonly<number> = 2
+const STOP_WORDS = new Set([
+	'and',
+	'or',
+	'to',
+	'in',
+	'a',
+	'the',
+	'for',
+	'of',
+	'is',
+	'it',
+	'an',
+	'as',
+	'at',
+	'be',
+	'by',
+	'on',
+	'with',
+	'from',
+])
+const STORE_FIELDS = [
+	// TGeneralCardData fields
+	'id',
+	'name',
+	'frameType',
+	'desc',
+	'ygoprodeck_url',
+	'images',
+	'card_sets',
+	'card_prices',
+	'archetype',
+	// TMonsterCardData fields (partial)
+	'atk',
+	'def',
+	'level',
+	'attribute',
+	'scale',
+	'linkval',
+	'linkmarkers',
+	'race',
+	'typeline',
+	// TCardDataMisc fields
+	'misc_info',
+]
+const TOKENIZE_FN = (text: string) => {
+	// Custom tokenizer with bigram support that preserves D/D/D/D patterns
+	const baseTokens = text
+		.toLowerCase()
+		// Normalize special characters and symbols to common equivalents
+		.replace(/☆/g, '-') // Star symbol to "star"
+		.replace(/★/g, '-') // Filled star to "star"
+
+		// First, protect D/D/D/D patterns by replacing slashes with a placeholder
+		.replace(/\bd(\/d)+\b/g, (match) => match.replace(/\//g, '___SLASH___'))
+		// Also protect other slash-separated terms that might be important
+		.replace(/\b\w+\/\w+(?:\/\w+)*\b/g, (match) =>
+			match.replace(/\//g, '___SLASH___')
+		)
+		// Split on whitespace and hyphens
+		.split(/[\s-]+/)
+		// Restore the slashes
+		.map((token) => token.replace(/___SLASH___/g, '/'))
+		// Filter out empty tokens
+		.filter((token) => token.length > 0)
+
+	const tokens = [...baseTokens] // Start with individual tokens
+
+	// Add bigrams (pairs of adjacent tokens)
+	for (let i = 0; i < baseTokens.length - 1; i++) {
+		const bigram = `${baseTokens[i]} ${baseTokens[i + 1]}`
+		tokens.push(bigram)
+	}
+
+	return tokens
+}
 
 export enum ESortBy {
 	Name_Asc = 'Name (Ascending)',
@@ -26,6 +104,11 @@ export enum ESortBy {
 	DEF_Desc = 'DEF (Descending)',
 	Type = 'Card Type',
 }
+
+// #endregion
+// -----------------------------------------------------------
+// #region Singleton useCardSearch
+// -----------------------------------------------------------
 
 let miniSearchIndex = null as null | MiniSearch<TCardData>
 let initialized = false
@@ -41,58 +124,12 @@ const useCardSearch = () => {
 		if (initialized && !force) return
 		initialized = true
 
-		const stopWords = new Set([
-			'and',
-			'or',
-			'to',
-			'in',
-			'a',
-			'the',
-			'for',
-			'of',
-			'is',
-			'it',
-			'an',
-			'as',
-			'at',
-			'be',
-			'by',
-			'on',
-			'with',
-			'from',
-		])
-		const cardData = _filterCardData(await getCardList(), [
-			'token',
-			'skill',
-		])
+		const cardData = _initialFilterCardData(await getCardList())
 		fullCardList.value = cardData
 
 		const miniSearch = new MiniSearch({
 			fields: ['name', 'desc', 'archetype'],
-			storeFields: [
-				// TGeneralCardData fields
-				'id',
-				'name',
-				'frameType',
-				'desc',
-				'ygoprodeck_url',
-				'images',
-				'card_sets',
-				'card_prices',
-				'archetype',
-				// TMonsterCardData fields (partial)
-				'atk',
-				'def',
-				'level',
-				'attribute',
-				'scale',
-				'linkval',
-				'linkmarkers',
-				'race',
-				'typeline',
-				// TCardDataMisc fields
-				'misc_info',
-			],
+			storeFields: STORE_FIELDS,
 			searchOptions: {
 				fuzzy: 0.3,
 				prefix: true,
@@ -100,42 +137,11 @@ const useCardSearch = () => {
 				combineWith: 'AND',
 			},
 			processTerm: (term, _fieldName) =>
-				stopWords.has(term) ? null : term.toLowerCase(),
-			tokenize: (text) => {
-				// Custom tokenizer with bigram support that preserves D/D/D/D patterns
-				const baseTokens = text
-					.toLowerCase()
-					// Normalize special characters and symbols to common equivalents
-					.replace(/☆/g, '-') // Star symbol to "star"
-					.replace(/★/g, '-') // Filled star to "star"
-
-					// First, protect D/D/D/D patterns by replacing slashes with a placeholder
-					.replace(/\bd(\/d)+\b/g, (match) =>
-						match.replace(/\//g, '___SLASH___')
-					)
-					// Also protect other slash-separated terms that might be important
-					.replace(/\b\w+\/\w+(?:\/\w+)*\b/g, (match) =>
-						match.replace(/\//g, '___SLASH___')
-					)
-					// Split on whitespace and hyphens
-					.split(/[\s-]+/)
-					// Restore the slashes
-					.map((token) => token.replace(/___SLASH___/g, '/'))
-					// Filter out empty tokens
-					.filter((token) => token.length > 0)
-
-				const tokens = [...baseTokens] // Start with individual tokens
-
-				// Add bigrams (pairs of adjacent tokens)
-				for (let i = 0; i < baseTokens.length - 1; i++) {
-					const bigram = `${baseTokens[i]} ${baseTokens[i + 1]}`
-					tokens.push(bigram)
-				}
-
-				return tokens
-			},
+				STOP_WORDS.has(term) ? null : term.toLowerCase(),
+			tokenize: TOKENIZE_FN,
 		})
 		miniSearch.addAll(cardData as TCardData[])
+
 		miniSearchIndex = miniSearch
 		activeQuery.value = {}
 		searchResults.value = null
@@ -159,55 +165,7 @@ const useCardSearch = () => {
 			}
 		}
 
-		// Apply Core Type Filter
-		if (query.coreCardType) {
-			cOut = _searchCoreCardType(query.coreCardType, cOut)
-		}
-
-		// Apply Spell/Trap Filters
-		if (query.spellTypes && query.spellTypes.length > 0) {
-			cOut = _searchSpellTrapType(query.spellTypes, cOut)
-		}
-
-		if (query.trapTypes && query.trapTypes.length > 0) {
-			cOut = _searchSpellTrapType(query.trapTypes, cOut)
-		}
-
-		// Apply Monster Filters
-		if (query.scales && query.scales.length > 0) {
-			cOut = _searchPendulumScales(query.scales, cOut)
-		}
-
-		if (query.linkvals && query.linkvals.length > 0) {
-			cOut = _searchLinkvals(query.linkvals, cOut)
-		}
-
-		if (query.attributes && query.attributes.length > 0) {
-			cOut = _searchAttribute(query.attributes, cOut)
-		}
-
-		if (query.monsterTypes && query.monsterTypes.terms.length > 0) {
-			cOut = _searchMonsterType(query.monsterTypes, cOut)
-		}
-
-		if (query.monsterRaces && query.monsterRaces.length > 0) {
-			cOut = _searchMonsterRace(query.monsterRaces, cOut)
-		}
-
-		if (query.levels && query.levels.length > 0) {
-			cOut = _searchMonsterLevels(query.levels, cOut)
-		}
-
-		if (query.links && query.links.terms.length > 0) {
-			cOut = _searchLinkmarkers(query.links, cOut)
-		}
-
-		if (
-			(query.atk && (query.atk.gte != null || query.atk.lte != null)) ||
-			(query.def && (query.def.gte != null || query.def.lte != null))
-		) {
-			cOut = _searchAtkAndDef(cOut, query.atk, query.def)
-		}
+		cOut = _applyQueryFilters(cOut, query)
 
 		searchResults.value = markRaw(cOut)
 		return cOut
@@ -245,7 +203,130 @@ const useCardSearch = () => {
 	}
 }
 
-export {useCardSearch}
+const useListSearch = (cardIdInput: TCardIdInput) => {
+	let l_initialized = false
+	let l_miniSearchIndex = null as null | MiniSearch<TCardData>
+	let l_searchResults = ref(null as TCardData[] | null)
+	let l_activeQuery = ref<TSearchQuery>({})
+	let l_fullCardList = ref([] as TCardData[])
+	let l_sortedBy = ref(ESortBy.Name_Asc)
+	_init()
+
+	async function _init(force = false) {
+		if (l_initialized && !force) return
+		l_initialized = true
+
+		const cardIdSet = Array.isArray(cardIdInput)
+			? new Set(cardIdInput)
+			: new Set(Object.keys(cardIdInput).map(Number))
+		const cardData = _initialFilterCardData(await getCardList())
+		if (!fullCardList.value) fullCardList.value = cardData
+		l_fullCardList.value = cardData.filter((card) => cardIdSet.has(card.id))
+
+		const miniSearch = new MiniSearch({
+			fields: ['name', 'desc', 'archetype'],
+			storeFields: STORE_FIELDS,
+			searchOptions: {
+				fuzzy: 0.3,
+				prefix: true,
+				boost: {name: 6, archetype: 2, desc: 1},
+				combineWith: 'AND',
+			},
+			processTerm: (term, _fieldName) =>
+				STOP_WORDS.has(term) ? null : term.toLowerCase(),
+			tokenize: TOKENIZE_FN,
+		})
+		miniSearch.addAll(cardData as TCardData[])
+
+		l_miniSearchIndex = miniSearch
+		l_activeQuery.value = {}
+		l_searchResults.value = null
+		l_sortedBy.value = ESortBy.Name_Asc
+		return miniSearch
+	}
+	const search = (query: TSearchQuery) => {
+		if (!l_miniSearchIndex) return []
+		l_activeQuery.value = query
+		if (_searchQueryIsEmpty(query)) {
+			l_searchResults.value = null
+			return []
+		}
+
+		let cOut = l_fullCardList.value
+
+		if (query.term && query.term.length > 0) {
+			cOut = _searchTerm(query.term)
+			if (l_sortedBy.value !== ESortBy.Search_Score) {
+				_sort(l_sortedBy.value, cOut)
+			}
+		}
+
+		cOut = _applyQueryFilters(cOut, query)
+
+		l_searchResults.value = markRaw(cOut)
+		return cOut
+	}
+	const resetSearch = () => {
+		l_searchResults.value = null
+		l_activeQuery.value = {}
+	}
+	function reinitializeIndex() {
+		_init(true)
+	}
+
+	function sort(by?: ESortBy) {
+		if (!by && l_sortedBy.value === ESortBy.Name_Asc) return
+		else if (by === l_sortedBy.value) return
+		l_sortedBy.value = by ?? ESortBy.Name_Asc
+
+		l_fullCardList.value = _sort(
+			by ?? ESortBy.Name_Asc,
+			l_fullCardList.value
+		)
+		if (l_searchResults.value) {
+			l_searchResults.value = markRaw(
+				_sort(by ?? ESortBy.Name_Asc, [...l_searchResults.value])
+			)
+		}
+	}
+
+	return {
+		search,
+		resetSearch,
+		searchResults: l_searchResults,
+		activeQuery: l_activeQuery,
+		fullCardList: l_fullCardList,
+		reinitializeIndex,
+		sort,
+		indexCard,
+		deindexCard,
+		sortedBy: l_sortedBy,
+	}
+
+	function indexCard(cardId: number) {
+		console.log('INDEXING', cardId)
+
+		if (!l_miniSearchIndex) return
+		if (l_miniSearchIndex.has(cardId)) return
+		const card = fullCardList.value.find((c) => c.id === cardId)
+		if (card) {
+			l_fullCardList.value.push(card)
+			l_miniSearchIndex.add(card)
+		}
+	}
+	function deindexCard(cardId: number) {
+		console.log('DEINDEXING', cardId)
+
+		if (!l_miniSearchIndex) return
+		if (!l_miniSearchIndex.has(cardId)) return
+		l_fullCardList.value = l_fullCardList.value.filter(
+			(c) => c.id !== cardId
+		)
+		l_miniSearchIndex.discard(cardId)
+	}
+}
+
+export {useCardSearch, useListSearch}
 
 // -----------------------------------------------------------
 // #region Interfaces
@@ -275,13 +356,15 @@ export type TSearchQuery = {
 	trapTypes?: TTrapTypes[]
 }
 export type TCoreCardType = 'Monster' | 'Spell' | 'Trap'
+type TCardIdInput = number[] | Record<number, unknown>
 
 // #endregion
 // -----------------------------------------------------------
 // #region Helper Functions
 // -----------------------------------------------------------
 
-function _filterCardData(cardData: TCardData[], filteredFields: TFrameType[]) {
+function _initialFilterCardData(cardData: TCardData[]) {
+	const filteredFields = ['token', 'skill']
 	return cardData.filter((card) => {
 		return !filteredFields.includes(card.frameType)
 	})
@@ -291,6 +374,63 @@ function _filterCardData(cardData: TCardData[], filteredFields: TFrameType[]) {
 // -----------------------------------------------------------
 // #region Search Functions
 // -----------------------------------------------------------
+
+function _applyQueryFilters(
+	cardList: TCardData[] | TSearchResultCardData[],
+	query: TSearchQuery
+) {
+	let cOut = cardList
+	// Apply Core Type Filter
+	if (query.coreCardType) {
+		cOut = _searchCoreCardType(query.coreCardType, cOut)
+	}
+
+	// Apply Spell/Trap Filters
+	if (query.spellTypes && query.spellTypes.length > 0) {
+		cOut = _searchSpellTrapType(query.spellTypes, cOut)
+	}
+
+	if (query.trapTypes && query.trapTypes.length > 0) {
+		cOut = _searchSpellTrapType(query.trapTypes, cOut)
+	}
+
+	// Apply Monster Filters
+	if (query.scales && query.scales.length > 0) {
+		cOut = _searchPendulumScales(query.scales, cOut)
+	}
+
+	if (query.linkvals && query.linkvals.length > 0) {
+		cOut = _searchLinkvals(query.linkvals, cOut)
+	}
+
+	if (query.attributes && query.attributes.length > 0) {
+		cOut = _searchAttribute(query.attributes, cOut)
+	}
+
+	if (query.monsterTypes && query.monsterTypes.terms.length > 0) {
+		cOut = _searchMonsterType(query.monsterTypes, cOut)
+	}
+
+	if (query.monsterRaces && query.monsterRaces.length > 0) {
+		cOut = _searchMonsterRace(query.monsterRaces, cOut)
+	}
+
+	if (query.levels && query.levels.length > 0) {
+		cOut = _searchMonsterLevels(query.levels, cOut)
+	}
+
+	if (query.links && query.links.terms.length > 0) {
+		cOut = _searchLinkmarkers(query.links, cOut)
+	}
+
+	if (
+		(query.atk && (query.atk.gte != null || query.atk.lte != null)) ||
+		(query.def && (query.def.gte != null || query.def.lte != null))
+	) {
+		cOut = _searchAtkAndDef(cOut, query.atk, query.def)
+	}
+	return cOut
+}
 
 function _searchQueryIsEmpty(query: TSearchQuery) {
 	return !(

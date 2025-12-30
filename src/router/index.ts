@@ -18,7 +18,7 @@ const routes = [
 	{
 		path: '/Collection',
 		name: 'Collection',
-		component: () => import('../views/DefaultView.vue'),
+		component: () => import('../views/CollectionView.vue'),
 	},
 	{
 		path: '/Decks',

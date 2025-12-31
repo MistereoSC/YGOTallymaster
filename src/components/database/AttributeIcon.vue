@@ -1,10 +1,7 @@
 <script lang="ts" setup>
-import {
-	TMonsterAttribute,
-	TSpellTrappAttribute,
-} from '@/libs/interfaces/YGOProInterfaces'
+import {TMonsterAttribute, TSpellTrapAttribute} from '@/libs/interfaces/YGOProInterfaces'
 interface IProps {
-	attribute: TMonsterAttribute | TSpellTrappAttribute | string
+	attribute: TMonsterAttribute | TSpellTrapAttribute | string
 	size?: 'tiny' | 'small' | 'normal' | 'large'
 }
 const props = withDefaults(defineProps<IProps>(), {
@@ -14,9 +11,7 @@ const emit = defineEmits<{
 	(e: 'click'): void
 }>()
 
-function getAttributeIconPath(
-	attribute: TMonsterAttribute | TSpellTrappAttribute | string
-): string {
+function getAttributeIconPath(attribute: TMonsterAttribute | TSpellTrapAttribute | string): string {
 	switch (attribute) {
 		case 'WIND':
 			return 'assets/icons/attributes/WIND.svg'

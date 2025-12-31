@@ -7,6 +7,7 @@ import {getCardStyles} from '@/libs/CardData'
 import AttributeIcon from './AttributeIcon.vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
 import CardOwnHeart from '@/components/cards/CardOwnHeart.vue'
+import CardLinkPreview from './CardLinkPreview.vue'
 
 interface IProps {
 	card: TCardData
@@ -39,9 +40,7 @@ async function getPreviewImage() {
 		const result = await loadImage(props.card.id, 'cropped')
 		if (result.success && result.localPath) {
 			// Get image as data URL to avoid file:// protocol issues
-			const dataUrlResult = await window.electronImage.getDataUrl(
-				result.localPath
-			)
+			const dataUrlResult = await window.electronImage.getDataUrl(result.localPath)
 			if (dataUrlResult.success && dataUrlResult.data) {
 				imageUrl.value = dataUrlResult.data
 				hasError.value = false
@@ -50,11 +49,7 @@ async function getPreviewImage() {
 				hasError.value = true
 			}
 		} else {
-			console.error(
-				'Failed to load image for:',
-				props.card.name,
-				result.error
-			)
+			console.error('Failed to load image for:', props.card.name, result.error)
 			hasError.value = true
 		}
 	} catch (error) {
@@ -126,13 +121,8 @@ const styles = getCardStyles(props.card)
 					/>
 				</div>
 				<!-- Loading state -->
-				<div
-					v-else-if="isLoading"
-					class="w-full h-full flex items-center justify-center"
-				>
-					<i class="animate-spin text-4xl"
-						><Icon icon="tabler:loader-2"
-					/></i>
+				<div v-else-if="isLoading" class="w-full h-full flex items-center justify-center">
+					<i class="animate-spin text-4xl"><Icon icon="tabler:loader-2" /></i>
 				</div>
 				<!-- Image loaded -->
 				<div v-else class="w-full h-full relative cursor-pointer">
@@ -145,27 +135,112 @@ const styles = getCardStyles(props.card)
 			</div>
 
 			<!-- Card Info -->
-			<div
-				class=""
-				:class="{
-					'grid grid-rows-[auto_1fr] py-1': props.size !== 'tiny',
-					'flex items-center gap-4': props.size === 'tiny',
-				}"
-			>
-				<div class="flex gap-2 items-center">
-					<AttributeIcon
-						:attribute="props.card.attribute ?? props.card.race"
-						:size="
-							props.size === 'tiny' || props.size === 'small'
-								? 'tiny'
-								: 'small'
-						"
-					/>
-					<div class="line-clamp-1">
-						{{ props.card.name }}
+			<div class="grid grid-cols-[1fr_auto]">
+				<div
+					:class="{
+						'grid-rows-[auto_1fr] grid': props.size !== 'tiny',
+						'flex items-center gap-4': props.size === 'tiny',
+					}"
+				>
+					<!-- Top Row -->
+					<div
+						class="flex gap-2 items-center justify-between"
+						:class="{
+							'w-full': props.size === 'tiny',
+						}"
+					>
+						<div class="flex gap-2 items-center">
+							<AttributeIcon
+								class="shrink-0"
+								:attribute="props.card.attribute ?? props.card.race"
+								:size="
+									props.size === 'tiny' || props.size === 'small'
+										? 'tiny'
+										: 'small'
+								"
+							/>
+							<div class="line-clamp-1">
+								{{ props.card.name }}
+							</div>
+						</div>
+						<div class="flex gap-4">
+							<span class="flex items-center gap-1" v-if="card.scale">
+								<div class="rotate-45 w-2 h-2 bg-blue-500"></div>
+								<span class="font-bold">{{ card.scale }}</span>
+								<div class="rotate-45 w-2 h-2 bg-red-500"></div>
+							</span>
+							<div
+								class="h-full grid grid-cols-[74px_74px] gap-2"
+								v-if="card.attribute"
+							>
+								<span>
+									Atk/
+									<b class="font-semibold">{{
+										card.atk! >= 0 ? card.atk : '?'
+									}}</b>
+								</span>
+								<span class="font-semibold" v-if="card.linkval">
+									LINK {{ card.linkval }}
+								</span>
+								<span v-else>
+									Def/
+									<b class="font-semibold">{{
+										card.def! >= 0 ? card.def : '?'
+									}}</b>
+								</span>
+							</div>
+						</div>
+					</div>
+					<!-- Bottom Row-->
+					<div class="flex gap-2 items-center justify-between">
+						<div class="flex gap-4" v-if="props.size !== 'tiny' && card.attribute">
+							<span class="line-clamp-1"
+								>[{{ props.card.typeline?.join(' / ') }}]</span
+							>
+						</div>
+						<div>
+							<div
+								v-if="props.size !== 'tiny' && card.level"
+								class="flex items-center gap-1"
+							>
+								<span class="font-semibold"> [{{ card.level }}] </span>
+								<span
+									v-for="n in card.level"
+									:key="n"
+									class="leading-none rounded-full w-4 h-4 grid place-items-center text-card-effecttext"
+									:class="
+										['xyz', 'xyz_pendulum'].includes(card.frameType)
+											? 'bg-black'
+											: 'bg-card-effect'
+									"
+								>
+									<Icon icon="material-symbols:star-rounded" />
+								</span>
+							</div>
+							<div v-else-if="card.level" class="flex gap-0.5 items-center">
+								<span class="font-bold">{{ card.level }}</span>
+								<span
+									class="leading-none rounded-full w-4 h-4 grid place-items-center text-card-effecttext"
+									:class="
+										['xyz', 'xyz_pendulum'].includes(card.frameType)
+											? 'bg-black'
+											: 'bg-card-effect'
+									"
+								>
+									<Icon icon="material-symbols:star-rounded" />
+								</span>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class=""></div>
+
+				<div class="flex items-center justify-center">
+					<CardLinkPreview
+						v-if="props.card.linkmarkers"
+						:links="props.card.linkmarkers"
+						:size="props.size === 'tiny' ? 'tiny' : 'small'"
+					/>
+				</div>
 			</div>
 
 			<!-- Controls -->
@@ -178,11 +253,7 @@ const styles = getCardStyles(props.card)
 
 <style lang="scss" scoped>
 .cardItemFrame[grayscale='true'] {
-	background-color: color-mix(
-		in srgb,
-		var(--color-primary-600) 90%,
-		transparent
-	);
+	background-color: color-mix(in srgb, var(--color-primary-600) 90%, transparent);
 
 	.cardItemImage {
 		filter: grayscale(1);

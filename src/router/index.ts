@@ -34,7 +34,7 @@ const routes = [
 	{
 		path: '/Decks',
 		name: 'Decks',
-		component: () => import('../views/DefaultView.vue'),
+		component: () => import('../views/DeckList.vue'),
 	},
 	{
 		path: '/Lists',

@@ -5,12 +5,15 @@ import CardPreviewListitem from './CardPreviewListitem.vue'
 
 const emit = defineEmits<{
 	(e: 'cardClicked', value: TCardData): void
+	(e: 'cardHovered', value: TCardData): void
 }>()
 
 interface IProps {
 	cardList: TCardData[]
 	activeCardId?: number | null
 	itemSize?: 'tiny' | 'small' | 'medium' | 'large'
+	showLimitedInfo?: boolean
+
 	showOwnedHeart?: boolean
 	showOwnedNumber?: boolean
 	grayUnowned?: boolean
@@ -46,9 +49,7 @@ const visibleRange = computed(() => {
 	)
 	const endRow = Math.min(
 		props.cardList.length,
-		Math.ceil(
-			(scrollPosition + containerHeight.value) / (CARD_HEIGHT.value + GAP)
-		) +
+		Math.ceil((scrollPosition + containerHeight.value) / (CARD_HEIGHT.value + GAP)) +
 			1 +
 			BUFFER_ROWS
 	)
@@ -145,6 +146,9 @@ onUnmounted(() => {
 function onCardClick(card: TCardData) {
 	emit('cardClicked', card)
 }
+function onHoverEnter(card: TCardData) {
+	emit('cardHovered', card)
+}
 
 function scrollToTop() {
 	if (scrollContainer.value) {
@@ -179,7 +183,9 @@ defineExpose({
 					:card="card"
 					:active="card.id === props.activeCardId"
 					:size="props.itemSize"
-					@click="onCardClick(card)"
+					@click="() => onCardClick(card)"
+					@mouseenter="() => onHoverEnter(card)"
+					:show-limited-info="props.showLimitedInfo"
 					:show-owned-heart="props.showOwnedHeart"
 					:show-owned-number="props.showOwnedNumber"
 					:gray-unowned="props.grayUnowned"

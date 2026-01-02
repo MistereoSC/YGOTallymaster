@@ -27,10 +27,7 @@ const debugOutput = ref('')
 
 <template>
 	<div class="flex flex-wrap gap-4 p-4">
-		<button
-			class="bg-primary-700 rounded-md shadow-md p-2 cursor-pointer"
-			@click="onTestPath"
-		>
+		<button class="bg-primary-700 rounded-md shadow-md p-2 cursor-pointer" @click="onTestPath">
 			Copy Path
 		</button>
 		<button
@@ -40,15 +37,15 @@ const debugOutput = ref('')
 			Test Config Read
 		</button>
 
-		<span>
+		<span class="flex gap-2">
 			<button
 				class="bg-primary-700 rounded-md shadow-md p-2 cursor-pointer"
 				@click="onGetValues"
 			>
-				GET
+				Get unique values
 			</button>
 			<input
-				class="bg-primary-600 rounded-md shadow-md p-2 ml-2"
+				class="bg-primary-600 rounded-md shadow-md p-2"
 				v-model="valueInput"
 				placeholder="json key"
 			/>

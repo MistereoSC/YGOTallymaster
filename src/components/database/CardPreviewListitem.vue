@@ -13,6 +13,8 @@ interface IProps {
 	card: TCardData
 	active?: boolean
 	size?: 'tiny' | 'small' | 'medium' | 'large'
+
+	showLimitedInfo?: boolean
 	grayUnowned?: boolean
 	showOwnedHeart?: boolean
 }
@@ -22,6 +24,7 @@ const props = withDefaults(defineProps<IProps>(), {
 
 const emit = defineEmits<{
 	(e: 'click', value: TCardData): void
+	(e: 'hoverEnter'): void
 }>()
 const imageUrl = ref<string | null>(null)
 const isLoading = ref(true)
@@ -74,6 +77,9 @@ watch(
 function onClick() {
 	emit('click', props.card)
 }
+function onHoverEnter() {
+	emit('hoverEnter')
+}
 const styles = getCardStyles(props.card)
 </script>
 
@@ -89,6 +95,7 @@ const styles = getCardStyles(props.card)
 				: styles.vars.border,
 		}"
 		@click="onClick"
+		@mouseenter="onHoverEnter"
 	>
 		<div
 			class="cardItemFrame bg-primary-900/90 hover:bg-primary-900 w-full grid grid-cols-[auto_1fr_auto] gap-2"
@@ -163,7 +170,7 @@ const styles = getCardStyles(props.card)
 								{{ props.card.name }}
 							</div>
 						</div>
-						<div class="flex gap-4">
+						<div class="flex gap-4" v-if="!props.showLimitedInfo">
 							<span class="flex items-center gap-1" v-if="card.scale">
 								<div class="rotate-45 w-2 h-2 bg-blue-500"></div>
 								<span class="font-bold">{{ card.scale }}</span>
@@ -192,7 +199,10 @@ const styles = getCardStyles(props.card)
 						</div>
 					</div>
 					<!-- Bottom Row-->
-					<div class="flex gap-2 items-center justify-between">
+					<div
+						class="flex gap-2 items-center justify-between"
+						v-if="!props.showLimitedInfo"
+					>
 						<div class="flex gap-4" v-if="props.size !== 'tiny' && card.attribute">
 							<span class="line-clamp-1"
 								>[{{ props.card.typeline?.join(' / ') }}]</span
@@ -234,7 +244,7 @@ const styles = getCardStyles(props.card)
 					</div>
 				</div>
 
-				<div class="flex items-center justify-center">
+				<div class="flex items-center justify-center" v-if="!props.showLimitedInfo">
 					<CardLinkPreview
 						v-if="props.card.linkmarkers"
 						:links="props.card.linkmarkers"
@@ -245,7 +255,7 @@ const styles = getCardStyles(props.card)
 
 			<!-- Controls -->
 			<div class="flex flex-col justify-evenly items-center">
-				<CardOwnHeart :card-id="props.card.id" />
+				<CardOwnHeart :card-id="props.card.id" v-if="props.showOwnedHeart" />
 			</div>
 		</div>
 	</div>

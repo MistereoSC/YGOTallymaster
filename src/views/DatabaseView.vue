@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import {onMounted, ref, watch, nextTick} from 'vue'
+import {ref, watch, nextTick} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardFullView from '@/components/database/CardFullView.vue'
-import {Icon} from '@iconify/vue'
 import CardListVirtualGrid from '@/components/database/CardListVirtualGrid.vue'
 import CardFilter from '@/components/database/CardFilter.vue'
 
@@ -10,11 +9,12 @@ import {useCardSearch} from '@/composables/useCardSearch'
 import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import DisplaySettings from '@/components/database/DisplaySettings.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
+import Button from '@/components/common/Button.vue'
+import {Icon} from '@iconify/vue'
+import Spinner from '@/components/common/Spinner.vue'
 const {searchResults, fullCardList} = useCardSearch()
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
-
-onMounted(async () => {})
 
 // Watch for changes in search results and scroll to top
 watch(searchResults, async () => {
@@ -24,7 +24,7 @@ watch(searchResults, async () => {
 	}
 })
 
-type TSidePanel = 'filter' | 'settings' | 'none' | 'card' | 'other'
+type TSidePanel = 'filter' | 'settings' | 'none' | 'card'
 const activePanel = ref<TSidePanel>('filter')
 const previousPanel = ref<TSidePanel>('filter')
 const activeCard = ref<TCardData | null>(null)
@@ -41,8 +41,7 @@ watch(activePanel, async (newVal, oldVal) => {
 
 function onCardClick(card: TCardData) {
 	if (activePanel.value !== 'card') {
-		previousPanel.value =
-			activePanel.value === 'none' ? 'other' : activePanel.value
+		previousPanel.value = activePanel.value === 'none' ? 'filter' : activePanel.value
 		activeCard.value = card
 		activePanel.value = 'card'
 		return
@@ -50,8 +49,7 @@ function onCardClick(card: TCardData) {
 	if (activeCard.value && activeCard.value.id === card.id) {
 		// Deselect card
 		activeCard.value = null
-		activePanel.value =
-			previousPanel.value === 'none' ? 'other' : previousPanel.value
+		activePanel.value = previousPanel.value === 'none' ? 'filter' : previousPanel.value
 		return
 	}
 	activeCard.value = card
@@ -61,7 +59,7 @@ function toggleFilter() {
 		if (activeCard.value) {
 			activePanel.value = 'card'
 		} else {
-			activePanel.value = 'other'
+			activePanel.value = 'none'
 		}
 		previousPanel.value = 'filter'
 		return
@@ -73,7 +71,7 @@ function toggleSettings() {
 		if (activeCard.value) {
 			activePanel.value = 'card'
 		} else {
-			activePanel.value = 'other'
+			activePanel.value = 'none'
 		}
 		previousPanel.value = 'settings'
 		return
@@ -83,7 +81,7 @@ function toggleSettings() {
 function closePanel() {
 	activePanel.value = 'none'
 	activeCard.value = null
-	previousPanel.value = 'other'
+	previousPanel.value = 'filter'
 }
 // #endregion
 // ----------------------------------------------
@@ -100,10 +98,8 @@ const settingsStore = useDatabaseSettings()
 		<div class="w-full grid grid-cols-[1fr_auto] bg-primary-600">
 			<div class="flex gap-4 items-center px-4 py-2 text-sm font-bold">
 				<span>
-					Showing
-					<span v-if="searchResults !== null">
-						{{ searchResults.length }} /
-					</span>
+					Displaying
+					<span v-if="searchResults !== null"> {{ searchResults.length }} /</span>
 					{{ fullCardList.length }} Cards
 				</span>
 			</div>
@@ -111,39 +107,33 @@ const settingsStore = useDatabaseSettings()
 				<span class="flex justify-between w-full">
 					<span></span>
 					<span class="flex gap-2">
-						<button
+						<Button
 							v-if="activePanel !== 'none'"
-							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
+							rounded
+							size="small"
+							icon="material-symbols:arrow-menu-open-rounded"
 							@click="closePanel"
-						>
-							<Icon
-								icon="material-symbols:arrow-menu-open-rounded"
-								class="text-xl"
-							/>
-						</button>
-						<button
-							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
+						/>
+						<Button
+							rounded
+							size="small"
+							icon="material-symbols:settings-rounded"
 							@click="toggleSettings"
-						>
-							<Icon
-								icon="material-symbols:settings-rounded"
-								class="text-xl"
-							/>
-						</button>
-						<button
-							class="rounded-full bg-accent-500 p-1 cursor-pointer hover:bg-accent-400"
+						/>
+						<Button
+							rounded
+							size="small"
+							icon="material-symbols:filter-alt"
 							@click="toggleFilter"
-						>
-							<Icon
-								icon="material-symbols:filter-alt"
-								class="text-xl"
-							/>
-						</button>
+						/>
 					</span>
 				</span>
 			</div>
 		</div>
-		<div class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden">
+		<div
+			class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden"
+			v-if="fullCardList.length > 0"
+		>
 			<CardListVirtualList
 				v-if="settingsStore.settings.value?.displayAsList"
 				ref="cardGrid"
@@ -152,9 +142,7 @@ const settingsStore = useDatabaseSettings()
 				:active-card-id="activeCard ? activeCard.id : null"
 				:item-size="settingsStore.settings.value?.listSize || 'medium'"
 				:show-owned-heart="true"
-				:show-owned-number="
-					settingsStore.settings.value?.showOwnedNumbers
-				"
+				:show-owned-number="settingsStore.settings.value?.showOwnedNumbers"
 				:gray-unowned="settingsStore.settings.value?.grayUnowned"
 			/>
 			<CardListVirtualGrid
@@ -165,9 +153,7 @@ const settingsStore = useDatabaseSettings()
 				:active-card-id="activeCard ? activeCard.id : null"
 				item-size="medium"
 				:show-owned-heart="true"
-				:show-owned-number="
-					settingsStore.settings.value?.showOwnedNumbers
-				"
+				:show-owned-number="settingsStore.settings.value?.showOwnedNumbers"
 				:gray-unowned="settingsStore.settings.value?.grayUnowned"
 			/>
 
@@ -176,17 +162,16 @@ const settingsStore = useDatabaseSettings()
 				class="min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
 				<div class="h-full overflow-y-auto scrollable p-3">
-					<CardFullView
-						v-if="activeCard && activePanel === 'card'"
-						:card="activeCard"
-					/>
-					<CardFilter
-						:search-while-typing="true"
-						v-else-if="activePanel === 'filter'"
-					/>
+					<CardFullView v-if="activeCard && activePanel === 'card'" :card="activeCard" />
+					<CardFilter :search-while-typing="true" v-else-if="activePanel === 'filter'" />
 
 					<DisplaySettings v-else-if="activePanel === 'settings'" />
 				</div>
+			</div>
+		</div>
+		<div v-else class="w-full h-full">
+			<div class="w-full h-full flex flex-col justify-center items-center">
+				<Spinner />
 			</div>
 		</div>
 	</div>

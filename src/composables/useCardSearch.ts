@@ -355,6 +355,10 @@ type TCardIdInput = number[] | Record<number, unknown>
 // #region Helper Functions
 // -----------------------------------------------------------
 
+function _findCardById(cardId: number, cardList: TCardData[] = fullCardList.value) {
+	return cardList.find((card) => card.id === cardId)
+}
+
 function _initialFilterCardData(cardData: TCardData[]) {
 	const filteredFields = ['token', 'skill']
 	return cardData.filter((card) => {
@@ -592,6 +596,7 @@ function __getAllViableValues<K extends keyof TCardData>(
 }
 
 const _find = {
+	ID: _findCardById,
 	AtkDef: _searchAtkAndDef,
 	Level: _searchMonsterLevels,
 	Scale: _searchPendulumScales,

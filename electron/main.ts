@@ -51,10 +51,7 @@ function createWindow() {
 
 	// Test active push message to Renderer-process.
 	win.webContents.on('did-finish-load', () => {
-		win?.webContents.send(
-			'main-process-message',
-			new Date().toLocaleString()
-		)
+		win?.webContents.send('main-process-message', new Date().toLocaleString())
 	})
 
 	if (VITE_DEV_SERVER_URL) {
@@ -101,20 +98,17 @@ function setupIpcHandlers() {
 	})
 
 	// Write file as text
-	ipcMain.handle(
-		'fs:writeFile',
-		async (_, filePath: string, data: string) => {
-			try {
-				// Ensure directory exists
-				const dir = path.dirname(filePath)
-				await fs.mkdir(dir, {recursive: true})
-				await fs.writeFile(filePath, data, 'utf-8')
-				return {success: true}
-			} catch (error: any) {
-				return {success: false, error: error.message}
-			}
+	ipcMain.handle('fs:writeFile', async (_, filePath: string, data: string) => {
+		try {
+			// Ensure directory exists
+			const dir = path.dirname(filePath)
+			await fs.mkdir(dir, {recursive: true})
+			await fs.writeFile(filePath, data, 'utf-8')
+			return {success: true}
+		} catch (error: any) {
+			return {success: false, error: error.message}
 		}
-	)
+	})
 
 	// Check if file exists
 	ipcMain.handle('fs:exists', async (_, filePath: string) => {
@@ -168,6 +162,33 @@ function setupIpcHandlers() {
 			return {success: false, error: error.message}
 		}
 	})
+
+	// Read directory with stats, sorted by creation date (newest first)
+	ipcMain.handle(
+		'fs:readdirSorted',
+		async (_, dirPath: string, order: 'asc' | 'desc' = 'desc') => {
+			try {
+				const files = await fs.readdir(dirPath)
+				const filesWithStats = await Promise.all(
+					files.map(async (file) => {
+						const filePath = path.join(dirPath, file)
+						const stats = await fs.stat(filePath)
+						return {
+							name: file,
+							birthtime: stats.birthtime.getTime(),
+						}
+					})
+				)
+				// Sort by creation date
+				filesWithStats.sort((a, b) =>
+					order === 'desc' ? b.birthtime - a.birthtime : a.birthtime - b.birthtime
+				)
+				return {success: true, data: filesWithStats.map((f) => f.name)}
+			} catch (error: any) {
+				return {success: false, error: error.message}
+			}
+		}
+	)
 
 	// Show save dialog
 	ipcMain.handle('dialog:showSaveDialog', async (_, options = {}) => {
@@ -235,31 +256,26 @@ function setupIpcHandlers() {
 	)
 
 	// Download image from URL and save to local path
-	ipcMain.handle(
-		'image:download',
-		async (_, url: string, localPath: string) => {
-			try {
-				// Create directory if it doesn't exist
-				const dir = path.dirname(localPath)
-				await fs.mkdir(dir, {recursive: true})
+	ipcMain.handle('image:download', async (_, url: string, localPath: string) => {
+		try {
+			// Create directory if it doesn't exist
+			const dir = path.dirname(localPath)
+			await fs.mkdir(dir, {recursive: true})
 
-				// Download image
-				const response = await fetch(url)
-				if (!response.ok) {
-					throw new Error(
-						`HTTP ${response.status}: ${response.statusText}`
-					)
-				}
-
-				const buffer = Buffer.from(await response.arrayBuffer())
-				await fs.writeFile(localPath, buffer)
-
-				return {success: true, path: localPath}
-			} catch (error: any) {
-				return {success: false, error: error.message}
+			// Download image
+			const response = await fetch(url)
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}: ${response.statusText}`)
 			}
+
+			const buffer = Buffer.from(await response.arrayBuffer())
+			await fs.writeFile(localPath, buffer)
+
+			return {success: true, path: localPath}
+		} catch (error: any) {
+			return {success: false, error: error.message}
 		}
-	)
+	})
 
 	// Read image file and return as base64 data URL
 	ipcMain.handle('image:getDataUrl', async (_, localPath: string) => {

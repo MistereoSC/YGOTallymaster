@@ -29,10 +29,7 @@ function createWindow() {
     return { action: "deny" };
   });
   win.webContents.on("did-finish-load", () => {
-    win == null ? void 0 : win.webContents.send(
-      "main-process-message",
-      (/* @__PURE__ */ new Date()).toLocaleString()
-    );
+    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
   });
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
@@ -64,19 +61,16 @@ function setupIpcHandlers() {
       return { success: false, error: error.message };
     }
   });
-  ipcMain.handle(
-    "fs:writeFile",
-    async (_, filePath, data) => {
-      try {
-        const dir = path.dirname(filePath);
-        await fs.mkdir(dir, { recursive: true });
-        await fs.writeFile(filePath, data, "utf-8");
-        return { success: true };
-      } catch (error) {
-        return { success: false, error: error.message };
-      }
+  ipcMain.handle("fs:writeFile", async (_, filePath, data) => {
+    try {
+      const dir = path.dirname(filePath);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(filePath, data, "utf-8");
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  );
+  });
   ipcMain.handle("fs:exists", async (_, filePath) => {
     try {
       await fs.access(filePath);
@@ -120,6 +114,30 @@ function setupIpcHandlers() {
       return { success: false, error: error.message };
     }
   });
+  ipcMain.handle(
+    "fs:readdirSorted",
+    async (_, dirPath, order = "desc") => {
+      try {
+        const files = await fs.readdir(dirPath);
+        const filesWithStats = await Promise.all(
+          files.map(async (file) => {
+            const filePath = path.join(dirPath, file);
+            const stats = await fs.stat(filePath);
+            return {
+              name: file,
+              birthtime: stats.birthtime.getTime()
+            };
+          })
+        );
+        filesWithStats.sort(
+          (a, b) => order === "desc" ? b.birthtime - a.birthtime : a.birthtime - b.birthtime
+        );
+        return { success: true, data: filesWithStats.map((f) => f.name) };
+      } catch (error) {
+        return { success: false, error: error.message };
+      }
+    }
+  );
   ipcMain.handle("dialog:showSaveDialog", async (_, options = {}) => {
     try {
       const result = await dialog.showSaveDialog(win, {
@@ -160,26 +178,21 @@ function setupIpcHandlers() {
       }
     }
   );
-  ipcMain.handle(
-    "image:download",
-    async (_, url, localPath) => {
-      try {
-        const dir = path.dirname(localPath);
-        await fs.mkdir(dir, { recursive: true });
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(
-            `HTTP ${response.status}: ${response.statusText}`
-          );
-        }
-        const buffer = Buffer.from(await response.arrayBuffer());
-        await fs.writeFile(localPath, buffer);
-        return { success: true, path: localPath };
-      } catch (error) {
-        return { success: false, error: error.message };
+  ipcMain.handle("image:download", async (_, url, localPath) => {
+    try {
+      const dir = path.dirname(localPath);
+      await fs.mkdir(dir, { recursive: true });
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      const buffer = Buffer.from(await response.arrayBuffer());
+      await fs.writeFile(localPath, buffer);
+      return { success: true, path: localPath };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  );
+  });
   ipcMain.handle("image:getDataUrl", async (_, localPath) => {
     try {
       const buffer = await fs.readFile(localPath);

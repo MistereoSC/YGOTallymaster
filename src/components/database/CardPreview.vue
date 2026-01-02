@@ -38,15 +38,10 @@ onMounted(async () => {
 })
 async function getPreviewImage() {
 	try {
-		const result = await loadImage(
-			props.card.id,
-			props.size === 'large' ? 'normal' : 'small'
-		)
+		const result = await loadImage(props.card.id, props.size === 'large' ? 'normal' : 'small')
 		if (result.success && result.localPath) {
 			// Get image as data URL to avoid file:// protocol issues
-			const dataUrlResult = await window.electronImage.getDataUrl(
-				result.localPath
-			)
+			const dataUrlResult = await window.electronImage.getDataUrl(result.localPath)
 			if (dataUrlResult.success && dataUrlResult.data) {
 				imageUrl.value = dataUrlResult.data
 				hasError.value = false
@@ -55,11 +50,7 @@ async function getPreviewImage() {
 				hasError.value = true
 			}
 		} else {
-			console.error(
-				'Failed to load image for:',
-				props.card.name,
-				result.error
-			)
+			console.error('Failed to load image for:', props.card.name, result.error)
 			hasError.value = true
 		}
 	} catch (error) {
@@ -97,21 +88,14 @@ function onClick() {
 			'outline-4 outline-secondary-500': props.active,
 		}"
 		:style="{
-			transition:
-				'outline-width 0.1s ease-out, outline-color 0.1s ease-out',
+			transition: 'outline-width 0.1s ease-out, outline-color 0.1s ease-out',
 		}"
 		:grayscale="props.grayUnowned && numOwned === 0 ? 'true' : 'false'"
 		@click="onClick"
 	>
 		<!-- Error state -->
-		<div
-			v-if="hasError"
-			class="w-full h-full flex flex-col items-center justify-center p-2"
-		>
-			<Icon
-				icon="material-symbols:imagesmode-outline"
-				class="text-4xl text-red-400"
-			/>
+		<div v-if="hasError" class="w-full h-full flex flex-col items-center justify-center p-2">
+			<Icon icon="material-symbols:imagesmode-outline" class="text-4xl text-red-400" />
 			<div class="text-sm text-center font-semibold">
 				{{ card.name }}
 			</div>
@@ -121,10 +105,7 @@ function onClick() {
 		</div>
 
 		<!-- Loading state -->
-		<div
-			v-else-if="isLoading"
-			class="w-full h-full flex items-center justify-center"
-		>
+		<div v-else-if="isLoading" class="w-full h-full flex items-center justify-center">
 			<i class="animate-spin text-4xl"><Icon icon="tabler:loader-2" /></i>
 		</div>
 
@@ -149,9 +130,7 @@ function onClick() {
 			v-if="showOwnedNumber && numOwned > 0"
 			class="absolute bottom-0 left-0 w-12 h-12 bg-[radial-gradient(circle_at_bottom_left,rgba(0,0,0,0.8),transparent_70%)]"
 		>
-			<div
-				class="text-shadow-contrast-900 text-md font-bold absolute bottom-0.5 left-1.5"
-			>
+			<div class="text-contrast-900 text-md font-bold absolute bottom-0.5 left-1.5">
 				{{ numOwned }}
 			</div>
 		</div>

@@ -1,13 +1,7 @@
 export interface ElectronAPI {
 	ipcRenderer: {
-		on: (
-			channel: string,
-			listener: (event: any, ...args: any[]) => void
-		) => void
-		off: (
-			channel: string,
-			listener?: (event: any, ...args: any[]) => void
-		) => void
+		on: (channel: string, listener: (event: any, ...args: any[]) => void) => void
+		off: (channel: string, listener?: (event: any, ...args: any[]) => void) => void
 		send: (channel: string, ...args: any[]) => void
 		invoke: (channel: string, ...args: any[]) => Promise<any>
 	}
@@ -19,6 +13,7 @@ export interface ElectronAPI {
 		writeJSON: (filePath: string, data: any) => Promise<FSResult<void>>
 		mkdir: (dirPath: string) => Promise<FSResult<void>>
 		readdir: (dirPath: string) => Promise<FSResult<string[]>>
+		readdirSorted: (dirPath: string, order?: 'asc' | 'desc') => Promise<FSResult<string[]>>
 		showSaveDialog: (options?: any) => Promise<DialogResult>
 		showOpenDialog: (options?: any) => Promise<DialogResult>
 	}
@@ -44,10 +39,7 @@ export interface ElectronAPI {
 		) => Promise<AppPathResult>
 	}
 	electronImage: {
-		downloadImage: (
-			url: string,
-			localPath: string
-		) => Promise<FSResult<string>>
+		downloadImage: (url: string, localPath: string) => Promise<FSResult<string>>
 		getDataUrl: (localPath: string) => Promise<FSResult<string>>
 	}
 	electronShell: {

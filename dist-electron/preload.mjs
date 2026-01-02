@@ -3,10 +3,7 @@ const electron = require("electron");
 electron.contextBridge.exposeInMainWorld("ipcRenderer", {
   on(...args) {
     const [channel, listener] = args;
-    return electron.ipcRenderer.on(
-      channel,
-      (event, ...args2) => listener(event, ...args2)
-    );
+    return electron.ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
   },
   off(...args) {
     const [channel, ...omit] = args;
@@ -29,6 +26,7 @@ electron.contextBridge.exposeInMainWorld("electronFS", {
   writeJSON: (filePath, data) => electron.ipcRenderer.invoke("fs:writeJSON", filePath, data),
   mkdir: (dirPath) => electron.ipcRenderer.invoke("fs:mkdir", dirPath),
   readdir: (dirPath) => electron.ipcRenderer.invoke("fs:readdir", dirPath),
+  readdirSorted: (dirPath, order) => electron.ipcRenderer.invoke("fs:readdirSorted", dirPath, order),
   showSaveDialog: (options) => electron.ipcRenderer.invoke("dialog:showSaveDialog", options),
   showOpenDialog: (options) => electron.ipcRenderer.invoke("dialog:showOpenDialog", options)
 });

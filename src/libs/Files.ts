@@ -5,9 +5,7 @@ async function exists(path: string) {
 	const p = await Path.AppRoot()
 	if (!p) return {success: false, exists: false}
 	const subPath = path.startsWith('/') ? path : '/' + path
-	const result: FSResult<boolean> = await window.electronFS.exists(
-		p + subPath
-	)
+	const result: FSResult<boolean> = await window.electronFS.exists(p + subPath)
 	return {
 		success: result.success,
 		exists: result.success ? result.exists! : false,
@@ -27,6 +25,37 @@ async function read<T>(path: string): Promise<T | null> {
 	}
 }
 
+async function readRaw(path: string): Promise<string | null> {
+	const p = await Path.AppRoot()
+	if (!p) return null
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result: FSResult<string> = await window.electronFS.readFile(p + subPath)
+	if (result.success && result.data) {
+		return result.data
+	} else {
+		console.error('Failed to read RAW file:', result.error)
+		return null
+	}
+}
+
+async function readDir(
+	path: string,
+	sortByCreationDate?: 'asc' | 'desc'
+): Promise<string[] | null> {
+	const p = await Path.AppRoot()
+	if (!p) return null
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result: FSResult<string[]> = sortByCreationDate
+		? await window.electronFS.readdirSorted(p + subPath, sortByCreationDate)
+		: await window.electronFS.readdir(p + subPath)
+	if (result.success && result.data) {
+		return result.data
+	} else {
+		console.error('Failed to read directory:', result.error)
+		return null
+	}
+}
+
 async function write<T>(path: string, data: T): Promise<boolean> {
 	const p = await Path.AppRoot()
 	if (!p) return false
@@ -36,6 +65,18 @@ async function write<T>(path: string, data: T): Promise<boolean> {
 	const result = await window.electronFS.writeJSON(p + subPath, plainData)
 	if (!result.success) {
 		console.error('Failed to write file:', result.error)
+		return false
+	}
+	return true
+}
+
+async function writeRaw(path: string, data: string): Promise<boolean> {
+	const p = await Path.AppRoot()
+	if (!p) return false
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result = await window.electronFS.writeFile(p + subPath, data)
+	if (!result.success) {
+		console.error('Failed to write RAW file:', result.error)
 		return false
 	}
 	return true
@@ -74,7 +115,10 @@ async function load() {
 const Files = {
 	exists,
 	read,
+	readRaw,
+	readDir,
 	write,
+	writeRaw,
 	save,
 	load,
 }

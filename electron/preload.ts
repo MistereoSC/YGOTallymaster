@@ -4,9 +4,7 @@ import {ipcRenderer, contextBridge} from 'electron'
 contextBridge.exposeInMainWorld('ipcRenderer', {
 	on(...args: Parameters<typeof ipcRenderer.on>) {
 		const [channel, listener] = args
-		return ipcRenderer.on(channel, (event, ...args) =>
-			listener(event, ...args)
-		)
+		return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args))
 	},
 	off(...args: Parameters<typeof ipcRenderer.off>) {
 		const [channel, ...omit] = args
@@ -29,22 +27,20 @@ contextBridge.exposeInMainWorld('electronFS', {
 		ipcRenderer.invoke('fs:writeFile', filePath, data),
 	exists: (filePath: string) => ipcRenderer.invoke('fs:exists', filePath),
 	readJSON: (filePath: string) => ipcRenderer.invoke('fs:readJSON', filePath),
-	writeJSON: (filePath: string, data: any) =>
-		ipcRenderer.invoke('fs:writeJSON', filePath, data),
+	writeJSON: (filePath: string, data: any) => ipcRenderer.invoke('fs:writeJSON', filePath, data),
 	mkdir: (dirPath: string) => ipcRenderer.invoke('fs:mkdir', dirPath),
 	readdir: (dirPath: string) => ipcRenderer.invoke('fs:readdir', dirPath),
-	showSaveDialog: (options?: any) =>
-		ipcRenderer.invoke('dialog:showSaveDialog', options),
-	showOpenDialog: (options?: any) =>
-		ipcRenderer.invoke('dialog:showOpenDialog', options),
+	readdirSorted: (dirPath: string, order?: 'asc' | 'desc') =>
+		ipcRenderer.invoke('fs:readdirSorted', dirPath, order),
+	showSaveDialog: (options?: any) => ipcRenderer.invoke('dialog:showSaveDialog', options),
+	showOpenDialog: (options?: any) => ipcRenderer.invoke('dialog:showOpenDialog', options),
 })
 
 // --------- Expose image API ---------
 contextBridge.exposeInMainWorld('electronImage', {
 	downloadImage: (url: string, localPath: string) =>
 		ipcRenderer.invoke('image:download', url, localPath),
-	getDataUrl: (localPath: string) =>
-		ipcRenderer.invoke('image:getDataUrl', localPath),
+	getDataUrl: (localPath: string) => ipcRenderer.invoke('image:getDataUrl', localPath),
 })
 
 // --------- Expose app API ---------
@@ -72,6 +68,5 @@ contextBridge.exposeInMainWorld('electronApp', {
 
 // --------- Expose shell API ---------
 contextBridge.exposeInMainWorld('electronShell', {
-	openExternal: (url: string) =>
-		ipcRenderer.invoke('shell:openExternal', url),
+	openExternal: (url: string) => ipcRenderer.invoke('shell:openExternal', url),
 })

@@ -15,6 +15,17 @@ const routes = [
 		name: 'Database',
 		component: () => import('../views/DatabaseView.vue'),
 	},
+
+	{
+		path: '/Archetypes',
+		name: 'Archetypes',
+		component: () => import('../views/ArchetypeListView.vue'),
+	},
+	{
+		path: '/Sets',
+		name: 'Sets',
+		component: () => import('../views/DefaultView.vue'),
+	},
 	{
 		path: '/Collection',
 		name: 'Collection',
@@ -26,10 +37,11 @@ const routes = [
 		component: () => import('../views/DefaultView.vue'),
 	},
 	{
-		path: '/Sets',
-		name: 'Sets',
+		path: '/Lists',
+		name: 'Lists',
 		component: () => import('../views/DefaultView.vue'),
 	},
+
 	// #endregion
 	// ---------------------------------------------------------
 	// #region Option Routes

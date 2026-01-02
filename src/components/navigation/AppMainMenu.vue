@@ -16,9 +16,7 @@ const activeRoute = computed(() => route.name as string)
 </script>
 
 <template>
-	<div
-		class="bg-primary-900 w-40 h-full grid grid-rows-[1fr_auto] shadow-lg py-2"
-	>
+	<div class="bg-primary-900 w-40 h-full grid grid-rows-[1fr_auto] shadow-lg py-2">
 		<div>
 			<AppMainMenuLink
 				label="Database"
@@ -27,8 +25,23 @@ const activeRoute = computed(() => route.name as string)
 				:active="activeRoute === 'Database'"
 			/>
 			<AppMainMenuLink
-				label="Collection"
+				label="Archetypes"
+				icon="material-symbols:cards-stack"
+				route-name="Archetypes"
+				:active="activeRoute === 'Archetypes'"
+			/>
+			<AppMainMenuLink
+				label="Sets"
 				icon="material-symbols:cards-star-rounded"
+				route-name="Sets"
+				:active="activeRoute === 'Sets'"
+			/>
+
+			<div class="w-full h-px bg-primary-500 my-2"></div>
+
+			<AppMainMenuLink
+				label="Collection"
+				icon="tabler:archive-filled"
 				route-name="Collection"
 				:active="activeRoute === 'Collection'"
 			/>
@@ -39,10 +52,10 @@ const activeRoute = computed(() => route.name as string)
 				:active="activeRoute === 'Decks'"
 			/>
 			<AppMainMenuLink
-				label="Sets"
+				label="Lists"
 				icon="material-symbols:bookmark-heart-rounded"
-				route-name="Sets"
-				:active="activeRoute === 'Sets'"
+				route-name="Lists"
+				:active="activeRoute === 'Lists'"
 			/>
 		</div>
 		<div>

@@ -71,9 +71,7 @@ const TOKENIZE_FN = (text: string) => {
 		// First, protect D/D/D/D patterns by replacing slashes with a placeholder
 		.replace(/\bd(\/d)+\b/g, (match) => match.replace(/\//g, '___SLASH___'))
 		// Also protect other slash-separated terms that might be important
-		.replace(/\b\w+\/\w+(?:\/\w+)*\b/g, (match) =>
-			match.replace(/\//g, '___SLASH___')
-		)
+		.replace(/\b\w+\/\w+(?:\/\w+)*\b/g, (match) => match.replace(/\//g, '___SLASH___'))
 		// Split on whitespace and hyphens
 		.split(/[\s-]+/)
 		// Restore the slashes
@@ -136,8 +134,7 @@ const useCardSearch = () => {
 				boost: {name: 6, archetype: 2, desc: 1},
 				combineWith: 'AND',
 			},
-			processTerm: (term, _fieldName) =>
-				STOP_WORDS.has(term) ? null : term.toLowerCase(),
+			processTerm: (term, _fieldName) => (STOP_WORDS.has(term) ? null : term.toLowerCase()),
 			tokenize: TOKENIZE_FN,
 		})
 		miniSearch.addAll(cardData as TCardData[])
@@ -185,9 +182,7 @@ const useCardSearch = () => {
 
 		fullCardList.value = _sort(by ?? ESortBy.Name_Asc, fullCardList.value)
 		if (searchResults.value) {
-			searchResults.value = markRaw(
-				_sort(by ?? ESortBy.Name_Asc, [...searchResults.value])
-			)
+			searchResults.value = markRaw(_sort(by ?? ESortBy.Name_Asc, [...searchResults.value]))
 		}
 	}
 
@@ -232,8 +227,7 @@ const useListSearch = (cardIdInput: TCardIdInput) => {
 				boost: {name: 6, archetype: 2, desc: 1},
 				combineWith: 'AND',
 			},
-			processTerm: (term, _fieldName) =>
-				STOP_WORDS.has(term) ? null : term.toLowerCase(),
+			processTerm: (term, _fieldName) => (STOP_WORDS.has(term) ? null : term.toLowerCase()),
 			tokenize: TOKENIZE_FN,
 		})
 		miniSearch.addAll(cardData as TCardData[])
@@ -279,10 +273,7 @@ const useListSearch = (cardIdInput: TCardIdInput) => {
 		else if (by === l_sortedBy.value) return
 		l_sortedBy.value = by ?? ESortBy.Name_Asc
 
-		l_fullCardList.value = _sort(
-			by ?? ESortBy.Name_Asc,
-			l_fullCardList.value
-		)
+		l_fullCardList.value = _sort(by ?? ESortBy.Name_Asc, l_fullCardList.value)
 		if (l_searchResults.value) {
 			l_searchResults.value = markRaw(
 				_sort(by ?? ESortBy.Name_Asc, [...l_searchResults.value])
@@ -315,14 +306,19 @@ const useListSearch = (cardIdInput: TCardIdInput) => {
 	function deindexCard(cardId: number) {
 		if (!l_miniSearchIndex) return
 		if (!l_miniSearchIndex.has(cardId)) return
-		l_fullCardList.value = l_fullCardList.value.filter(
-			(c) => c.id !== cardId
-		)
+		l_fullCardList.value = l_fullCardList.value.filter((c) => c.id !== cardId)
 		l_miniSearchIndex.discard(cardId)
 	}
 }
 
-export {useCardSearch, useListSearch, __getAllViableValues}
+const getFullCardList = async () => {
+	if (fullCardList.value.length === 0) {
+		fullCardList.value = _initialFilterCardData(await getCardList())
+	}
+	return fullCardList.value
+}
+
+export {useCardSearch, useListSearch, getFullCardList, __getAllViableValues, _find, _sort}
 
 // -----------------------------------------------------------
 // #region Interfaces
@@ -371,10 +367,7 @@ function _initialFilterCardData(cardData: TCardData[]) {
 // #region Search Functions
 // -----------------------------------------------------------
 
-function _applyQueryFilters(
-	cardList: TCardData[] | TSearchResultCardData[],
-	query: TSearchQuery
-) {
+function _applyQueryFilters(cardList: TCardData[] | TSearchResultCardData[], query: TSearchQuery) {
 	let cOut = cardList
 	// Apply Core Type Filter
 	if (query.coreCardType) {
@@ -441,10 +434,8 @@ function _searchQueryIsEmpty(query: TSearchQuery) {
 		(query.links && query.links.terms.length != 0) ||
 		(query.linkvals && query.linkvals.length != 0) ||
 		(query.scales && query.scales.length != 0) ||
-		(query.atk &&
-			(query.atk.lte != undefined || query.atk.gte != undefined)) ||
-		(query.def &&
-			(query.def.lte != undefined || query.def.gte != undefined))
+		(query.atk && (query.atk.lte != undefined || query.atk.gte != undefined)) ||
+		(query.def && (query.def.lte != undefined || query.def.gte != undefined))
 	)
 }
 
@@ -453,8 +444,7 @@ function _searchAtkAndDef(
 	atk?: {lte?: number | null; gte?: number | null},
 	def?: {lte?: number | null; gte?: number | null}
 ) {
-	if ((!atk || (!atk.gte && !atk.lte)) && (!def || (!def.gte && !def.lte)))
-		return cardList
+	if ((!atk || (!atk.gte && !atk.lte)) && (!def || (!def.gte && !def.lte))) return cardList
 
 	return cardList.filter((card) => {
 		const cardAtk = card.atk || 0
@@ -492,19 +482,13 @@ function _searchLinkvals(linkvals: number[], cardList: TCardData[]) {
 	})
 }
 
-function _searchMonsterRace(
-	monsterRaces: TMonsterRace[],
-	cardList: TCardData[]
-) {
+function _searchMonsterRace(monsterRaces: TMonsterRace[], cardList: TCardData[]) {
 	return cardList.filter((card) => {
 		return card.race && monsterRaces.includes(card.race as TMonsterRace)
 	})
 }
 
-function _searchAttribute(
-	attributes: TMonsterAttribute[],
-	cardList: TCardData[]
-) {
+function _searchAttribute(attributes: TMonsterAttribute[], cardList: TCardData[]) {
 	return cardList.filter((card) => {
 		return (
 			'attribute' in card &&
@@ -536,9 +520,7 @@ function _searchMonsterType(
 ) {
 	if (monsterType.operand === 'OR') {
 		return cardList.filter((card) => {
-			return card.typeline?.some((line) =>
-				monsterType.terms.includes(line as TMonsterType)
-			)
+			return card.typeline?.some((line) => monsterType.terms.includes(line as TMonsterType))
 		})
 	}
 	// 'AND'
@@ -553,9 +535,7 @@ function _searchLinkmarkers(
 ) {
 	if (links.operand === 'OR') {
 		return cardList.filter((card) => {
-			return card.linkmarkers?.some((marker) =>
-				links.terms.includes(marker as TLinkMarkers)
-			)
+			return card.linkmarkers?.some((marker) => links.terms.includes(marker as TLinkMarkers))
 		})
 	}
 	// 'AND'
@@ -564,14 +544,9 @@ function _searchLinkmarkers(
 	})
 }
 
-function _searchSpellTrapType(
-	types: TSpellTypes[] | TTrapTypes[],
-	cardList: TCardData[]
-) {
+function _searchSpellTrapType(types: TSpellTypes[] | TTrapTypes[], cardList: TCardData[]) {
 	return cardList.filter((card) => {
-		return (
-			card.race && types.includes(card.race as TSpellTypes & TTrapTypes)
-		)
+		return card.race && types.includes(card.race as TSpellTypes & TTrapTypes)
 	})
 }
 
@@ -593,11 +568,7 @@ function _searchTerm(term: string, cardList?: TCardData[]) {
 function __getAllViableValues<K extends keyof TCardData>(
 	key: K,
 	cardList: TCardData[] = fullCardList.value
-): Array<
-	NonNullable<TCardData[K]> extends Array<infer U>
-		? U
-		: NonNullable<TCardData[K]>
-> {
+): Array<NonNullable<TCardData[K]> extends Array<infer U> ? U : NonNullable<TCardData[K]>> {
 	const valuesSet = new Set<unknown>()
 	for (const card of cardList) {
 		const value = card[key]
@@ -616,10 +587,21 @@ function __getAllViableValues<K extends keyof TCardData>(
 	}
 
 	return Array.from(valuesSet) as Array<
-		NonNullable<TCardData[K]> extends Array<infer U>
-			? U
-			: NonNullable<TCardData[K]>
+		NonNullable<TCardData[K]> extends Array<infer U> ? U : NonNullable<TCardData[K]>
 	>
+}
+
+const _find = {
+	AtkDef: _searchAtkAndDef,
+	Level: _searchMonsterLevels,
+	Scale: _searchPendulumScales,
+	Linkval: _searchLinkvals,
+	MonsterRace: _searchMonsterRace,
+	Attribute: _searchAttribute,
+	CoreCardType: _searchCoreCardType,
+	MonsterType: _searchMonsterType,
+	Linkmarkers: _searchLinkmarkers,
+	SpellTrapType: _searchSpellTrapType,
 }
 // #endregion
 // -----------------------------------------------------------
@@ -638,10 +620,8 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 			return cardList.sort((a, b) => b.name.localeCompare(a.name))
 		case ESortBy.TCG_Date_Asc:
 			return cardList.sort((a, b) => {
-				const dateA =
-					a.misc_info[0]?.tcg_date || a.misc_info[0]?.ocg_date
-				const dateB =
-					b.misc_info[0]?.tcg_date || b.misc_info[0]?.ocg_date
+				const dateA = a.misc_info[0]?.tcg_date || a.misc_info[0]?.ocg_date
+				const dateB = b.misc_info[0]?.tcg_date || b.misc_info[0]?.ocg_date
 
 				if (!dateA && !dateB) return a.name.localeCompare(b.name) // Sort by name when both dates missing
 				if (!dateA) return 1
@@ -649,16 +629,12 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 
 				const dateComparison = dateA.localeCompare(dateB)
 				// If dates are equal, sort by name as secondary criteria
-				return dateComparison === 0
-					? a.name.localeCompare(b.name)
-					: dateComparison
+				return dateComparison === 0 ? a.name.localeCompare(b.name) : dateComparison
 			})
 		case ESortBy.TCG_Date_Desc:
 			return cardList.sort((a, b) => {
-				const dateA =
-					a.misc_info[0]?.tcg_date || a.misc_info[0]?.ocg_date
-				const dateB =
-					b.misc_info[0]?.tcg_date || b.misc_info[0]?.ocg_date
+				const dateA = a.misc_info[0]?.tcg_date || a.misc_info[0]?.ocg_date
+				const dateB = b.misc_info[0]?.tcg_date || b.misc_info[0]?.ocg_date
 
 				if (!dateA && !dateB) return a.name.localeCompare(b.name) // Sort by name when both dates missing
 				if (!dateA) return 1
@@ -666,9 +642,7 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 
 				const dateComparison = dateB.localeCompare(dateA)
 				// If dates are equal, sort by name as secondary criteria
-				return dateComparison === 0
-					? a.name.localeCompare(b.name)
-					: dateComparison
+				return dateComparison === 0 ? a.name.localeCompare(b.name) : dateComparison
 			})
 		case ESortBy.ATK_Asc:
 			return cardList.sort((a, b) => {
@@ -677,9 +651,7 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 
 				const atkComparison = atkA - atkB
 				// If ATK values are equal, sort by name as secondary criteria
-				return atkComparison === 0
-					? a.name.localeCompare(b.name)
-					: atkComparison
+				return atkComparison === 0 ? a.name.localeCompare(b.name) : atkComparison
 			}) // Use -2 for cards without ATK
 		case ESortBy.ATK_Desc:
 			return cardList.sort((a, b) => {
@@ -688,28 +660,16 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 
 				const atkComparison = atkB - atkA
 				// If ATK values are equal, sort by name as secondary criteria
-				return atkComparison === 0
-					? a.name.localeCompare(b.name)
-					: atkComparison
+				return atkComparison === 0 ? a.name.localeCompare(b.name) : atkComparison
 			})
 		case ESortBy.DEF_Asc:
 			return cardList.sort((a, b) => {
-				const defA = a.linkval
-					? 9900
-					: a.def !== undefined
-					? a.def
-					: 9999
-				const defB = b.linkval
-					? 9900
-					: b.def !== undefined
-					? b.def
-					: 9999
+				const defA = a.linkval ? 9900 : a.def !== undefined ? a.def : 9999
+				const defB = b.linkval ? 9900 : b.def !== undefined ? b.def : 9999
 
 				const defComparison = defA - defB
 				// If DEF values are equal, sort by name as secondary criteria
-				return defComparison === 0
-					? a.name.localeCompare(b.name)
-					: defComparison
+				return defComparison === 0 ? a.name.localeCompare(b.name) : defComparison
 			})
 		case ESortBy.DEF_Desc:
 			return cardList.sort((a, b) => {
@@ -718,9 +678,7 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 
 				const defComparison = defB - defA
 				// If DEF values are equal, sort by name as secondary criteria
-				return defComparison === 0
-					? a.name.localeCompare(b.name)
-					: defComparison
+				return defComparison === 0 ? a.name.localeCompare(b.name) : defComparison
 			})
 		case ESortBy.Type:
 			return cardList.sort((a, b) => {
@@ -736,9 +694,7 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 
 				// If both are the same type, sort by race
 				const raceComparison = a.race?.localeCompare(b.race ?? '') ?? 0
-				return raceComparison === 0
-					? a.name.localeCompare(b.name)
-					: raceComparison
+				return raceComparison === 0 ? a.name.localeCompare(b.name) : raceComparison
 			})
 
 		default:

@@ -1,4 +1,9 @@
-import {fetchCardData, fetchDatabaseVersion} from './api/YGOProAPI'
+import {
+	fetchCardData,
+	fetchDatabaseVersion,
+	fetchCardSets,
+	fetchCardArchetypes,
+} from './api/YGOProAPI'
 import {getConfig, setConfig, APP_VER} from './Config'
 import Files from './Files'
 export async function appNeedsUpdating(): Promise<boolean> {
@@ -19,16 +24,16 @@ export async function dbNeedsUpdating(): Promise<boolean> {
 export async function performDBUpdate(
 	onProgress?: (step: number, total: number, message: string) => void
 ) {
+	const TOTAL_STEPS: Readonly<number> = 5
 	let hasError = false
 	let errorMsgs: string[] = []
-	const totalSteps = 2 // Update this when adding more steps
 	let currentStep = 0
 
 	const updateProgress = (message: string) => {
 		currentStep++
-		console.debug(`UPDATE::: Step ${currentStep}/${totalSteps}: ${message}`)
+		console.debug(`UPDATE::: Step ${currentStep}/${TOTAL_STEPS}: ${message}`)
 		if (onProgress) {
-			onProgress(currentStep, totalSteps, message)
+			onProgress(currentStep, TOTAL_STEPS, message)
 		}
 	}
 
@@ -38,10 +43,34 @@ export async function performDBUpdate(
 
 	// Step 2: Update Core Card Data
 	updateProgress('Updating Core Card Data...')
-	const l = await updateCoreCardData()
-	if (!l) {
+	const coreData = await updateCoreCardData()
+	if (!coreData) {
 		hasError = true
 		errorMsgs.push('Failed to update core card data.')
+	}
+
+	// Step 3: Update Staple Data
+	updateProgress('Updating Staple Data...')
+	const stapleData = await updateStapleData()
+	if (!stapleData) {
+		hasError = true
+		errorMsgs.push('Failed to update staple data.')
+	}
+
+	// Step 4: Update Archetypes
+	updateProgress('Updating Archetypes...')
+	const archetypes = await updateArchetypes()
+	if (!archetypes) {
+		hasError = true
+		errorMsgs.push('Failed to update archetypes.')
+	}
+
+	// Step 5: Update Card Sets
+	updateProgress('Updating Card Sets...')
+	const cardSets = await updateCardSets()
+	if (!cardSets) {
+		hasError = true
+		errorMsgs.push('Failed to update card sets.')
 	}
 
 	await setConfig({dbVer: dbVer.database_version})
@@ -49,7 +78,7 @@ export async function performDBUpdate(
 	return {
 		success: !hasError,
 		errors: errorMsgs,
-		totalSteps,
+		totalSteps: TOTAL_STEPS,
 		completedSteps: currentStep,
 	}
 }
@@ -59,4 +88,25 @@ async function updateCoreCardData() {
 	if (!cardData) return null
 	await Files.write('data/carddata_en.json', cardData)
 	return cardData.data.length
+}
+
+async function updateStapleData() {
+	const cardData = await fetchCardData('en', ['&staple=yes'])
+	if (!cardData) return null
+	await Files.write('data/staples_en.json', cardData)
+	return cardData.data.length
+}
+
+async function updateCardSets() {
+	const cardSets = await fetchCardSets()
+	if (!cardSets) return null
+	await Files.write('data/sets_en.json', cardSets)
+	return cardSets.length
+}
+
+async function updateArchetypes() {
+	const archetypes = await fetchCardArchetypes()
+	if (!archetypes) return null
+	await Files.write('data/archetypes_en.json', archetypes)
+	return archetypes.length
 }

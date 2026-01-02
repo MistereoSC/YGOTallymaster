@@ -1,30 +1,25 @@
-<script lang="ts" setup>
-import {onMounted, ref, computed, onUnmounted, nextTick, watch} from 'vue'
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
-import CardPreview from '@/components/database/CardPreview.vue'
+<script lang="ts" setup generic="T">
+import {onMounted, ref, computed, onUnmounted, nextTick} from 'vue'
 
 interface IProps {
-	cardList: TCardData[]
-	activeCardId?: number | null
-	itemSize?: 'small' | 'medium' | 'large' | 'tiny'
+	items: T[]
+	itemDimensions: {width: number; height: number}
 	itemGapPx?: number
 	containerPaddingPx?: number
-	showOwnedHeart?: boolean
-	showOwnedNumber?: boolean
-	grayUnowned?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
-	itemSize: 'medium',
 	itemGapPx: 16,
 	containerPaddingPx: 8,
 })
 
-const emit = defineEmits<{
-	(e: 'cardClicked', value: TCardData): void
+defineSlots<{
+	item(props: {item: T; index: number}): any
 }>()
 // ----------------------------------------------
 // #region Virtual Scroll
 // ----------------------------------------------
+const BUFFER_ROWS = 2
+
 const scrollContainer = ref<HTMLElement>()
 const containerWidth = ref(0)
 const containerHeight = ref(0)
@@ -32,22 +27,21 @@ const scrollTop = ref(0)
 const debouncedScrollTop = ref(0)
 const isScrolling = ref(false)
 
-// Card dimensions
-let CARD_WIDTH = 173 // w-43.25 = 173px
-let CARD_HEIGHT = 258 // h-64.5 = 258px
-const BUFFER_ROWS = 2
+const itemCount = computed(() => props.items.length)
 
-const cardsPerRow = computed(() => {
+const itemsPerRow = computed(() => {
 	if (containerWidth.value === 0) return 1
 	const availableWidth = containerWidth.value - props.containerPaddingPx * 2
 	return Math.max(
 		1,
-		Math.floor((availableWidth + props.itemGapPx) / (CARD_WIDTH + props.itemGapPx))
+		Math.floor(
+			(availableWidth + props.itemGapPx) / (props.itemDimensions.width + props.itemGapPx)
+		)
 	)
 })
 
 const totalRows = computed(() => {
-	return Math.ceil(props.cardList.length / cardsPerRow.value)
+	return Math.ceil(itemCount.value / itemsPerRow.value)
 })
 
 // Calculate visible range (using debounced scroll position)
@@ -55,28 +49,31 @@ const visibleRange = computed(() => {
 	const scrollPosition = debouncedScrollTop.value
 	const startRow = Math.max(
 		0,
-		Math.floor(scrollPosition / (CARD_HEIGHT + props.itemGapPx)) - BUFFER_ROWS
+		Math.floor(scrollPosition / (props.itemDimensions.height + props.itemGapPx)) - BUFFER_ROWS
 	)
 	const endRow = Math.min(
 		totalRows.value,
-		Math.ceil((scrollPosition + containerHeight.value) / (CARD_HEIGHT + props.itemGapPx)) +
+		Math.ceil(
+			(scrollPosition + containerHeight.value) /
+				(props.itemDimensions.height + props.itemGapPx)
+		) +
 			1 +
 			BUFFER_ROWS
 	)
 
-	const startIndex = Math.max(0, startRow * cardsPerRow.value)
-	const endIndex = Math.min(props.cardList.length, endRow * cardsPerRow.value)
+	const startIndex = Math.max(0, startRow * itemsPerRow.value)
+	const endIndex = Math.min(itemCount.value, endRow * itemsPerRow.value)
 
 	return {startIndex, endIndex, startRow}
 })
 
-// Get visible cards
-const visibleCards = computed(() => {
+// Get visible items
+const visibleItems = computed(() => {
 	const {startIndex, endIndex} = visibleRange.value
 	const result = []
-	for (let i = startIndex; i < endIndex && i < props.cardList.length; i++) {
+	for (let i = startIndex; i < endIndex && i < itemCount.value; i++) {
 		result.push({
-			card: props.cardList[i],
+			item: props.items[i],
 			index: i,
 		})
 	}
@@ -85,12 +82,12 @@ const visibleCards = computed(() => {
 
 // Calculate total height for scrolling
 const totalHeight = computed(() => {
-	return totalRows.value * (CARD_HEIGHT + props.itemGapPx) - props.itemGapPx
+	return totalRows.value * (props.itemDimensions.height + props.itemGapPx) - props.itemGapPx
 })
 
 // Calculate offset for visible items
 const offsetY = computed(() => {
-	return visibleRange.value.startRow * (CARD_HEIGHT + props.itemGapPx)
+	return visibleRange.value.startRow * (props.itemDimensions.height + props.itemGapPx)
 })
 
 let scrollDebounceTimer: NodeJS.Timeout | null = null
@@ -125,7 +122,6 @@ let resizeObserver: ResizeObserver | null = null
 // #region Setup
 // ----------------------------------------------
 onMounted(async () => {
-	setCardSizes(props.itemSize)
 	await nextTick()
 	handleResize()
 
@@ -146,41 +142,8 @@ onUnmounted(() => {
 	}
 })
 
-function setCardSizes(size: 'small' | 'medium' | 'large' | 'tiny') {
-	switch (size) {
-		case 'tiny':
-			CARD_WIDTH = 87 // w-21.75
-			CARD_HEIGHT = 128 // h-32
-			break
-		case 'small':
-			CARD_WIDTH = 118 // w-29.5
-			CARD_HEIGHT = 172 // h-43
-			break
-		case 'medium':
-			CARD_WIDTH = 173 // w-43.25
-			CARD_HEIGHT = 258 // h-64.5
-			break
-		case 'large':
-			CARD_WIDTH = 236 // w-59
-			CARD_HEIGHT = 344 // h-86
-			break
-	}
-}
-watch(
-	() => props.itemSize,
-	(newVal) => {
-		setCardSizes(newVal || 'medium')
-		handleResize()
-		scrollToTop()
-	}
-)
-
 // #endregion
 // ----------------------------------------------
-
-function onCardClick(card: TCardData) {
-	emit('cardClicked', card)
-}
 
 function scrollToTop() {
 	if (scrollContainer.value) {
@@ -211,19 +174,14 @@ defineExpose({
 				:style="{
 					transform: `translateY(${offsetY}px)`,
 					gap: props.itemGapPx + 'px',
-					gridTemplateColumns: `repeat(auto-fill, ${CARD_WIDTH}px)`,
+					gridTemplateColumns: `repeat(auto-fill, ${props.itemDimensions.width}px)`,
 				}"
 			>
-				<CardPreview
-					v-for="{card} in visibleCards"
-					:key="card.id"
-					:card="card"
-					:active="card.id === props.activeCardId"
-					:size="props.itemSize"
-					@click="onCardClick(card)"
-					:show-owned-heart="props.showOwnedHeart"
-					:show-owned-number="props.showOwnedNumber"
-					:gray-unowned="props.grayUnowned"
+				<slot
+					v-for="{item, index} in visibleItems"
+					name="item"
+					:item="item"
+					:index="index"
 				/>
 			</div>
 		</div>

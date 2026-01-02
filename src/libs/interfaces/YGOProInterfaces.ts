@@ -76,10 +76,30 @@ type TCardDataMisc = {
 
 export type TCardData = TGeneralCardData & Partial<TMonsterCardData>
 
+export type TSetListData = {
+	set_name: string
+	set_code: string
+	num_of_cards: number
+	tcg_date: string
+	set_image: string
+}
+
+export type TSetItemData = {
+	id: number
+	name: string
+	set_name: string
+	set_code: string
+	set_rarity: string
+	set_price: string
+}
+
+export type TArchetypeData = {archetype_name: string}
+
 export type TDBVersionData = {
 	database_version: string
 	last_update: string
 }
+
 // endregion
 // -----------------------------------------------------------
 // region Type Definitions
@@ -167,22 +187,7 @@ export type TFrameType =
 	| 'token'
 	| 'skill'
 
-export type TMonsterAttribute =
-	| 'WIND'
-	| 'FIRE'
-	| 'WATER'
-	| 'EARTH'
-	| 'LIGHT'
-	| 'DARK'
-	| 'DIVINE'
-
-export type TSpellTrapAttribute =
-	| 'Normal'
-	| 'Continuous'
-	| 'Counter'
-	| 'Quick-Play'
-	| 'Field'
-	| 'Ritual'
+export type TMonsterAttribute = 'WIND' | 'FIRE' | 'WATER' | 'EARTH' | 'LIGHT' | 'DARK' | 'DIVINE'
 
 export enum EMonsterAttributes {
 	WIND = 'WIND',
@@ -241,12 +246,9 @@ export enum EMonsterRace {
 
 export type TTrapTypes = 'Normal' | 'Continuous' | 'Counter'
 
-export type TSpellTypes =
-	| 'Normal'
-	| 'Continuous'
-	| 'Quick-Play'
-	| 'Field'
-	| 'Ritual'
+export type TSpellTypes = 'Normal' | 'Continuous' | 'Quick-Play' | 'Field' | 'Ritual'
+
+export type TSpellTrapAttribute = TTrapTypes | TSpellTypes
 
 export enum ETrapTypes {
 	NORMAL = 'Normal',

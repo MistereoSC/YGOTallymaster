@@ -1,10 +1,4 @@
-import {
-	TArchetypeData,
-	TCardData,
-	TDBVersionData,
-	TSetItemData,
-	TSetListData,
-} from '../interfaces/YGOProInterfaces'
+import {TCardData, TDBVersionData, TSetItemData, TSetListData} from '../interfaces/YGOProInterfaces'
 
 export async function fetchCardData(language: 'en' | 'de' = 'en', args?: string[]) {
 	let url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
@@ -40,16 +34,6 @@ export async function fetchCardSetDetails(setCode: string) {
 		throw new Error(`Failed to fetch card set details: ${res.status} ${res.statusText}`)
 	}
 	const data: TSetItemData = await res.json()
-	return data
-}
-
-export async function fetchCardArchetypes() {
-	const url = 'https://db.ygoprodeck.com/api/v7/archetypes.php'
-	const res = await fetch(url)
-	if (!res.ok) {
-		throw new Error(`Failed to fetch card data: ${res.status} ${res.statusText}`)
-	}
-	const data: Array<TArchetypeData> = await res.json()
 	return data
 }
 

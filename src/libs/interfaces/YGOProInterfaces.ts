@@ -93,8 +93,6 @@ export type TSetItemData = {
 	set_price: string
 }
 
-export type TArchetypeData = {archetype_name: string}
-
 export type TDBVersionData = {
 	database_version: string
 	last_update: string

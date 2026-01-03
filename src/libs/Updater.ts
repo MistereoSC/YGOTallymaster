@@ -1,9 +1,4 @@
-import {
-	fetchCardData,
-	fetchDatabaseVersion,
-	fetchCardSets,
-	fetchCardArchetypes,
-} from './api/YGOProAPI'
+import {fetchCardData, fetchDatabaseVersion, fetchCardSets} from './api/YGOProAPI'
 import {getConfig, setConfig, APP_VER} from './Config'
 import Files from './Files'
 export async function appNeedsUpdating(): Promise<boolean> {
@@ -24,7 +19,7 @@ export async function dbNeedsUpdating(): Promise<boolean> {
 export async function performDBUpdate(
 	onProgress?: (step: number, total: number, message: string) => void
 ) {
-	const TOTAL_STEPS: Readonly<number> = 5
+	const TOTAL_STEPS: Readonly<number> = 4
 	let hasError = false
 	let errorMsgs: string[] = []
 	let currentStep = 0
@@ -57,15 +52,7 @@ export async function performDBUpdate(
 		errorMsgs.push('Failed to update staple data.')
 	}
 
-	// Step 4: Update Archetypes
-	updateProgress('Updating Archetypes...')
-	const archetypes = await updateArchetypes()
-	if (!archetypes) {
-		hasError = true
-		errorMsgs.push('Failed to update archetypes.')
-	}
-
-	// Step 5: Update Card Sets
+	// Step 4: Update Card Sets
 	updateProgress('Updating Card Sets...')
 	const cardSets = await updateCardSets()
 	if (!cardSets) {
@@ -102,11 +89,4 @@ async function updateCardSets() {
 	if (!cardSets) return null
 	await Files.write('data/sets_en.json', cardSets)
 	return cardSets.length
-}
-
-async function updateArchetypes() {
-	const archetypes = await fetchCardArchetypes()
-	if (!archetypes) return null
-	await Files.write('data/archetypes_en.json', archetypes)
-	return archetypes.length
 }

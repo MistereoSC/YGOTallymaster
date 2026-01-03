@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardReImage from './CardReImage.vue'
 import {Icon} from '@iconify/vue'
 import AttributeIcon from './AttributeIcon.vue'
+import CardBanIcon from '../cards/CardBanIcon.vue'
 
 const props = defineProps<{
 	card: TCardData
+	showBanlistFor?: TBanlistFormat | 'none'
 }>()
 const emit = defineEmits([])
 </script>
@@ -21,20 +23,21 @@ const emit = defineEmits([])
 					class="shadow-sm shadow-black/50"
 				/>
 			</div>
-			<div class="text-xl font-bold flex justify-between items-center">
-				<span>{{ card.name }}</span>
-				<span>
+			<div class="text-xl font-bold grid grid-cols-[auto_1fr_auto] items-center gap-2">
+				<CardBanIcon
+					:show-banlist-for="props.showBanlistFor"
+					:banlist-info="card.banlist_info"
+					size="small"
+				/>
+				<span class="">{{ card.name }}</span>
+				<span class="">
 					<AttributeIcon :attribute="card.attribute ?? card.race" />
 				</span>
 			</div>
 			<div
 				v-if="card.level"
 				class="flex text-xl items-center gap-1 pt-2"
-				:class="
-					['xyz', 'xyz_pendulum'].includes(card.frameType)
-						? ''
-						: 'flex-row-reverse'
-				"
+				:class="['xyz', 'xyz_pendulum'].includes(card.frameType) ? '' : 'flex-row-reverse'"
 			>
 				<span v-for="n in card.level" :key="n">
 					<span
@@ -48,8 +51,7 @@ const emit = defineEmits([])
 						<Icon icon="material-symbols:star-rounded" />
 					</span>
 				</span>
-				<span
-					class="font-semibold mb-1 text-md leading-none text-contrast-500"
+				<span class="font-semibold mb-1 text-md leading-none text-contrast-500"
 					>({{ card.level }})</span
 				>
 			</div>
@@ -75,9 +77,7 @@ const emit = defineEmits([])
 					<div class="h-full flex flex-row gap-4 px-4 pb-1 font-bold">
 						<span>Atk/ {{ card.atk! >= 0 ? card.atk : '?' }}</span>
 						<span v-if="card.linkval">LINK {{ card.linkval }}</span>
-						<span v-else
-							>Def/ {{ card.def! >= 0 ? card.def : '?' }}</span
-						>
+						<span v-else>Def/ {{ card.def! >= 0 ? card.def : '?' }}</span>
 					</div>
 				</div>
 				<div>

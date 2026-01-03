@@ -130,9 +130,9 @@ const useCardSearch = () => {
 			fields: ['name', 'desc', 'archetype'],
 			storeFields: STORE_FIELDS,
 			searchOptions: {
-				fuzzy: 0.3,
+				fuzzy: 0.1,
 				prefix: true,
-				boost: {name: 6, archetype: 2, desc: 1},
+				boost: {name: 6, archetype: 3, desc: 1},
 				combineWith: 'AND',
 			},
 			processTerm: (term, _fieldName) => (STOP_WORDS.has(term) ? null : term.toLowerCase()),

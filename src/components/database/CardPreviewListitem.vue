@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue'
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {loadImage} from '@/libs/Images'
 import {Icon} from '@iconify/vue'
 import {getCardStyles} from '@/libs/CardData'
@@ -8,6 +8,7 @@ import AttributeIcon from './AttributeIcon.vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
 import CardOwnHeart from '@/components/cards/CardOwnHeart.vue'
 import CardLinkPreview from './CardLinkPreview.vue'
+import CardBanIcon from '../cards/CardBanIcon.vue'
 
 interface IProps {
 	card: TCardData
@@ -17,6 +18,8 @@ interface IProps {
 	showLimitedInfo?: boolean
 	grayUnowned?: boolean
 	showOwnedHeart?: boolean
+	showOwnedNumber?: boolean
+	showBanlistFor?: TBanlistFormat | 'none'
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'medium',
@@ -30,13 +33,13 @@ const imageUrl = ref<string | null>(null)
 const isLoading = ref(true)
 const hasError = ref(false)
 
-const ownedStore = useOwnedCards()
+const {ownedCards} = useOwnedCards()
 onMounted(async () => {
 	await getPreviewImage()
 })
 
 const numOwned = computed(() => {
-	return ownedStore.ownedCards.value?.[props.card.id] ?? 0
+	return ownedCards.value?.[props.card.id] ?? 0
 })
 async function getPreviewImage() {
 	try {
@@ -157,6 +160,11 @@ const styles = getCardStyles(props.card)
 						}"
 					>
 						<div class="flex gap-2 items-center">
+							<CardBanIcon
+								:show-banlist-for="props.showBanlistFor"
+								:banlist-info="props.card.banlist_info"
+								:size="props.size"
+							/>
 							<AttributeIcon
 								class="shrink-0"
 								:attribute="props.card.attribute ?? props.card.race"
@@ -244,12 +252,18 @@ const styles = getCardStyles(props.card)
 					</div>
 				</div>
 
-				<div class="flex items-center justify-center" v-if="!props.showLimitedInfo">
+				<div class="flex items-center justify-center">
 					<CardLinkPreview
-						v-if="props.card.linkmarkers"
+						v-if="!props.showLimitedInfo && props.card.linkmarkers"
 						:links="props.card.linkmarkers"
 						:size="props.size === 'tiny' ? 'tiny' : 'small'"
 					/>
+					<div
+						v-else-if="props.showOwnedNumber && !props.showOwnedHeart && numOwned > 0"
+						class="font-bold"
+					>
+						{{ numOwned }}
+					</div>
 				</div>
 			</div>
 

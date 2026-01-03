@@ -1,18 +1,22 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue'
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {loadImage} from '@/libs/Images'
 import {Icon} from '@iconify/vue'
 import CardOwnHeart from '@/components/cards/CardOwnHeart.vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
+import CardBanIcon from '../cards/CardBanIcon.vue'
 
 interface IProps {
 	card: TCardData
 	size?: 'small' | 'medium' | 'large' | 'tiny'
 	active?: boolean
 	grayUnowned?: boolean
+	grayOverride?: boolean
+
 	showOwnedHeart?: boolean
 	showOwnedNumber?: boolean
+	showBanlistFor?: TBanlistFormat | 'none'
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'small',
@@ -90,7 +94,7 @@ function onClick() {
 		:style="{
 			transition: 'outline-width 0.1s ease-out, outline-color 0.1s ease-out',
 		}"
-		:grayscale="props.grayUnowned && numOwned === 0 ? 'true' : 'false'"
+		:grayscale="props.grayOverride || (props.grayUnowned && numOwned === 0 ? 'true' : 'false')"
 		@click="onClick"
 	>
 		<!-- Error state -->
@@ -133,6 +137,13 @@ function onClick() {
 			<div class="text-contrast-900 text-md font-bold absolute bottom-0.5 left-1.5">
 				{{ numOwned }}
 			</div>
+		</div>
+		<div class="absolute left-2 top-2">
+			<CardBanIcon
+				:show-banlist-for="props.showBanlistFor"
+				:banlist-info="props.card.banlist_info"
+				:size="props.size"
+			/>
 		</div>
 	</div>
 </template>

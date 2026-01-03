@@ -37,6 +37,7 @@ type TGeneralCardData = {
 	card_images: TCardImageData[]
 	card_sets: TCardSetData[]
 	card_prices: TCardPriceData[]
+	banlist_info?: TBanlistInfo
 
 	archetype?: string
 	misc_info: TCardDataMisc[]
@@ -259,6 +260,14 @@ export enum ESpellTypes {
 	QUICK_PLAY = 'Quick-Play',
 	FIELD = 'Field',
 	RITUAL = 'Ritual',
+}
+
+export type TBanlistFormat = 'ban_tcg' | 'ban_ocg' | 'ban_goat'
+export type TBanlistType = 'Forbidden' | 'Limited' | 'Semi-Limited'
+export type TBanlistInfo = {
+	ban_tcg?: TBanlistType
+	ban_ocg?: TBanlistType
+	ban_goat?: TBanlistType
 }
 
 // endregion

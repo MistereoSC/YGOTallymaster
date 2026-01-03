@@ -4,21 +4,20 @@ import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useOwnedCards} from '@/composables/useOwnedCards'
 import {onMounted} from 'vue'
 
-const cardStore = useOwnedCards()
-const settingsStore = useDatabaseSettings()
+const {cardList} = useOwnedCards()
+const {settings} = useDatabaseSettings()
 
 onMounted(async () => {})
 </script>
 
 <template>
 	<div class="p-4">
-		<div v-if="cardStore.cardList.value">
+		<div v-if="cardList">
 			<CardListVirtualGrid
-				:card-list="cardStore.cardList.value.fullCardList"
-				:show-owned-number="
-					settingsStore.settings.value?.showOwnedNumbers
-				"
-				:gray-unowned-cards="settingsStore.settings.value?.grayUnowned"
+				:card-list="cardList.fullCardList"
+				:show-owned-number="settings?.showOwnedNumbers"
+				:gray-unowned-cards="settings?.grayUnowned"
+				:show-banlist-for="settings?.showBanlistFor"
 			/>
 		</div>
 	</div>

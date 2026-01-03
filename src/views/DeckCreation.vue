@@ -5,10 +5,12 @@ import CardFilter from '@/components/database/CardFilter.vue'
 import CardFullView from '@/components/database/CardFullView.vue'
 import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import DeckCardGrid from '@/components/decks/DeckCardGrid.vue'
+import DeckDisplaySettings from '@/components/decks/DeckDisplaySettings.vue'
 import {useCardSearch} from '@/composables/useCardSearch'
+import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useDeckList} from '@/composables/useDeckList'
 import {TDeckData} from '@/libs/Decks'
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {TCardData, TFrameType} from '@/libs/interfaces/YGOProInterfaces'
 import {onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
 
 const props = defineProps<{
@@ -19,14 +21,14 @@ const emit = defineEmits<{
 	(e: 'close'): void
 }>()
 
+const {settings} = useDatabaseSettings()
 const {resetSearch, fullCardList, searchResults} = useCardSearch()
-const store = useDeckList()
+const {getDeckCards, saveDeck} = useDeckList()
 const cards = ref<{main: TCardData[]; extra: TCardData[]; side: TCardData[]}>({
 	main: [],
 	extra: [],
 	side: [],
 })
-const TMP_LIST = ref<TCardData[]>([])
 
 const loading = ref(true)
 
@@ -52,9 +54,8 @@ function onDeckAreaWheel(e: WheelEvent) {
 
 onMounted(async () => {
 	resetSearch()
-	cards.value = await store.getDeckCards(props.deckData)
+	cards.value = await getDeckCards(props.deckData)
 	loading.value = false
-	TMP_LIST.value = [...cards.value.main, ...cards.value.extra, ...cards.value.side]
 
 	window.addEventListener('keydown', onKeyDown)
 	window.addEventListener('keyup', onKeyUp)
@@ -68,6 +69,7 @@ onUnmounted(() => {
 const hoveredCard = ref<null | TCardData>(null)
 function onCardHover(card?: TCardData) {
 	hoveredCard.value = card || null
+	settingsToggled.value = false
 }
 
 function onCardAdd(card: TCardData) {
@@ -98,7 +100,52 @@ function checkDeckLimit(cardId: number) {
 }
 
 function onSortClick() {
-	return
+	cards.value.main = sortForDeck(cards.value.main)
+	cards.value.extra = sortForDeck(cards.value.extra)
+	cards.value.side = sortForDeck(cards.value.side)
+}
+
+const frameTypeSortOrder: Record<string, number> = {
+	link: 0,
+	xyz: 1,
+	xyz_pendulum: 2,
+	synchro: 3,
+	synchro_pendulum: 4,
+	fusion: 5,
+	fusion_pendulum: 6,
+	ritual: 7,
+	// Other monster types will get 8
+	spell: 9,
+	trap: 10,
+}
+
+function getFrameTypeOrder(frameType: TFrameType): number {
+	if (frameType in frameTypeSortOrder) {
+		return frameTypeSortOrder[frameType]
+	}
+	// All other monster frame types
+	if (frameType !== 'spell' && frameType !== 'trap') {
+		return 8
+	}
+	return frameTypeSortOrder[frameType]
+}
+
+function sortForDeck(cards: TCardData[]) {
+	return [...cards].sort((a, b) => {
+		const frameOrderA = getFrameTypeOrder(a.frameType)
+		const frameOrderB = getFrameTypeOrder(b.frameType)
+		if (frameOrderA !== frameOrderB) {
+			return frameOrderA - frameOrderB
+		}
+
+		const atkA = a.atk ?? -1
+		const atkB = b.atk ?? -1
+		if (atkA !== atkB) {
+			return atkB - atkA
+		}
+
+		return a.name.localeCompare(b.name)
+	})
 }
 
 onBeforeUnmount(async () => {
@@ -106,8 +153,13 @@ onBeforeUnmount(async () => {
 	newDeckData.main = cards.value.main.map((c) => c.id)
 	newDeckData.extra = cards.value.extra.map((c) => c.id)
 	newDeckData.side = cards.value.side.map((c) => c.id)
-	await store.saveDeck(newDeckData)
+	await saveDeck(newDeckData)
 })
+
+const settingsToggled = ref(false)
+function toggleSettings() {
+	settingsToggled.value = !settingsToggled.value
+}
 </script>
 
 <template>
@@ -116,8 +168,8 @@ onBeforeUnmount(async () => {
 			class="min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 		>
 			<div class="grid grid-rows-[auto_1fr] overflow-hidden">
-				<div class="bg-primary-600 flex items-center justify-end p-1 gap-1">
-					<span>
+				<div class="bg-primary-600 flex items-center justify-end p-1 gap-2">
+					<span class="flex gap-2">
 						<Button
 							size="small"
 							rounded
@@ -125,7 +177,13 @@ onBeforeUnmount(async () => {
 							@click="emit('close')"
 						/>
 					</span>
-					<span>
+					<span class="flex gap-2">
+						<Button
+							rounded
+							size="small"
+							icon="material-symbols:settings-rounded"
+							@click="toggleSettings"
+						/>
 						<Button
 							size="small"
 							rounded
@@ -135,7 +193,8 @@ onBeforeUnmount(async () => {
 					</span>
 				</div>
 				<div class="p-2 h-full overflow-y-auto scrollable" ref="cardFullViewContainer">
-					<CardFullView v-if="hoveredCard" :card="hoveredCard" />
+					<DeckDisplaySettings v-if="settingsToggled" />
+					<CardFullView v-else-if="hoveredCard" :card="hoveredCard" />
 				</div>
 			</div>
 		</div>
@@ -150,7 +209,13 @@ onBeforeUnmount(async () => {
 					</span>
 				</h3>
 				<div class="overflow-y-scroll scrollable flex flex-wrap gap-2 p-2">
-					<DeckCardGrid v-model="cards.main" @cardHover="onCardHover" />
+					<DeckCardGrid
+						v-model="cards.main"
+						@cardHover="onCardHover"
+						:gray-unowned="settings?.decklistGrayUnownedGrid"
+						:card-size="settings?.decklistGridCardSize || 'tiny'"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
+					/>
 				</div>
 			</div>
 			<div
@@ -165,12 +230,18 @@ onBeforeUnmount(async () => {
 					</span>
 				</h3>
 				<div class="h-full overflow-y-scroll scrollable flex flex-wrap gap-2 p-2">
-					<DeckCardGrid v-model="cards.extra" @cardHover="onCardHover" />
+					<DeckCardGrid
+						v-model="cards.extra"
+						@cardHover="onCardHover"
+						:gray-unowned="settings?.decklistGrayUnownedGrid"
+						:card-size="settings?.decklistGridCardSize || 'tiny'"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
+					/>
 				</div>
 			</div>
 		</div>
 		<div
-			class="min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+			class="max-w-180 w-[30vw] bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 		>
 			<div class="h-full grid grid-rows-2 overflow-hidden gap">
 				<div class="overflow-y-scroll scrollable border-b-2 border-b-primary-400 p-2">
@@ -179,10 +250,13 @@ onBeforeUnmount(async () => {
 				<div class="h-full overflow-y-scroll scrollable">
 					<CardListVirtualList
 						:card-list="searchResults == null ? fullCardList : searchResults"
-						item-size="tiny"
-						:show-limited-info="true"
+						:show-limited-info="settings?.decklistListSize === 'tiny'"
+						:show-owned-number="true"
+						:show-owned-heart="settings?.decklistShowOwnedHeartList"
+						:gray-unowned="settings?.decklistGrayUnownedList"
 						@card-hovered="(card) => onCardHover(card)"
 						@card-clicked="(card) => onCardAdd(card)"
+						:item-size="settings?.decklistListSize || 'tiny'"
 					/>
 				</div>
 			</div>

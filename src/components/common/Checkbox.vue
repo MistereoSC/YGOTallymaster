@@ -18,7 +18,7 @@ const emit = defineEmits<{
 }>()
 
 function onToggle() {
-	if (props.disabled || props.modelValue == null) return
+	if (props.disabled) return
 	emit('update:modelValue', !props.modelValue)
 	emit('change', !props.modelValue)
 }
@@ -28,8 +28,7 @@ function onToggle() {
 	<div
 		class="flex items-center gap-2 cursor-pointer select-none"
 		:class="{
-			'opacity-50 cursor-not-allowed!':
-				props.disabled || props.modelValue == null,
+			'opacity-50 cursor-not-allowed!': props.disabled,
 		}"
 		@click="onToggle"
 	>
@@ -40,8 +39,7 @@ function onToggle() {
 				'w-5 h-5': props.size === 'medium',
 				'w-6 h-6': props.size === 'large',
 				'bg-accent-500 border-accent-500': modelValue,
-				'bg-primary-700 border-primary-500 hover:border-accent-400':
-					!modelValue,
+				'bg-primary-700 border-primary-500 hover:border-accent-400': !modelValue,
 			}"
 		>
 			<Icon

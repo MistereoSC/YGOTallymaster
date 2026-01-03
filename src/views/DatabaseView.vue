@@ -142,8 +142,8 @@ const settingsStore = useDatabaseSettings()
 				:active-card-id="activeCard ? activeCard.id : null"
 				:item-size="settingsStore.settings.value?.listSize || 'medium'"
 				:show-owned-heart="true"
-				:show-owned-number="settingsStore.settings.value?.showOwnedNumbers"
 				:gray-unowned="settingsStore.settings.value?.grayUnowned"
+				:show-banlist-for="settingsStore.settings.value?.showBanlistFor || 'none'"
 			/>
 			<CardListVirtualGrid
 				v-else
@@ -155,6 +155,7 @@ const settingsStore = useDatabaseSettings()
 				:show-owned-heart="true"
 				:show-owned-number="settingsStore.settings.value?.showOwnedNumbers"
 				:gray-unowned="settingsStore.settings.value?.grayUnowned"
+				:show-banlist-for="settingsStore.settings.value?.showBanlistFor || 'none'"
 			/>
 
 			<div

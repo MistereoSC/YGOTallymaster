@@ -20,7 +20,9 @@ async function onTestConfig() {
 const valueInput = ref('')
 function onGetValues() {
 	const t = __getAllViableValues(valueInput.value as any)
-	debugOutput.value = t.join('\n')
+	const stringifyed = t.map((v) => JSON.stringify(v))
+	debugOutput.value =
+		`Found ${t.length} unique values for key "${valueInput.value}":\n` + stringifyed.join('\n')
 }
 const debugOutput = ref('')
 </script>

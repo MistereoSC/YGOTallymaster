@@ -48,7 +48,8 @@ onMounted(() => {
 		>
 			<span class="truncate">{{ deckData.name }}</span>
 			<span class="text-contrast-600">
-				({{ deckData.main.length }}/{{ deckData.extra.length }}/{{ deckData.side.length }})
+				({{ deckData.main.length }}/{{ deckData.extra.length }})
+				<!-- ({{ deckData.main.length }}/{{ deckData.extra.length }}/{{ deckData.side.length }}) -->
 			</span>
 		</div>
 	</div>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {onMounted, ref, computed, onUnmounted, nextTick, watch} from 'vue'
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardPreview from '@/components/database/CardPreview.vue'
 
 interface IProps {
@@ -9,9 +9,11 @@ interface IProps {
 	itemSize?: 'small' | 'medium' | 'large' | 'tiny'
 	itemGapPx?: number
 	containerPaddingPx?: number
+
 	showOwnedHeart?: boolean
 	showOwnedNumber?: boolean
 	grayUnowned?: boolean
+	showBanlistFor?: TBanlistFormat | 'none'
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
@@ -224,6 +226,7 @@ defineExpose({
 					:show-owned-heart="props.showOwnedHeart"
 					:show-owned-number="props.showOwnedNumber"
 					:gray-unowned="props.grayUnowned"
+					:show-banlist-for="props.showBanlistFor"
 				/>
 			</div>
 		</div>

@@ -16,7 +16,6 @@ enum EListSize {
 	'tiny' = 'Tiny',
 	'small' = 'Small',
 	'medium' = 'Medium',
-	'large' = 'Large',
 }
 enum EBanlistFormat {
 	'none' = 'None',
@@ -31,27 +30,40 @@ enum EBanlistFormat {
 		<h3 class="font-bold text-xl">Settings</h3>
 		<div class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col">
 			<Checkbox
-				label="Gray Out Unowned Cards"
-				:modelValue="store.settings.value?.grayUnowned"
-				@change="store.toggle.grayUnowned"
+				label="Gray Out Unowned Cards (Grid)"
+				:modelValue="store.settings.value?.decklistGrayUnownedGrid"
+				@change="store.toggle.decklistGrayUnownedGrid"
 			/>
 			<Checkbox
-				label="Always Show Owned Numbers"
-				:modelValue="store.settings.value?.showOwnedNumbers"
-				@change="store.toggle.showOwnedNumbers"
+				label="Gray Out Unowned Cards (List)"
+				:modelValue="store.settings.value?.decklistGrayUnownedList"
+				@change="store.toggle.decklistGrayUnownedList"
 			/>
 			<Checkbox
-				label="Display as List"
-				:modelValue="store.settings.value?.displayAsList"
-				@change="store.toggle.displayAsList"
+				label="Always Show Owned Heart (List)"
+				:modelValue="store.settings.value?.decklistShowOwnedHeartList"
+				@change="store.toggle.decklistShowOwnedHeartList"
 			/>
+
+			<div class="grid grid-cols-[3fr_10fr] items-center">
+				<span>Card Size</span>
+				<select
+					:value="store.settings.value?.decklistGridCardSize"
+					@change="(e) => store.set.decklistGridSize((e.target as HTMLSelectElement).value as keyof typeof EListSize)"
+					class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+				>
+					<option v-for="(label, key) in EListSize" :key="key" :value="key">
+						{{ label }}
+					</option>
+				</select>
+			</div>
 
 			<div class="grid grid-cols-[3fr_10fr] items-center">
 				<span>List Size</span>
 				<select
-					:value="store.settings.value?.listSize"
-					@change="(e) => store.set.listSize((e.target as HTMLSelectElement).value as keyof typeof EListSize)"
-					class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-full"
+					:value="store.settings.value?.decklistListSize"
+					@change="(e) => store.set.decklistListSize((e.target as HTMLSelectElement).value as keyof typeof EListSize)"
+					class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 				>
 					<option v-for="(label, key) in EListSize" :key="key" :value="key">
 						{{ label }}

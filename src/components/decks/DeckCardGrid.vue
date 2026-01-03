@@ -1,16 +1,46 @@
 <script lang="ts" setup>
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
-import {ref} from 'vue'
+import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {computed, ref} from 'vue'
 import CardPreview from '../database/CardPreview.vue'
+import {useOwnedCards} from '@/composables/useOwnedCards'
 
 interface IProps {
 	modelValue: TCardData[]
 	allowCardRemoval?: boolean
 	allowReorder?: boolean
+	grayUnowned?: boolean
+	cardSize?: 'tiny' | 'small' | 'medium' | 'large'
+	showBanlistFor?: TBanlistFormat | 'none'
 }
 const props = withDefaults(defineProps<IProps>(), {
 	allowCardRemoval: true,
 	allowReorder: true,
+	grayUnowned: false,
+	cardSize: 'tiny',
+})
+
+const ownedStore = useOwnedCards()
+
+// Compute which cards should be grayed out based on occurrence vs owned count
+const grayedOutIndices = computed(() => {
+	if (!props.grayUnowned) return new Set<number>()
+
+	const grayed = new Set<number>()
+	const occurrenceCount: Record<number, number> = {}
+
+	props.modelValue.forEach((card, index) => {
+		const cardId = card.id
+		occurrenceCount[cardId] = (occurrenceCount[cardId] || 0) + 1
+		const currentOccurrence = occurrenceCount[cardId]
+		const ownedCount = ownedStore.getOwned(cardId)
+
+		// Gray out if this occurrence exceeds the owned count
+		if (currentOccurrence > ownedCount) {
+			grayed.add(index)
+		}
+	})
+
+	return grayed
 })
 
 const emit = defineEmits<{
@@ -81,13 +111,27 @@ function resetDragState() {
 	draggedIndex.value = null
 	dragOverIndex.value = null
 }
+
+const CARD_WIDTH = computed(() => {
+	switch (props.cardSize) {
+		default:
+		case 'tiny':
+			return 87
+		case 'small':
+			return 118
+		case 'medium':
+			return 173
+		case 'large':
+			return 236
+	}
+})
 </script>
 
 <template>
 	<div
 		class="w-full grid justify-center gap-2"
 		:style="{
-			gridTemplateColumns: `repeat(auto-fill, 87px)`,
+			gridTemplateColumns: `repeat(auto-fill, ${CARD_WIDTH}px)`,
 		}"
 	>
 		<div
@@ -107,9 +151,11 @@ function resetDragState() {
 		>
 			<CardPreview
 				:card="card"
-				:size="'tiny'"
+				:size="props.cardSize"
 				@mouseenter="() => onCardHover(card)"
 				@click.right="() => onCardRemove(index)"
+				:gray-override="grayedOutIndices.has(index)"
+				:show-banlist-for="props.showBanlistFor"
 			/>
 		</div>
 	</div>

@@ -47,6 +47,7 @@ const STORE_FIELDS = [
 	'card_sets',
 	'card_prices',
 	'archetype',
+	'banlist_info',
 	// TMonsterCardData fields (partial)
 	'atk',
 	'def',

@@ -1,14 +1,13 @@
 import {ref, toRaw} from 'vue'
 import Files from '@/libs/Files'
+import {TBanlistFormat} from '@/libs/interfaces/YGOProInterfaces'
 
 const SAVE_DEBOUNCE_MS = 1000
 const PATH = 'userdata/db_settings.json'
 let saveTimeout: ReturnType<typeof setTimeout> | null = null
 
 const settings = ref<TDatabaseSettings | null>(null)
-const initialized = ref(
-	'uninitialized' as 'ready' | 'uninitialized' | 'loading'
-)
+const initialized = ref('uninitialized' as 'ready' | 'uninitialized' | 'loading')
 
 export const useDatabaseSettings = () => {
 	if (initialized.value === 'uninitialized') {
@@ -55,9 +54,41 @@ export const useDatabaseSettings = () => {
 		settings.value.grayUnowned = to ?? !settings.value.grayUnowned
 		save()
 	}
+
+	function decklistGrayUnownedGrid(to?: boolean) {
+		if (!settings.value) return
+		settings.value.decklistGrayUnownedGrid = to ?? !settings.value.decklistGrayUnownedGrid
+		save()
+	}
+	function decklistGrayUnownedList(to?: boolean) {
+		if (!settings.value) return
+		settings.value.decklistGrayUnownedList = to ?? !settings.value.decklistGrayUnownedList
+		save()
+	}
+	function decklistShowOwnedHeartList(to?: boolean) {
+		if (!settings.value) return
+		settings.value.decklistShowOwnedHeartList = to ?? !settings.value.decklistShowOwnedHeartList
+		save()
+	}
+
 	function listSize(to: TSizes) {
 		if (!settings.value) return
 		settings.value.listSize = to
+		save()
+	}
+	function decklistGridSize(to: TSizes) {
+		if (!settings.value) return
+		settings.value.decklistGridCardSize = to
+		save()
+	}
+	function decklistListSize(to: TSizes) {
+		if (!settings.value) return
+		settings.value.decklistListSize = to
+		save()
+	}
+	function showBanlistFor(to: TBanlistFormat | 'none') {
+		if (!settings.value) return
+		settings.value.showBanlistFor = to
 		save()
 	}
 
@@ -65,9 +96,15 @@ export const useDatabaseSettings = () => {
 		displayAsList,
 		showOwnedNumbers,
 		grayUnowned,
+		decklistGrayUnownedGrid,
+		decklistGrayUnownedList,
+		decklistShowOwnedHeartList,
 	}
 	const setFns = {
 		listSize,
+		decklistGridSize,
+		decklistListSize,
+		showBanlistFor,
 	}
 
 	return {
@@ -84,6 +121,13 @@ export type TDatabaseSettings = {
 	showOwnedNumbers: boolean
 	grayUnowned: boolean
 	listSize: TSizes
+	showBanlistFor?: TBanlistFormat | 'none'
+
+	decklistGrayUnownedGrid: boolean
+	decklistGrayUnownedList: boolean
+	decklistShowOwnedHeartList: boolean
+	decklistGridCardSize: TSizes
+	decklistListSize: TSizes
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
@@ -91,4 +135,11 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	showOwnedNumbers: false,
 	grayUnowned: false,
 	listSize: 'small',
+	showBanlistFor: 'ban_tcg',
+
+	decklistGrayUnownedGrid: false,
+	decklistGrayUnownedList: false,
+	decklistShowOwnedHeartList: false,
+	decklistGridCardSize: 'tiny',
+	decklistListSize: 'tiny',
 }

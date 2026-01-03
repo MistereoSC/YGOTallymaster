@@ -3,7 +3,7 @@ import {Icon} from '@iconify/vue'
 import {onMounted, ref, watch} from 'vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
 
-const store = useOwnedCards()
+const {getOwned, setOwned, initialized} = useOwnedCards()
 const props = defineProps<{
 	cardId: number
 }>()
@@ -11,13 +11,13 @@ const emit = defineEmits<{
 	(e: 'change', value: number): void
 }>()
 onMounted(() => {
-	num.value = store.getOwned(props.cardId)
+	num.value = getOwned(props.cardId)
 })
 const unwatch = watch(
-	() => store.initialized.value,
+	() => initialized.value,
 	(newVal) => {
 		if (newVal === 'ready') {
-			num.value = store.getOwned(props.cardId)
+			num.value = getOwned(props.cardId)
 			unwatch()
 		}
 	}
@@ -25,7 +25,7 @@ const unwatch = watch(
 
 const num = ref(0)
 function onMouse(e: MouseEvent) {
-	if (store.initialized.value !== 'ready') return
+	if (initialized.value !== 'ready') return
 	if (e.button === 0) {
 		if (e.shiftKey) {
 			// Shift + Left click
@@ -49,7 +49,7 @@ function onMouse(e: MouseEvent) {
 
 watch(num, (newVal) => {
 	emit('change', newVal)
-	store.setOwned(props.cardId, newVal)
+	setOwned(props.cardId, newVal)
 })
 </script>
 

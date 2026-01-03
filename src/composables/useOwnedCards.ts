@@ -1,17 +1,31 @@
 // src/composables/useCardOwnership.ts
-import {ref, toRaw} from 'vue'
+import {ref, toRaw, markRaw} from 'vue'
 import type {IMarkedCards} from '@/libs/interfaces/CardSets'
 import Files from '@/libs/Files'
-import {useListSearch} from './useCardSearch'
+import {
+	_createMinisearchIndex,
+	_searchQueryIsEmpty,
+	_sort,
+	_find,
+	ESortBy,
+	getFullCardList,
+	TSearchQuery,
+	TSearchResultCardData,
+} from './useCardSearch'
+import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import MiniSearch from 'minisearch'
 
 const PATH = 'userdata/c_owned.json'
 const SAVE_DEBOUNCE_MS = 1000
-
-let listSearch = ref(null as null | ReturnType<typeof useListSearch>)
-const initialized = ref(
-	'uninitialized' as 'ready' | 'uninitialized' | 'loading'
-)
+const MIN_SCORE_THRESHOLD: Readonly<number> = 2
 let saveTimeout: ReturnType<typeof setTimeout> | null = null
+
+let miniSearchIndex = null as null | MiniSearch<TCardData>
+const initialized = ref('uninitialized' as 'ready' | 'uninitialized' | 'loading')
+const searchResults = ref(null as TCardData[] | null)
+const activeQuery = ref<TSearchQuery>({})
+const ownedCardList = ref([] as TCardData[])
+const sortedBy = ref(ESortBy.Name_Asc)
 
 const ownedCards = ref<IMarkedCards | null>(null)
 
@@ -21,7 +35,7 @@ export const useOwnedCards = () => {
 		_init()
 	}
 
-	async function _init(force = false) {
+	async function _init() {
 		const e = await Files.exists(PATH)
 		if (!e.exists) {
 			ownedCards.value = {}
@@ -33,13 +47,104 @@ export const useOwnedCards = () => {
 			}
 		}
 
-		if (force && listSearch) {
-			listSearch.value?.reinitializeIndex()
-		} else {
-			listSearch.value = useListSearch(ownedCards.value)
-		}
+		const cardData = await getFullCardList()
+		ownedCardList.value = cardData.filter(
+			(card) => ownedCards.value && ownedCards.value[card.id] && ownedCards.value[card.id] > 0
+		)
+		miniSearchIndex = _createMinisearchIndex(ownedCardList.value)
+
+		activeQuery.value = {}
+		searchResults.value = null
+		sortedBy.value = ESortBy.Name_Asc
+
 		initialized.value = 'ready'
 	}
+
+	function sort(by?: ESortBy) {
+		if (!by && sortedBy.value === ESortBy.Name_Asc) return
+		else if (by === sortedBy.value) return
+		sortedBy.value = by ?? ESortBy.Name_Asc
+
+		ownedCardList.value = _sort(by ?? ESortBy.Name_Asc, ownedCardList.value)
+		if (searchResults.value) {
+			searchResults.value = markRaw(_sort(by ?? ESortBy.Name_Asc, [...searchResults.value]))
+		}
+	}
+
+	function search(query: TSearchQuery) {
+		if (!miniSearchIndex) return []
+		activeQuery.value = query
+		if (_searchQueryIsEmpty(query)) {
+			searchResults.value = null
+			return []
+		}
+
+		let cOut = ownedCardList.value
+
+		if (query.term && query.term.length > 0) {
+			cOut = _searchTerm(query.term)
+			if (sortedBy.value !== ESortBy.Search_Score) {
+				_sort(sortedBy.value, cOut)
+			}
+		}
+
+		cOut = _find._ApplyAllQueryFilters(cOut, query)
+		searchResults.value = markRaw(cOut)
+		return cOut
+	}
+
+	function resetSearch() {
+		searchResults.value = null
+		activeQuery.value = {}
+	}
+
+	// -----------------------------------------------------------
+
+	function getOwned(cardId: number): number {
+		return ownedCards.value?.[cardId] ?? 0
+	}
+
+	async function setOwned(cardId: number, count: number) {
+		if (!ownedCards.value) return
+		const oldVal = getOwned(cardId)
+		if (!ownedCards.value[cardId]) {
+			ownedCards.value[cardId] = 0
+		}
+		ownedCards.value[cardId] = Math.max(0, count)
+
+		if (miniSearchIndex) {
+			if (count > 0 && oldVal === 0) {
+				if (!miniSearchIndex.has(cardId)) {
+					const fulLCardList = await getFullCardList()
+					const card = fulLCardList.find((c) => c.id === cardId)
+					if (card) {
+						ownedCardList.value.unshift(card)
+						miniSearchIndex.add(card)
+					}
+				}
+			} else if (count === 0 && oldVal > 0) {
+				if (miniSearchIndex.has(cardId)) {
+					ownedCardList.value = ownedCardList.value.filter((c) => c.id !== cardId)
+					miniSearchIndex.discard(cardId)
+				}
+			}
+		}
+
+		_cleanup(cardId)
+		save()
+	}
+
+	const incrementOwned = (cardId: number) => setOwned(cardId, getOwned(cardId) + 1)
+	const decrementOwned = (cardId: number) => setOwned(cardId, getOwned(cardId) - 1)
+
+	function _cleanup(cardId: number) {
+		const entry = ownedCards.value?.[cardId]
+		if (entry != undefined && entry <= 0) {
+			delete ownedCards.value![cardId]
+		}
+	}
+
+	// -----------------------------------------------------------
 
 	function save() {
 		if (saveTimeout) {
@@ -51,58 +156,41 @@ export const useOwnedCards = () => {
 		}, SAVE_DEBOUNCE_MS)
 	}
 
-	// Get/Set helpers
-	function getOwned(cardId: number): number {
-		return ownedCards.value?.[cardId] ?? 0
-	}
-
-	function setOwned(cardId: number, count: number) {
-		if (!ownedCards.value) return 0
-		const oldVal = getOwned(cardId)
-		if (!ownedCards.value[cardId]) {
-			ownedCards.value[cardId] = 0
-		}
-		ownedCards.value[cardId] = Math.max(0, count)
-		if (count > 0 && oldVal === 0) {
-			listSearch.value?.indexCard(cardId)
-		} else if (count === 0 && oldVal > 0) {
-			listSearch.value?.deindexCard(cardId)
-		}
-
-		_cleanup(cardId)
-		save()
-	}
-
-	// Increment/Decrement shortcuts
-	const incrementOwned = (cardId: number) =>
-		setOwned(cardId, getOwned(cardId) + 1)
-	const decrementOwned = (cardId: number) =>
-		setOwned(cardId, getOwned(cardId) - 1)
-
-	// Remove entry if both are 0 (keeps file clean)
-	function _cleanup(cardId: number) {
-		const entry = ownedCards.value?.[cardId]
-		if (entry != undefined && entry <= 0) {
-			delete ownedCards.value![cardId]
-		}
-	}
-
 	function reinitializeMarkedCards() {
 		initialized.value = 'uninitialized'
-		listSearch.value = null
 		ownedCards.value = {}
-		_init(true)
+		_init()
 	}
 
 	return {
 		ownedCards,
-		save,
+		ownedCardList,
+		sort,
+		search,
+		resetSearch,
+
 		getOwned,
 		setOwned,
 		incrementOwned,
 		decrementOwned,
-		reinitializeMarkedCards,
+
 		initialized,
-		cardList: listSearch,
+		save,
+		reinitializeMarkedCards,
 	}
+}
+
+function _searchTerm(term: string, cardList?: TCardData[]) {
+	if (!miniSearchIndex) return []
+
+	let results = miniSearchIndex
+		.search(term)
+		.filter((result) => result.score >= MIN_SCORE_THRESHOLD)
+
+	if (cardList && cardList.length > 0) {
+		const filteredCardIds = new Set(cardList.map((card) => card.id))
+		results = results.filter((result) => filteredCardIds.has(result.id))
+	}
+
+	return results as unknown as TSearchResultCardData[]
 }

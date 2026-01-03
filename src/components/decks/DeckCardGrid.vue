@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<IProps>(), {
 	cardSize: 'tiny',
 })
 
-const ownedStore = useOwnedCards()
+const {getOwned} = useOwnedCards()
 
 // Compute which cards should be grayed out based on occurrence vs owned count
 const grayedOutIndices = computed(() => {
@@ -32,7 +32,7 @@ const grayedOutIndices = computed(() => {
 		const cardId = card.id
 		occurrenceCount[cardId] = (occurrenceCount[cardId] || 0) + 1
 		const currentOccurrence = occurrenceCount[cardId]
-		const ownedCount = ownedStore.getOwned(cardId)
+		const ownedCount = getOwned(cardId)
 
 		// Gray out if this occurrence exceeds the owned count
 		if (currentOccurrence > ownedCount) {

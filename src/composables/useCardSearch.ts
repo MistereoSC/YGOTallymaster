@@ -110,41 +110,30 @@ export enum ESortBy {
 // -----------------------------------------------------------
 
 let miniSearchIndex = null as null | MiniSearch<TCardData>
-let initialized = false
-let searchResults = ref(null as TCardData[] | null)
-let activeQuery = ref<TSearchQuery>({})
-let fullCardList = ref([] as TCardData[])
-let sortedBy = ref(ESortBy.Name_Asc)
+const initialized = ref('uninitialized' as 'ready' | 'uninitialized' | 'loading')
+const searchResults = ref(null as TCardData[] | null)
+const activeQuery = ref<TSearchQuery>({})
+const fullCardList = ref([] as TCardData[])
+const sortedBy = ref(ESortBy.Name_Asc)
 
 const useCardSearch = () => {
-	_init()
+	if (initialized.value === 'uninitialized') {
+		initialized.value = 'loading'
+		_init()
+	}
 
 	async function _init(force = false) {
-		if (initialized && !force) return
-		initialized = true
+		const cardData = force
+			? _initialFilterCardData(await getCardList())
+			: _initialFilterCardData(await getFullCardList())
 
-		const cardData = _initialFilterCardData(await getCardList())
 		fullCardList.value = cardData
+		miniSearchIndex = _createMinisearchIndex(cardData)
 
-		const miniSearch = new MiniSearch({
-			fields: ['name', 'desc', 'archetype'],
-			storeFields: STORE_FIELDS,
-			searchOptions: {
-				fuzzy: 0.1,
-				prefix: true,
-				boost: {name: 6, archetype: 3, desc: 1},
-				combineWith: 'AND',
-			},
-			processTerm: (term, _fieldName) => (STOP_WORDS.has(term) ? null : term.toLowerCase()),
-			tokenize: TOKENIZE_FN,
-		})
-		miniSearch.addAll(cardData as TCardData[])
-
-		miniSearchIndex = miniSearch
 		activeQuery.value = {}
 		searchResults.value = null
 		sortedBy.value = ESortBy.Name_Asc
-		return miniSearch
+		initialized.value = 'ready'
 	}
 	const search = (query: TSearchQuery) => {
 		if (!miniSearchIndex) return []
@@ -173,6 +162,8 @@ const useCardSearch = () => {
 		activeQuery.value = {}
 	}
 	function reinitializeIndex() {
+		initialized.value = 'uninitialized'
+		fullCardList.value = []
 		_init(true)
 	}
 
@@ -199,119 +190,6 @@ const useCardSearch = () => {
 	}
 }
 
-const useListSearch = (cardIdInput: TCardIdInput) => {
-	let l_initialized = false
-	let l_miniSearchIndex = null as null | MiniSearch<TCardData>
-	let l_searchResults = ref(null as TCardData[] | null)
-	let l_activeQuery = ref<TSearchQuery>({})
-	let l_fullCardList = ref([] as TCardData[])
-	let l_sortedBy = ref(ESortBy.Name_Asc)
-	_init()
-
-	async function _init(force = false) {
-		if (l_initialized && !force) return
-		l_initialized = true
-
-		const cardIdSet = Array.isArray(cardIdInput)
-			? new Set(cardIdInput)
-			: new Set(Object.keys(cardIdInput).map(Number))
-		const cardData = _initialFilterCardData(await getCardList())
-		if (!fullCardList.value) fullCardList.value = cardData
-		l_fullCardList.value = cardData.filter((card) => cardIdSet.has(card.id))
-
-		const miniSearch = new MiniSearch({
-			fields: ['name', 'desc', 'archetype'],
-			storeFields: STORE_FIELDS,
-			searchOptions: {
-				fuzzy: 0.3,
-				prefix: true,
-				boost: {name: 6, archetype: 2, desc: 1},
-				combineWith: 'AND',
-			},
-			processTerm: (term, _fieldName) => (STOP_WORDS.has(term) ? null : term.toLowerCase()),
-			tokenize: TOKENIZE_FN,
-		})
-		miniSearch.addAll(cardData as TCardData[])
-
-		l_miniSearchIndex = miniSearch
-		l_activeQuery.value = {}
-		l_searchResults.value = null
-		l_sortedBy.value = ESortBy.Name_Asc
-		return miniSearch
-	}
-	const search = (query: TSearchQuery) => {
-		if (!l_miniSearchIndex) return []
-		l_activeQuery.value = query
-		if (_searchQueryIsEmpty(query)) {
-			l_searchResults.value = null
-			return []
-		}
-
-		let cOut = l_fullCardList.value
-
-		if (query.term && query.term.length > 0) {
-			cOut = _searchTerm(query.term)
-			if (l_sortedBy.value !== ESortBy.Search_Score) {
-				_sort(l_sortedBy.value, cOut)
-			}
-		}
-
-		cOut = _applyQueryFilters(cOut, query)
-
-		l_searchResults.value = markRaw(cOut)
-		return cOut
-	}
-	const resetSearch = () => {
-		l_searchResults.value = null
-		l_activeQuery.value = {}
-	}
-	function reinitializeIndex() {
-		_init(true)
-	}
-
-	function sort(by?: ESortBy) {
-		if (!by && l_sortedBy.value === ESortBy.Name_Asc) return
-		else if (by === l_sortedBy.value) return
-		l_sortedBy.value = by ?? ESortBy.Name_Asc
-
-		l_fullCardList.value = _sort(by ?? ESortBy.Name_Asc, l_fullCardList.value)
-		if (l_searchResults.value) {
-			l_searchResults.value = markRaw(
-				_sort(by ?? ESortBy.Name_Asc, [...l_searchResults.value])
-			)
-		}
-	}
-
-	return {
-		search,
-		resetSearch,
-		searchResults: l_searchResults,
-		activeQuery: l_activeQuery,
-		fullCardList: l_fullCardList,
-		reinitializeIndex,
-		sort,
-		indexCard,
-		deindexCard,
-		sortedBy: l_sortedBy,
-	}
-
-	function indexCard(cardId: number) {
-		if (!l_miniSearchIndex) return
-		if (l_miniSearchIndex.has(cardId)) return
-		const card = fullCardList.value.find((c) => c.id === cardId)
-		if (card) {
-			l_fullCardList.value.push(card)
-			l_miniSearchIndex.add(card)
-		}
-	}
-	function deindexCard(cardId: number) {
-		if (!l_miniSearchIndex) return
-		if (!l_miniSearchIndex.has(cardId)) return
-		l_fullCardList.value = l_fullCardList.value.filter((c) => c.id !== cardId)
-		l_miniSearchIndex.discard(cardId)
-	}
-}
-
 const getFullCardList = async () => {
 	if (fullCardList.value.length === 0) {
 		fullCardList.value = _initialFilterCardData(await getCardList())
@@ -319,7 +197,15 @@ const getFullCardList = async () => {
 	return fullCardList.value
 }
 
-export {useCardSearch, useListSearch, getFullCardList, __getAllViableValues, _find, _sort}
+export {
+	useCardSearch,
+	getFullCardList,
+	__getAllViableValues,
+	_find,
+	_sort,
+	_createMinisearchIndex,
+	_searchQueryIsEmpty,
+}
 
 // -----------------------------------------------------------
 // #region Interfaces
@@ -349,7 +235,6 @@ export type TSearchQuery = {
 	trapTypes?: TTrapTypes[]
 }
 export type TCoreCardType = 'Monster' | 'Spell' | 'Trap'
-type TCardIdInput = number[] | Record<number, unknown>
 
 // #endregion
 // -----------------------------------------------------------
@@ -365,6 +250,23 @@ function _initialFilterCardData(cardData: TCardData[]) {
 	return cardData.filter((card) => {
 		return !filteredFields.includes(card.frameType)
 	})
+}
+
+function _createMinisearchIndex(cardData: TCardData[]) {
+	const miniSearch = new MiniSearch({
+		fields: ['name', 'desc', 'archetype'],
+		storeFields: STORE_FIELDS,
+		searchOptions: {
+			fuzzy: 0.1,
+			prefix: true,
+			boost: {name: 6, archetype: 3, desc: 1},
+			combineWith: 'AND',
+		},
+		processTerm: (term, _fieldName) => (STOP_WORDS.has(term) ? null : term.toLowerCase()),
+		tokenize: TOKENIZE_FN,
+	})
+	miniSearch.addAll(cardData as TCardData[])
+	return miniSearch
 }
 
 // #endregion
@@ -608,6 +510,7 @@ const _find = {
 	MonsterType: _searchMonsterType,
 	Linkmarkers: _searchLinkmarkers,
 	SpellTrapType: _searchSpellTrapType,
+	_ApplyAllQueryFilters: _applyQueryFilters,
 }
 // #endregion
 // -----------------------------------------------------------

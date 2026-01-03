@@ -5,7 +5,7 @@ import {loadImage} from '@/libs/Images'
 import {Icon} from '@iconify/vue'
 import CardOwnHeart from '@/components/cards/CardOwnHeart.vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
-import CardBanIcon from '../cards/CardBanIcon.vue'
+import CardBanIcon from '@/components/cards/CardBanIcon.vue'
 
 interface IProps {
 	card: TCardData
@@ -31,10 +31,10 @@ const emit = defineEmits<{
 const imageUrl = ref<string | null>(null)
 const isLoading = ref(true)
 const hasError = ref(false)
-const ownedStore = useOwnedCards()
+const {ownedCards} = useOwnedCards()
 
 const numOwned = computed(() => {
-	return ownedStore.ownedCards.value?.[props.card.id] ?? 0
+	return ownedCards.value?.[props.card.id] ?? 0
 })
 
 onMounted(async () => {

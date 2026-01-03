@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {TDeckData} from '@/libs/Decks'
-import {onMounted, ref} from 'vue'
+import {computed} from 'vue'
 import CardPreview from '@/components/database/CardPreview.vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {_find} from '@/composables/useCardSearch'
@@ -12,9 +12,8 @@ const emit = defineEmits<{
 	(e: 'click'): void
 }>()
 
-const previewCard = ref<TCardData | null>(null)
-onMounted(() => {
-	previewCard.value = _find.ID(props.deckData.main[0]) || null
+const previewCard = computed<TCardData | null>(() => {
+	return _find.ID(props.deckData.main[0]) || null
 })
 </script>
 

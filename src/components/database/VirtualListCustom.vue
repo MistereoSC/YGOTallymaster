@@ -134,8 +134,22 @@ function scrollToTop() {
 	}
 }
 
+function scrollTo(position: number) {
+	if (scrollContainer.value) {
+		scrollContainer.value.scrollTop = position
+		scrollTop.value = position
+		debouncedScrollTop.value = position
+	}
+}
+
+function getScrollTop(): number {
+	return scrollTop.value
+}
+
 defineExpose({
 	scrollToTop,
+	scrollTo,
+	getScrollTop,
 	handleResize,
 })
 </script>

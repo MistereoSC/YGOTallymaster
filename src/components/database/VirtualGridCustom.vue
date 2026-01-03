@@ -15,6 +15,14 @@ const props = withDefaults(defineProps<IProps>(), {
 defineSlots<{
 	item(props: {item: T; index: number}): any
 }>()
+
+// Function to get a unique key from an item
+const getItemKey = (item: T, index: number): string | number => {
+	if (item && typeof item === 'object' && 'id' in item) {
+		return (item as {id: string | number}).id
+	}
+	return index
+}
 // ----------------------------------------------
 // #region Virtual Scroll
 // ----------------------------------------------
@@ -153,8 +161,22 @@ function scrollToTop() {
 	}
 }
 
+function scrollTo(position: number) {
+	if (scrollContainer.value) {
+		scrollContainer.value.scrollTop = position
+		scrollTop.value = position
+		debouncedScrollTop.value = position
+	}
+}
+
+function getScrollTop(): number {
+	return scrollTop.value
+}
+
 defineExpose({
 	scrollToTop,
+	scrollTo,
+	getScrollTop,
 	handleResize,
 })
 </script>
@@ -177,12 +199,16 @@ defineExpose({
 					gridTemplateColumns: `repeat(auto-fill, ${props.itemDimensions.width}px)`,
 				}"
 			>
-				<slot
+				<div
 					v-for="{item, index} in visibleItems"
-					name="item"
-					:item="item"
-					:index="index"
-				/>
+					:key="getItemKey(item, index)"
+					:style="{
+						width: `${props.itemDimensions.width}px`,
+						height: `${props.itemDimensions.height}px`,
+					}"
+				>
+					<slot name="item" :item="item" :index="index" />
+				</div>
 			</div>
 		</div>
 	</div>

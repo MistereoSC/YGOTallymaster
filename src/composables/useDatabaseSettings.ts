@@ -121,7 +121,7 @@ export type TDatabaseSettings = {
 	showOwnedNumbers: boolean
 	grayUnowned: boolean
 	listSize: TSizes
-	showBanlistFor?: TBanlistFormat | 'none'
+	showBanlistFor: TBanlistFormat | 'none'
 
 	decklistGrayUnownedGrid: boolean
 	decklistGrayUnownedList: boolean

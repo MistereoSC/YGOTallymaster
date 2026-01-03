@@ -41,6 +41,11 @@ const routes = [
 		name: 'Lists',
 		component: () => import('../views/DefaultView.vue'),
 	},
+	{
+		path: '/Banlist',
+		name: 'Banlist',
+		component: () => import('../views/DefaultView.vue'),
+	},
 
 	// #endregion
 	// ---------------------------------------------------------

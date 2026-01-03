@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {ref, watch, nextTick} from 'vue'
+import {ref, watch, nextTick, onBeforeMount} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardFullView from '@/components/database/CardFullView.vue'
 import CardListVirtualGrid from '@/components/database/CardListVirtualGrid.vue'
@@ -10,11 +10,13 @@ import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import DisplaySettings from '@/components/database/DisplaySettings.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import Button from '@/components/common/Button.vue'
-import {Icon} from '@iconify/vue'
 import Spinner from '@/components/common/Spinner.vue'
-const {searchResults, fullCardList} = useCardSearch()
+const {searchResults, fullCardList, resetSearch} = useCardSearch()
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
+onBeforeMount(() => {
+	resetSearch()
+})
 
 // Watch for changes in search results and scroll to top
 watch(searchResults, async () => {

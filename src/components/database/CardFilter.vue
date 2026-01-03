@@ -115,8 +115,7 @@ function toggleMonsterType(type: TMonsterType) {
 	onSearch()
 }
 function toggleMonsterTypesOperand() {
-	toggledMonsterTypesOperand.value =
-		toggledMonsterTypesOperand.value === 'AND' ? 'OR' : 'AND'
+	toggledMonsterTypesOperand.value = toggledMonsterTypesOperand.value === 'AND' ? 'OR' : 'AND'
 	if (toggledMonsterTypes.value.length > 0) onSearch()
 }
 
@@ -222,8 +221,7 @@ function resetLinkMarkers() {
 	onSearch()
 }
 function toggleMonsterTypesOperandLinkMarkers() {
-	toggledLinkMarkersOperand.value =
-		toggledLinkMarkersOperand.value === 'AND' ? 'OR' : 'AND'
+	toggledLinkMarkersOperand.value = toggledLinkMarkersOperand.value === 'AND' ? 'OR' : 'AND'
 	if (toggledLinkMarkers.value.length > 0) onSearch()
 }
 
@@ -248,14 +246,8 @@ function _applyActiveQuery() {
 	toggledSpellTypes.value = activeQuery.value.spellTypes || []
 	toggledTrapTypes.value = activeQuery.value.trapTypes || []
 
-	atkFilter.value = [
-		activeQuery.value.atk?.lte ?? null,
-		activeQuery.value.atk?.gte ?? null,
-	]
-	defFilter.value = [
-		activeQuery.value.def?.lte ?? null,
-		activeQuery.value.def?.gte ?? null,
-	]
+	atkFilter.value = [activeQuery.value.atk?.lte ?? null, activeQuery.value.atk?.gte ?? null]
+	defFilter.value = [activeQuery.value.def?.lte ?? null, activeQuery.value.def?.gte ?? null]
 	toggledLevels.value = activeQuery.value.levels || []
 	toggledScales.value = activeQuery.value.scales || []
 	toggledLinkvals.value = activeQuery.value.linkvals || []
@@ -267,10 +259,7 @@ const query = computed<TSearchQuery>(() => {
 		term: searchInput.value,
 		attributes: toggledAttributes.value,
 		coreCardType: toggledCoreType.value ?? undefined,
-		monsterRaces:
-			toggledMonsterRaces.value.length > 0
-				? toggledMonsterRaces.value
-				: undefined,
+		monsterRaces: toggledMonsterRaces.value.length > 0 ? toggledMonsterRaces.value : undefined,
 		monsterTypes:
 			toggledMonsterTypes.value.length > 0
 				? {
@@ -278,22 +267,11 @@ const query = computed<TSearchQuery>(() => {
 						operand: toggledMonsterTypesOperand.value,
 				  }
 				: undefined,
-		spellTypes:
-			toggledSpellTypes.value.length > 0
-				? toggledSpellTypes.value
-				: undefined,
-		trapTypes:
-			toggledTrapTypes.value.length > 0
-				? toggledTrapTypes.value
-				: undefined,
-		levels:
-			toggledLevels.value.length > 0 ? toggledLevels.value : undefined,
-		scales:
-			toggledScales.value.length > 0 ? toggledScales.value : undefined,
-		linkvals:
-			toggledLinkvals.value.length > 0
-				? toggledLinkvals.value
-				: undefined,
+		spellTypes: toggledSpellTypes.value.length > 0 ? toggledSpellTypes.value : undefined,
+		trapTypes: toggledTrapTypes.value.length > 0 ? toggledTrapTypes.value : undefined,
+		levels: toggledLevels.value.length > 0 ? toggledLevels.value : undefined,
+		scales: toggledScales.value.length > 0 ? toggledScales.value : undefined,
+		linkvals: toggledLinkvals.value.length > 0 ? toggledLinkvals.value : undefined,
 		links:
 			toggledLinkMarkers.value.length > 0
 				? {
@@ -313,29 +291,21 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 
 <template>
 	<div class="max-w-2xl mx-auto flex flex-col gap-2">
-		<div
-			class="p-2 rounded-md bg-primary-800 grid grid-cols-[auto_1fr] gap-2 items-center"
-		>
+		<div class="p-2 rounded-md bg-primary-800 grid grid-cols-[auto_1fr] gap-2 items-center">
 			<span>Sort By</span>
 			<select
 				v-model="selectedSort"
 				@change="sort(selectedSort)"
 				class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 			>
-				<option
-					v-for="(label, key) in ESortBy"
-					:key="key"
-					:value="label"
-				>
+				<option v-for="(label, key) in ESortBy" :key="key" :value="label">
 					{{ label }}
 				</option>
 			</select>
 		</div>
 
 		<!-- Text Input / Reset -->
-		<div
-			class="p-2 rounded-md bg-primary-800 grid grid-cols-[1fr_auto] gap-2"
-		>
+		<div class="p-2 rounded-md bg-primary-800 grid grid-cols-[1fr_auto] gap-2">
 			<input
 				v-model="searchInput"
 				@keyup="(e) => onSearchInput(e)"
@@ -343,11 +313,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				placeholder="Search Cards..."
 				class="w-full px-2 py-1 rounded-md bg-primary-700 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-500"
 			/>
-			<Button
-				icon="material-symbols:filter-alt-off-rounded"
-				@click="onReset"
-				class="w-full p-2 rounded-md bg-accent-500 hover:bg-accent-400"
-			/>
+			<Button icon="material-symbols:filter-alt-off-rounded" @click="onReset" />
 		</div>
 
 		<!-- Core Card Types -->
@@ -532,9 +498,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 						@change="onSearch"
 					/>
 				</div>
-				<span class="text-xm text-contrast-400">
-					Enter '-1' for ?-Values
-				</span>
+				<span class="text-xm text-contrast-400"> Enter '-1' for ?-Values </span>
 			</div>
 		</div>
 
@@ -616,10 +580,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 			</h3>
 			<div class="flex justify-center">
 				<div class="bg-primary-700 rounded-md">
-					<CardLinkSelection
-						v-model="toggledLinkMarkers"
-						@change="onSearch"
-					/>
+					<CardLinkSelection v-model="toggledLinkMarkers" @change="onSearch" />
 				</div>
 			</div>
 		</div>
@@ -683,10 +644,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		</div>
 
 		<!-- Info -->
-		<div
-			v-if="!toggledCoreType"
-			class="text-sm font-semibold p-2 rounded-md bg-primary-800"
-		>
+		<div v-if="!toggledCoreType" class="text-sm font-semibold p-2 rounded-md bg-primary-800">
 			Select a Card Type
 			<span class="text-contrast-500"> (Monster / Spell / Trap) </span>
 			for more Filters.

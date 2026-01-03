@@ -23,7 +23,7 @@ const activeRoute = computed(() => route.name as string)
 		<div
 			class="bg-primary-900 w-40 h-full grid grid-rows-[1fr_auto] shadow-lg py-2 overflow-x-hidden"
 			:class="{'w-11! ': !menu.expanded.value}"
-			style="transition: width 0.3s ease-out"
+			style="transition: width 0.2s ease-out"
 		>
 			<div>
 				<AppMainMenuLink
@@ -37,6 +37,12 @@ const activeRoute = computed(() => route.name as string)
 					icon="material-symbols:cards-stack"
 					route-name="Archetypes"
 					:active="activeRoute === 'Archetypes'"
+				/>
+				<AppMainMenuLink
+					label="Banlist"
+					icon="material-symbols:block-outline"
+					route-name="Banlist"
+					:active="activeRoute === 'Banlist'"
 				/>
 				<AppMainMenuLink
 					label="Sets"
@@ -93,10 +99,7 @@ const activeRoute = computed(() => route.name as string)
 			</div>
 		</div>
 
-		<div
-			class="absolute right-1.5 top-1/2 delay-200 -translate-y-1/2 w-8 h-8 z-50"
-			style="transition: translate 0.3s"
-		>
+		<div class="absolute right-1.5 top-1/2 delay-200 -translate-y-1/2 w-8 h-8 z-50">
 			<div
 				class="w-full h-full flex justify-center items-center cursor-pointer bg-primary-800 hover:bg-primary-700 rounded-full text-contrast-400 hover:text-contrast-900"
 				@click="menu.expanded.value = !menu.expanded.value"

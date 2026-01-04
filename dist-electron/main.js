@@ -94,6 +94,24 @@ function setupIpcHandlers() {
       return { success: true, exists: false };
     }
   });
+  ipcMain.handle("fs:deleteFile", async (_, filePath) => {
+    try {
+      await fs.unlink(filePath);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+  ipcMain.handle("fs:renameFile", async (_, oldPath, newPath) => {
+    try {
+      const dir = path.dirname(newPath);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.rename(oldPath, newPath);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
   ipcMain.handle("fs:readJSON", async (_, filePath) => {
     try {
       const data = await fs.readFile(filePath, "utf-8");

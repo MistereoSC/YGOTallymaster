@@ -52,7 +52,9 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 <template>
 	<div class="w-full h-full">
 		<div v-if="banlist" class="h-full grid grid-rows-[auto_1fr]">
-			<div class="py-1 px-4 flex items-center justify-between gap-4 bg-primary-600 font-bold">
+			<div
+				class="py-1 px-4 flex items-center justify-between gap-4 bg-primary-600 font-bold h-10"
+			>
 				<span class="font-bold">
 					{{ banlist.forbidden.length }} Forbidden | {{ banlist.limited.length }} Limited
 					| {{ banlist.semi_limited.length }} Semi-Limited

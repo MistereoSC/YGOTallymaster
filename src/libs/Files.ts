@@ -112,6 +112,23 @@ async function load() {
 	return {success: false, error: 'Load canceled or failed'}
 }
 
+async function remove(path: string) {
+	const p = await Path.AppRoot()
+	if (!p) return false
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result = await window.electronFS.deleteFile(p + subPath)
+	return result.success as boolean
+}
+
+async function moveOrRename(oldPath: string, newPath: string) {
+	const p = await Path.AppRoot()
+	if (!p) return false
+	const subOldPath = oldPath.startsWith('/') ? oldPath : '/' + oldPath
+	const subNewPath = newPath.startsWith('/') ? newPath : '/' + newPath
+	const result = await window.electronFS.renameFile(p + subOldPath, p + subNewPath)
+	return result.success as boolean
+}
+
 const Files = {
 	exists,
 	read,
@@ -121,5 +138,7 @@ const Files = {
 	writeRaw,
 	save,
 	load,
+	remove,
+	moveOrRename,
 }
 export default Files

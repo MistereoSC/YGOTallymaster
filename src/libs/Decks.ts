@@ -123,6 +123,26 @@ export async function saveDeckFile(deckData: TDeckData) {
 	const fileName = deckData.name.endsWith('.ydk') ? deckData.name : `${deckData.name}.ydk`
 	await Files.writeRaw(`${DECK_PATH}${fileName}`, ydkData)
 }
+
+export async function renameDeckFile(oldName: string, newName: string) {
+	const oldFileName = oldName.endsWith('.ydk') ? oldName : `${oldName}.ydk`
+	const newFileName = newName.endsWith('.ydk') ? newName : `${newName}.ydk`
+	if(oldFileName === newFileName) return true
+	const e = await Files.exists(`${DECK_PATH}${oldFileName}`)
+	if (!e.exists) return false
+	const success = await Files.moveOrRename(
+		`${DECK_PATH}${oldFileName}`,
+		`${DECK_PATH}${newFileName}`
+	)
+	return success
+}
+
+export async function deleteDeckFile(deckName: string) {
+	const n = deckName.endsWith('.ydk') ? deckName : `${deckName}.ydk`
+	const e = await Files.exists(`${DECK_PATH}${n}`)
+	if (!e.exists) return
+	await Files.remove(`${DECK_PATH}${n}`)
+}
 // #endregion
 // ----------------------------------------------------
 

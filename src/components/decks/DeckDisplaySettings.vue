@@ -27,8 +27,8 @@ enum EBanlistFormat {
 
 <template>
 	<div>
-		<h3 class="font-bold text-xl">Settings</h3>
 		<div class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col">
+			<h3 class="font-bold">Display Settings</h3>
 			<Checkbox
 				label="Gray Out Unowned Cards (Grid)"
 				:modelValue="store.settings.value?.decklistGrayUnownedGrid"

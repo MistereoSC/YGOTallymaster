@@ -97,13 +97,13 @@ const settingsStore = useDatabaseSettings()
 
 <template>
 	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden">
-		<div class="w-full grid grid-cols-[1fr_auto] bg-primary-600">
-			<div class="flex gap-4 items-center px-4 py-2 text-sm font-bold">
-				<span>
+		<div class="w-full grid grid-cols-[1fr_auto] bg-primary-600 h-10">
+			<div class="flex gap-4 items-center px-4 py-1">
+				<h2 class="font-bold">
 					Displaying
 					<span v-if="searchResults !== null"> {{ searchResults.length }} /</span>
 					{{ fullCardList.length }} Cards
-				</span>
+				</h2>
 			</div>
 			<div class="min-w-116 w-[33vw] max-w-174 px-2 py-1">
 				<span class="flex justify-between w-full">

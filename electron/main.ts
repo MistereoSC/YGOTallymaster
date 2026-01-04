@@ -148,6 +148,29 @@ function setupIpcHandlers() {
 		}
 	})
 
+	// Delete file
+	ipcMain.handle('fs:deleteFile', async (_, filePath: string) => {
+		try {
+			await fs.unlink(filePath)
+			return {success: true}
+		} catch (error: any) {
+			return {success: false, error: error.message}
+		}
+	})
+
+	// Rename/move file
+	ipcMain.handle('fs:renameFile', async (_, oldPath: string, newPath: string) => {
+		try {
+			// Ensure target directory exists
+			const dir = path.dirname(newPath)
+			await fs.mkdir(dir, {recursive: true})
+			await fs.rename(oldPath, newPath)
+			return {success: true}
+		} catch (error: any) {
+			return {success: false, error: error.message}
+		}
+	})
+
 	// Read JSON file
 	ipcMain.handle('fs:readJSON', async (_, filePath: string) => {
 		try {

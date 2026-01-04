@@ -24,7 +24,10 @@ const activeDeck = ref<null | TDeckData>(null)
 	<div v-if="activeDeck" class="relative h-full overflow-hidden">
 		<DeckCreation :deck-data="activeDeck" @close="activeDeck = null" />
 	</div>
-	<div class="p-4 flex flex-wrap overflow-auto gap-8" v-else-if="decksStore.initialized.value">
+	<div
+		v-else-if="decksStore.initialized.value"
+		class="p-8 w-full flex flex-wrap overflow-auto gap-8"
+	>
 		<DeckPreview
 			v-for="deck in decksStore.deckList.value"
 			:key="deck.name"
@@ -32,7 +35,7 @@ const activeDeck = ref<null | TDeckData>(null)
 			@click="activeDeck = deck"
 		/>
 		<div
-			class="w-56 h-77 grid place-items-center p-4"
+			class="w-48 h-77 grid place-items-center"
 			v-if="decksStore.deckList.value.length < 100"
 		>
 			<DeckCreationModal

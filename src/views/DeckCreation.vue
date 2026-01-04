@@ -11,6 +11,7 @@ import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useDeckList} from '@/composables/useDeckList'
 import {TDeckData} from '@/libs/Decks'
 import {TCardData, TFrameType} from '@/libs/interfaces/YGOProInterfaces'
+import {Icon} from '@iconify/vue'
 import {onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
 
 const props = defineProps<{
@@ -81,11 +82,11 @@ function onCardAdd(card: TCardData) {
 		case 'xyz':
 		case 'xyz_pendulum':
 		case 'link':
-			if (cards.value.extra.length >= 20 || !checkDeckLimit(card.id)) return
+			if (cards.value.extra.length >= 15 || !checkDeckLimit(card.id)) return
 			cards.value.extra.push(card)
 			break
 		default:
-			if (cards.value.main.length >= 80 || !checkDeckLimit(card.id)) return
+			if (cards.value.main.length >= 60 || !checkDeckLimit(card.id)) return
 			cards.value.main.push(card)
 			break
 	}
@@ -153,12 +154,19 @@ onBeforeUnmount(async () => {
 	newDeckData.main = cards.value.main.map((c) => c.id)
 	newDeckData.extra = cards.value.extra.map((c) => c.id)
 	newDeckData.side = cards.value.side.map((c) => c.id)
-	await saveDeck(newDeckData)
+	newDeckData.name = nameContent.value.trim() || props.deckData.name
+
+	await saveDeck(newDeckData, props.deckData.name)
 })
 
 const settingsToggled = ref(false)
 function toggleSettings() {
 	settingsToggled.value = !settingsToggled.value
+}
+
+const nameContent = ref(props.deckData.name)
+function onReturnClick() {
+	emit('close')
 }
 </script>
 
@@ -168,16 +176,27 @@ function toggleSettings() {
 			class="min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 		>
 			<div class="grid grid-rows-[auto_1fr] overflow-hidden">
-				<div class="bg-primary-600 flex items-center justify-end p-1 gap-2">
+				<div class="bg-primary-600 flex items-center justify-between py-1 px-2 gap-2">
+					<div class="flex items-center">
+						<Icon
+							icon="material-symbols:edit-square-rounded"
+							class="text-contrast-300 mr-1"
+						/>
+						<input
+							type="text"
+							class="font-bold truncate :placeholder:text-contrast-500 focus:outline-none w-full border border-transparent focus:border-b-accent-500"
+							v-model="nameContent"
+							maxlength="32"
+							placeholder="Deck Name"
+						/>
+					</div>
 					<span class="flex gap-2">
 						<Button
 							size="small"
 							rounded
 							icon="material-symbols:keyboard-return-rounded"
-							@click="emit('close')"
+							@click="onReturnClick"
 						/>
-					</span>
-					<span class="flex gap-2">
 						<Button
 							rounded
 							size="small"
@@ -193,7 +212,37 @@ function toggleSettings() {
 					</span>
 				</div>
 				<div class="p-2 h-full overflow-y-auto scrollable" ref="cardFullViewContainer">
-					<DeckDisplaySettings v-if="settingsToggled" />
+					<div v-if="settingsToggled" class="flex flex-col gap-4">
+						<!-- <div class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col">
+							<Button
+								size="small"
+								icon="material-symbols:sort-rounded"
+								label="Sort Deck"
+								@click="onSortClick"
+							/>
+							<div class="flex gap-2 w-full">
+								<Button
+									class="grow"
+									size="small"
+									icon="material-symbols:sort-rounded"
+									label="Import Deck"
+								/>
+								<Button
+									class="grow"
+									size="small"
+									icon="material-symbols:sort-rounded"
+									label="Export Deck"
+								/>
+							</div>
+							<Button
+								size="small"
+								icon="material-symbols:sort-rounded"
+								label="Export Unowned Cards List"
+							/>
+						</div> -->
+
+						<DeckDisplaySettings />
+					</div>
 					<CardFullView v-else-if="hoveredCard" :card="hoveredCard" />
 				</div>
 			</div>

@@ -22,6 +22,8 @@ electron.contextBridge.exposeInMainWorld("electronFS", {
   readFile: (filePath) => electron.ipcRenderer.invoke("fs:readFile", filePath),
   writeFile: (filePath, data) => electron.ipcRenderer.invoke("fs:writeFile", filePath, data),
   exists: (filePath) => electron.ipcRenderer.invoke("fs:exists", filePath),
+  deleteFile: (filePath) => electron.ipcRenderer.invoke("fs:deleteFile", filePath),
+  renameFile: (oldPath, newPath) => electron.ipcRenderer.invoke("fs:renameFile", oldPath, newPath),
   readJSON: (filePath) => electron.ipcRenderer.invoke("fs:readJSON", filePath),
   writeJSON: (filePath, data) => electron.ipcRenderer.invoke("fs:writeJSON", filePath, data),
   mkdir: (dirPath) => electron.ipcRenderer.invoke("fs:mkdir", dirPath),

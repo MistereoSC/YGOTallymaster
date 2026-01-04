@@ -83,7 +83,7 @@ function onArchetypeListClose() {
 			v-else-if="initialized === 'ready' && archetypes.length > 0"
 			class="h-full overflow-hidden grid grid-rows-[auto_1fr]"
 		>
-			<div class="bg-primary-600 py-1 flex justify-between items-center px-4">
+			<div class="bg-primary-600 py-1 flex justify-between items-center px-4 h-10">
 				<h2 class="font-bold">{{ archetypes.length }} Archetypes</h2>
 				<div class="grid grid-cols-[1fr_auto] gap-2 items-center">
 					<input

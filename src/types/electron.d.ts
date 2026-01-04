@@ -9,6 +9,8 @@ export interface ElectronAPI {
 		readFile: (filePath: string) => Promise<FSResult<string>>
 		writeFile: (filePath: string, data: string) => Promise<FSResult<void>>
 		exists: (filePath: string) => Promise<FSResult<boolean>>
+		deleteFile: (filePath: string) => Promise<FSResult<void>>
+		renameFile: (oldPath: string, newPath: string) => Promise<FSResult<void>>
 		readJSON: (filePath: string) => Promise<FSResult<any>>
 		writeJSON: (filePath: string, data: any) => Promise<FSResult<void>>
 		mkdir: (dirPath: string) => Promise<FSResult<void>>

@@ -7,11 +7,11 @@ import {
 	_searchQueryIsEmpty,
 	_sort,
 	_find,
-	ESortBy,
 	getFullCardList,
 	TSearchQuery,
 	TSearchResultCardData,
 } from './useCardSearch'
+import {ESortBy} from './searchTypes'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import MiniSearch from 'minisearch'
 

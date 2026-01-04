@@ -29,6 +29,7 @@ import {Icon} from '@iconify/vue'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import NumberInputMinMax from '@/components/common/NumberInputMinMax.vue'
 import CardLinkSelection from './CardLinkSelection.vue'
+import Checkbox from '../common/Checkbox.vue'
 
 const props = defineProps<{
 	searchWhileTyping?: boolean
@@ -66,6 +67,7 @@ function onReset(fullReset = true) {
 
 	if (fullReset) {
 		searchInput.value = ''
+		toggledStaple.value = false
 		toggledCoreType.value = null
 		resetSearch()
 	}
@@ -234,6 +236,11 @@ function toggleOwned() {
 	toggledOwned.value = !toggledOwned.value
 	onSearch()
 }
+const toggledStaple = ref(false)
+function toggleStaple() {
+	toggledStaple.value = !toggledStaple.value
+	onSearch()
+}
 // #endregion
 // -----------------------------------------
 // #region Setup
@@ -244,6 +251,7 @@ onMounted(() => {
 function _applyActiveQuery() {
 	searchInput.value = activeQuery.value.term || ''
 	toggledOwned.value = activeQuery.value.owned || false
+	toggledStaple.value = activeQuery.value.staple || false
 	toggledAttributes.value = activeQuery.value.attributes || []
 	toggledCoreType.value = activeQuery.value.coreCardType || null
 	toggledMonsterRaces.value = activeQuery.value.monsterRaces || []
@@ -268,6 +276,7 @@ const query = computed<TSearchQuery>(() => {
 	return {
 		term: searchInput.value,
 		owned: toggledOwned.value,
+		staple: toggledStaple.value,
 		attributes: toggledAttributes.value,
 		coreCardType: toggledCoreType.value ?? undefined,
 		monsterRaces: toggledMonsterRaces.value.length > 0 ? toggledMonsterRaces.value : undefined,
@@ -335,6 +344,14 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				class="w-full px-2 py-1 rounded-md bg-primary-700 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-500"
 			/>
 			<Button icon="material-symbols:filter-alt-off-rounded" @click="onReset" />
+		</div>
+		<!-- Staple Filter -->
+		<div class="p-2 rounded-md bg-primary-800 flex gap-2 items-center">
+			<Checkbox
+				label="Show only 'Staple' Cards"
+				:model-value="toggledStaple"
+				@change="toggleStaple"
+			/>
 		</div>
 
 		<!-- Core Card Types -->

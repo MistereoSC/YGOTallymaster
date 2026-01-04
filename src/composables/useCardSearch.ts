@@ -12,6 +12,7 @@ import {
 import MiniSearch from 'minisearch'
 import {ref, markRaw} from 'vue'
 import {getReadyCardIds} from './useOwnedCards'
+import {ESortBy} from './searchTypes'
 
 // -----------------------------------------------------------
 // #region Constants
@@ -93,18 +94,8 @@ const TOKENIZE_FN = (text: string) => {
 	return tokens
 }
 
-export enum ESortBy {
-	Name_Asc = 'Name (Ascending)',
-	Name_Desc = 'Name (Descending)',
-	TCG_Date_Asc = 'TCG Date (Ascending)',
-	TCG_Date_Desc = 'TCG Date (Descending)',
-	Search_Score = 'Text Search Score',
-	ATK_Asc = 'ATK (Ascending)',
-	ATK_Desc = 'ATK (Descending)',
-	DEF_Asc = 'DEF (Ascending)',
-	DEF_Desc = 'DEF (Descending)',
-	Type = 'Card Type',
-}
+// Re-export ESortBy from searchTypes to maintain backwards compatibility
+export {ESortBy} from './searchTypes'
 
 // #endregion
 // -----------------------------------------------------------
@@ -237,6 +228,7 @@ export type TSearchQuery = {
 	trapTypes?: TTrapTypes[]
 
 	owned?: boolean
+	staple?: boolean
 }
 export type TCoreCardType = 'Monster' | 'Spell' | 'Trap'
 
@@ -280,9 +272,12 @@ function _createMinisearchIndex(cardData: TCardData[]) {
 
 function _applyQueryFilters(cardList: TCardData[] | TSearchResultCardData[], query: TSearchQuery) {
 	let cOut = cardList
-	// Apply Owned Filter
+	// Apply Owned/Staple Filter
 	if (query.owned) {
 		cOut = _searchOwnedCards(cOut)
+	}
+	if (query.staple) {
+		cOut = _searchStapleCards(cOut)
 	}
 
 	// Apply Core Type Filter
@@ -341,6 +336,7 @@ function _searchQueryIsEmpty(query: TSearchQuery) {
 	return !(
 		query.term ||
 		query.owned ||
+		query.staple ||
 		query.coreCardType ||
 		(query.attributes && query.attributes.length != 0) ||
 		(query.monsterTypes && query.monsterTypes.terms.length != 0) ||
@@ -487,6 +483,12 @@ function _searchOwnedCards(cardList: TCardData[], markedCardIds?: IMarkedCards) 
 	return cardList.filter((card) => cIds?.[card.id] && cIds?.[card.id] > 0)
 }
 
+function _searchStapleCards(cardList: TCardData[]) {
+	return cardList.filter((card) => {
+		return card.misc_info[0]?.staple === 'Yes'
+	})
+}
+
 function __getAllViableValues<K extends keyof TCardData>(
 	key: K,
 	cardList: TCardData[] = fullCardList.value
@@ -526,6 +528,7 @@ const _find = {
 	Linkmarkers: _searchLinkmarkers,
 	SpellTrapType: _searchSpellTrapType,
 	Owned: _searchOwnedCards,
+	Staples: _searchStapleCards,
 	_ApplyAllQueryFilters: _applyQueryFilters,
 }
 // #endregion

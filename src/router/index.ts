@@ -39,7 +39,7 @@ const routes = [
 	{
 		path: '/Lists',
 		name: 'Lists',
-		component: () => import('../views/DefaultView.vue'),
+		component: () => import('../views/CardListsView.vue'),
 	},
 	{
 		path: '/Banlist',

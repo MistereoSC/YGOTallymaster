@@ -2,6 +2,7 @@
 import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
 import CardPreviewListitem from './CardPreviewListitem.vue'
+import {Icon} from '@iconify/vue'
 
 const emit = defineEmits<{
 	(e: 'cardClicked', value: TCardData): void
@@ -75,6 +76,7 @@ const visibleCards = computed(() => {
 
 // Calculate total height for scrolling
 const totalHeight = computed(() => {
+	if (props.cardList.length === 0) return 0
 	return props.cardList.length * (CARD_HEIGHT.value + GAP) - GAP
 })
 
@@ -171,8 +173,18 @@ defineExpose({
 		class="w-full h-full overflow-y-scroll scrollable p-4"
 		@scroll="handleScroll"
 	>
+		<!-- Empty state -->
+		<div
+			v-if="props.cardList.length === 0"
+			class="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400"
+		>
+			<Icon icon="material-symbols:credit-card-off-rounded" class="text-4xl" />
+			<p class="text-lg font-medium">No cards found</p>
+			<p class="text-sm opacity-75">Try adjusting your search or filters</p>
+		</div>
+
 		<!-- Virtual scroll container -->
-		<div class="relative w-full" :style="{height: totalHeight + 'px'}">
+		<div v-else class="relative w-full" :style="{height: totalHeight + 'px'}">
 			<!-- Visible cards container -->
 			<div
 				class="absolute w-full flex flex-col gap-1.5"

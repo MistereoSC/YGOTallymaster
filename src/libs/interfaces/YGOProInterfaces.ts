@@ -68,6 +68,7 @@ type TCardDataMisc = {
 	md_rarity?: string
 	has_effect: number
 	genesys_points?: number
+	staple?: 'Yes'
 }
 
 // endregion

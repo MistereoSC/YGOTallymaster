@@ -23,7 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const {settings} = useDatabaseSettings()
-const {resetSearch, fullCardList, searchResults} = useCardSearch()
+const {resetSearch, fullCardList, searchResults, search} = useCardSearch()
 const {getDeckCards, saveDeck} = useDeckList()
 const cards = ref<{main: TCardData[]; extra: TCardData[]; side: TCardData[]}>({
 	main: [],
@@ -168,6 +168,12 @@ const nameContent = ref(props.deckData.name)
 function onReturnClick() {
 	emit('close')
 }
+
+function onCardShiftLClick(card: TCardData) {
+	resetSearch()
+	const searchTerm = card.archetype || card.name
+	search({term: searchTerm})
+}
 </script>
 
 <template>
@@ -264,6 +270,7 @@ function onReturnClick() {
 						:gray-unowned="settings?.decklistGrayUnownedGrid"
 						:card-size="settings?.decklistGridCardSize || 'tiny'"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
+						@card-shift-click="(card) => onCardShiftLClick(card)"
 					/>
 				</div>
 			</div>

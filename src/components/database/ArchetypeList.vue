@@ -47,6 +47,7 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 						<CardPreview
 							:card="card"
 							size="medium"
+							:show-owned-heart="true"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@click="activeCard = card"
 							:active="activeCard?.id === card.id"

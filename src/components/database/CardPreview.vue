@@ -27,6 +27,7 @@ const props = withDefaults(defineProps<IProps>(), {
 })
 const emit = defineEmits<{
 	(e: 'click', value: TCardData): void
+	(e: 'shiftClick', value: TCardData): void
 }>()
 const imageUrl = ref<string | null>(null)
 const isLoading = ref(true)
@@ -76,8 +77,9 @@ watch(
 	}
 )
 
-function onClick() {
-	emit('click', props.card)
+function onClick(e: PointerEvent) {
+	if(e.shiftKey) emit('shiftClick', props.card)
+	else emit('click', props.card)
 }
 </script>
 
@@ -95,7 +97,7 @@ function onClick() {
 			transition: 'outline-width 0.1s ease-out, outline-color 0.1s ease-out',
 		}"
 		:grayscale="props.grayOverride || (props.grayUnowned && numOwned === 0 ? 'true' : 'false')"
-		@click="onClick"
+		@click="(e) => onClick(e)"
 	>
 		<!-- Error state -->
 		<div v-if="hasError" class="w-full h-full flex flex-col items-center justify-center p-2">

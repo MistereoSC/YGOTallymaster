@@ -2,14 +2,14 @@
 // -----------------------------------------
 // #region Imports, Emits, Props
 // -----------------------------------------
-import {computed, onMounted, ref} from 'vue'
+import {computed, onMounted, ref, watch, type Ref} from 'vue'
 import {
 	type TSearchQuery,
 	type TCoreCardType,
 	ESortBy,
 	useCardSearch,
 } from '@/composables/useCardSearch'
-import ToggleButton from '../common/ToggleButton.vue'
+import ToggleButton from '@/components/common/ToggleButton.vue'
 import {
 	EMonsterAttributes,
 	EMonsterRace,
@@ -29,7 +29,9 @@ import {Icon} from '@iconify/vue'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import NumberInputMinMax from '@/components/common/NumberInputMinMax.vue'
 import CardLinkSelection from './CardLinkSelection.vue'
-import Checkbox from '../common/Checkbox.vue'
+import Checkbox from '@/components/common/Checkbox.vue'
+import FilterSection from './FilterSection.vue'
+import ToggleButtonGroup from '@/components/common/ToggleButtonGroup.vue'
 
 const props = defineProps<{
 	searchWhileTyping?: boolean
@@ -46,24 +48,30 @@ const emit = defineEmits<{
 const {search, resetSearch, activeQuery, sortedBy, sort} = useCardSearch()
 const searchInput = ref(activeQuery.value.term || '')
 
+// Flag to track self-initiated changes to activeQuery
+let isUpdatingFromSelf = false
+
 function onSearch() {
+	isUpdatingFromSelf = true
 	search(query.value)
+	Promise.resolve().then(() => {
+		isUpdatingFromSelf = false
+	})
 }
 
 function onReset(fullReset = true) {
-	toggledAttributes.value = []
-	toggledMonsterRaces.value = []
-	toggledMonsterTypes.value = []
-	toggledMonsterTypesOperand.value = 'AND'
-	toggledSpellTypes.value = []
-	toggledTrapTypes.value = []
-	toggledLinkMarkers.value = []
-	toggledLinkMarkersOperand.value = 'AND'
+	// Reset all toggle arrays
+	attributes.reset()
+	monsterTypes.reset()
+	monsterRaces.reset()
+	spellTypes.reset()
+	trapTypes.reset()
+	levels.reset()
+	scales.reset()
+	linkvals.reset()
+	linkMarkers.reset()
 	atkFilter.value = [null, null]
 	defFilter.value = [null, null]
-	toggledLevels.value = []
-	toggledScales.value = []
-	toggledLinkvals.value = []
 
 	if (fullReset) {
 		searchInput.value = ''
@@ -90,52 +98,59 @@ function onSearchInput(e: KeyboardEvent) {
 		onSearch()
 	}, DEBOUNCE_DELAY)
 }
+
+// #endregion
+// -----------------------------------------
+// #region Toggle Array Helper
+// -----------------------------------------
+
+function useToggleArray<T>(defaultOperand: 'AND' | 'OR' = 'AND') {
+	const items = ref<T[]>([]) as Ref<T[]>
+	const operand = ref<'AND' | 'OR'>(defaultOperand)
+
+	const toggle = (item: T) => {
+		const idx = items.value.indexOf(item)
+		if (idx === -1) items.value.push(item)
+		else items.value.splice(idx, 1)
+		onSearch()
+	}
+
+	const reset = () => {
+		items.value = []
+		operand.value = defaultOperand
+	}
+
+	const resetAndSearch = () => {
+		reset()
+		onSearch()
+	}
+
+	const toggleOperand = () => {
+		operand.value = operand.value === 'AND' ? 'OR' : 'AND'
+		if (items.value.length > 0) onSearch()
+	}
+
+	const setItems = (newItems: T[]) => {
+		items.value = newItems
+	}
+
+	return {items, operand, toggle, reset, resetAndSearch, toggleOperand, setItems}
+}
+
 // #endregion
 // -----------------------------------------
 // #region Filter Fields
 // -----------------------------------------
 
-const toggledAttributes = ref<TMonsterAttribute[]>([])
-function resetAttributes() {
-	toggledAttributes.value = []
-	onSearch()
-}
-function toggleAttribute(attribute: TMonsterAttribute) {
-	const index = toggledAttributes.value.indexOf(attribute)
-	if (index === -1) toggledAttributes.value.push(attribute)
-	else toggledAttributes.value.splice(index, 1)
-	onSearch()
-}
-
-const toggledMonsterTypesOperand = ref<'AND' | 'OR'>('AND')
-const toggledMonsterTypes = ref<TMonsterType[]>([])
-function resetMonsterTypes() {
-	toggledMonsterTypes.value = []
-	toggledMonsterTypesOperand.value = 'AND'
-	onSearch()
-}
-function toggleMonsterType(type: TMonsterType) {
-	const index = toggledMonsterTypes.value.indexOf(type)
-	if (index === -1) toggledMonsterTypes.value.push(type)
-	else toggledMonsterTypes.value.splice(index, 1)
-	onSearch()
-}
-function toggleMonsterTypesOperand() {
-	toggledMonsterTypesOperand.value = toggledMonsterTypesOperand.value === 'AND' ? 'OR' : 'AND'
-	if (toggledMonsterTypes.value.length > 0) onSearch()
-}
-
-const toggledMonsterRaces = ref<TMonsterRace[]>([])
-function resetMonsterRaces() {
-	toggledMonsterRaces.value = []
-	onSearch()
-}
-function toggleMonsterRace(race: TMonsterRace) {
-	const index = toggledMonsterRaces.value.indexOf(race)
-	if (index === -1) toggledMonsterRaces.value.push(race)
-	else toggledMonsterRaces.value.splice(index, 1)
-	onSearch()
-}
+const attributes = useToggleArray<TMonsterAttribute>('OR')
+const monsterTypes = useToggleArray<TMonsterType>('AND')
+const monsterRaces = useToggleArray<TMonsterRace>('OR')
+const spellTypes = useToggleArray<TSpellTypes>('OR')
+const trapTypes = useToggleArray<TTrapTypes>('OR')
+const levels = useToggleArray<number>('OR')
+const scales = useToggleArray<number>('OR')
+const linkvals = useToggleArray<number>('OR')
+const linkMarkers = useToggleArray<TLinkMarkers>('AND')
 
 const toggledCoreType = ref<TCoreCardType | null>(null)
 function resetCoreType() {
@@ -152,83 +167,11 @@ function toggleCoreType(type: TCoreCardType) {
 	onSearch()
 }
 
-const toggledTrapTypes = ref<TTrapTypes[]>([])
-function resetTrapTypes() {
-	toggledTrapTypes.value = []
-	onSearch()
-}
-function toggleTrapType(type: TTrapTypes) {
-	const index = toggledTrapTypes.value.indexOf(type)
-	if (index === -1) toggledTrapTypes.value.push(type)
-	else toggledTrapTypes.value.splice(index, 1)
-	onSearch()
-}
-
-const toggledSpellTypes = ref<TSpellTypes[]>([])
-function resetSpellTypes() {
-	toggledSpellTypes.value = []
-	onSearch()
-}
-function toggleSpellType(type: TSpellTypes) {
-	const index = toggledSpellTypes.value.indexOf(type)
-	if (index === -1) toggledSpellTypes.value.push(type)
-	else toggledSpellTypes.value.splice(index, 1)
-	onSearch()
-}
-
 const atkFilter = ref<[number | null, number | null]>([null, null])
 const defFilter = ref<[number | null, number | null]>([null, null])
 function resetAtkDefFilters() {
 	atkFilter.value = [null, null]
 	defFilter.value = [null, null]
-}
-
-const toggledLevels = ref<number[]>([])
-function resetLevels() {
-	toggledLevels.value = []
-	onSearch()
-}
-function toggleLevel(level: number) {
-	const index = toggledLevels.value.indexOf(level)
-	if (index === -1) toggledLevels.value.push(level)
-	else toggledLevels.value.splice(index, 1)
-	onSearch()
-}
-
-const toggledScales = ref<number[]>([])
-function resetScales() {
-	toggledScales.value = []
-	onSearch()
-}
-function toggleScale(scale: number) {
-	const index = toggledScales.value.indexOf(scale)
-	if (index === -1) toggledScales.value.push(scale)
-	else toggledScales.value.splice(index, 1)
-	onSearch()
-}
-
-const toggledLinkvals = ref<number[]>([])
-function resetLinkvals() {
-	toggledLinkvals.value = []
-	onSearch()
-}
-function toggleLinkval(linkval: number) {
-	const index = toggledLinkvals.value.indexOf(linkval)
-	if (index === -1) toggledLinkvals.value.push(linkval)
-	else toggledLinkvals.value.splice(index, 1)
-	onSearch()
-}
-
-const toggledLinkMarkers = ref<TLinkMarkers[]>([])
-const toggledLinkMarkersOperand = ref<'AND' | 'OR'>('AND')
-function resetLinkMarkers() {
-	toggledLinkMarkers.value = []
-	toggledLinkMarkersOperand.value = 'AND'
-	onSearch()
-}
-function toggleMonsterTypesOperandLinkMarkers() {
-	toggledLinkMarkersOperand.value = toggledLinkMarkersOperand.value === 'AND' ? 'OR' : 'AND'
-	if (toggledLinkMarkers.value.length > 0) onSearch()
 }
 
 const toggledOwned = ref(false)
@@ -241,72 +184,85 @@ function toggleStaple() {
 	toggledStaple.value = !toggledStaple.value
 	onSearch()
 }
+
 // #endregion
 // -----------------------------------------
-// #region Setup
+// #region Setup & Sync
 // -----------------------------------------
+
 onMounted(() => {
 	_applyActiveQuery()
 })
+
+watch(
+	activeQuery,
+	() => {
+		if (!isUpdatingFromSelf) {
+			_applyActiveQuery()
+		}
+	},
+	{deep: true}
+)
+
 function _applyActiveQuery() {
 	searchInput.value = activeQuery.value.term || ''
 	toggledOwned.value = activeQuery.value.owned || false
 	toggledStaple.value = activeQuery.value.staple || false
-	toggledAttributes.value = activeQuery.value.attributes || []
 	toggledCoreType.value = activeQuery.value.coreCardType || null
-	toggledMonsterRaces.value = activeQuery.value.monsterRaces || []
-	toggledMonsterTypes.value = activeQuery.value.monsterTypes
-		? activeQuery.value.monsterTypes.terms
-		: []
-	toggledMonsterTypesOperand.value = activeQuery.value.monsterTypes
-		? activeQuery.value.monsterTypes.operand
-		: 'AND'
-	toggledSpellTypes.value = activeQuery.value.spellTypes || []
-	toggledTrapTypes.value = activeQuery.value.trapTypes || []
+
+	attributes.setItems(activeQuery.value.attributes || [])
+	monsterRaces.setItems(activeQuery.value.monsterRaces || [])
+	spellTypes.setItems(activeQuery.value.spellTypes || [])
+	trapTypes.setItems(activeQuery.value.trapTypes || [])
+	levels.setItems(activeQuery.value.levels || [])
+	scales.setItems(activeQuery.value.scales || [])
+	linkvals.setItems(activeQuery.value.linkvals || [])
+
+	if (activeQuery.value.monsterTypes) {
+		monsterTypes.setItems(activeQuery.value.monsterTypes.terms)
+		monsterTypes.operand.value = activeQuery.value.monsterTypes.operand
+	} else {
+		monsterTypes.reset()
+	}
+
+	if (activeQuery.value.links) {
+		linkMarkers.setItems(activeQuery.value.links.terms)
+		linkMarkers.operand.value = activeQuery.value.links.operand
+	} else {
+		linkMarkers.reset()
+	}
 
 	atkFilter.value = [activeQuery.value.atk?.lte ?? null, activeQuery.value.atk?.gte ?? null]
 	defFilter.value = [activeQuery.value.def?.lte ?? null, activeQuery.value.def?.gte ?? null]
-	toggledLevels.value = activeQuery.value.levels || []
-	toggledScales.value = activeQuery.value.scales || []
-	toggledLinkvals.value = activeQuery.value.linkvals || []
-	toggledLinkMarkers.value = activeQuery.value.links?.terms || []
-	toggledLinkMarkersOperand.value = activeQuery.value.links?.operand || 'AND'
 }
-const query = computed<TSearchQuery>(() => {
-	return {
-		term: searchInput.value,
-		owned: toggledOwned.value,
-		staple: toggledStaple.value,
-		attributes: toggledAttributes.value,
-		coreCardType: toggledCoreType.value ?? undefined,
-		monsterRaces: toggledMonsterRaces.value.length > 0 ? toggledMonsterRaces.value : undefined,
-		monsterTypes:
-			toggledMonsterTypes.value.length > 0
-				? {
-						terms: toggledMonsterTypes.value,
-						operand: toggledMonsterTypesOperand.value,
-				  }
-				: undefined,
-		spellTypes: toggledSpellTypes.value.length > 0 ? toggledSpellTypes.value : undefined,
-		trapTypes: toggledTrapTypes.value.length > 0 ? toggledTrapTypes.value : undefined,
-		levels: toggledLevels.value.length > 0 ? toggledLevels.value : undefined,
-		scales: toggledScales.value.length > 0 ? toggledScales.value : undefined,
-		linkvals: toggledLinkvals.value.length > 0 ? toggledLinkvals.value : undefined,
-		links:
-			toggledLinkMarkers.value.length > 0
-				? {
-						terms: toggledLinkMarkers.value,
-						operand: toggledLinkMarkersOperand.value,
-				  }
-				: undefined,
-		atk: {lte: atkFilter.value[0], gte: atkFilter.value[1]},
-		def: {lte: defFilter.value[0], gte: defFilter.value[1]},
-	}
-})
+
+const query = computed<TSearchQuery>(() => ({
+	term: searchInput.value,
+	owned: toggledOwned.value,
+	staple: toggledStaple.value,
+	attributes: attributes.items.value,
+	coreCardType: toggledCoreType.value ?? undefined,
+	monsterRaces: monsterRaces.items.value.length > 0 ? monsterRaces.items.value : undefined,
+	monsterTypes:
+		monsterTypes.items.value.length > 0
+			? {terms: monsterTypes.items.value, operand: monsterTypes.operand.value}
+			: undefined,
+	spellTypes: spellTypes.items.value.length > 0 ? spellTypes.items.value : undefined,
+	trapTypes: trapTypes.items.value.length > 0 ? trapTypes.items.value : undefined,
+	levels: levels.items.value.length > 0 ? levels.items.value : undefined,
+	scales: scales.items.value.length > 0 ? scales.items.value : undefined,
+	linkvals: linkvals.items.value.length > 0 ? linkvals.items.value : undefined,
+	links:
+		linkMarkers.items.value.length > 0
+			? {terms: linkMarkers.items.value, operand: linkMarkers.operand.value}
+			: undefined,
+	atk: {lte: atkFilter.value[0], gte: atkFilter.value[1]},
+	def: {lte: defFilter.value[0], gte: defFilter.value[1]},
+}))
 
 const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
+
 // #endregion
-// -----------------------------------------
 </script>
 
 <template>
@@ -345,6 +301,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 			/>
 			<Button icon="material-symbols:filter-alt-off-rounded" @click="onReset" />
 		</div>
+
 		<!-- Staple Filter -->
 		<div class="p-2 rounded-md bg-primary-800 flex gap-2 items-center">
 			<Checkbox
@@ -355,331 +312,161 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		</div>
 
 		<!-- Core Card Types -->
-		<div class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col">
-			<h3 class="font-bold m-0 flex gap-2">
-				<Button
-					@click="resetCoreType"
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
+		<FilterSection title="Monster/Spell/Trap" @reset="resetCoreType">
+			<ToggleButton
+				v-for="type in (['Monster', 'Spell', 'Trap'] as TCoreCardType[])"
+				:key="type"
+				:model-value="toggledCoreType === type"
+				@toggle="toggleCoreType(type)"
+			>
+				<Icon
+					icon="material-symbols:credit-card"
+					:class="{
+						'text-card-effect': type === 'Monster',
+						'text-card-spell': type === 'Spell',
+						'text-card-trap': type === 'Trap',
+					}"
 				/>
-				<span>Monster/Spell/Trap</span>
-			</h3>
-			<div class="flex gap-3 flex-wrap items-center justify-center">
-				<ToggleButton
-					v-for="type in (['Monster', 'Spell', 'Trap'] as TCoreCardType[])"
-					:key="type"
-					:model-value="toggledCoreType === type"
-					@toggle="toggleCoreType(type)"
+				<span class="py-1 w-15 font-bold text-sm">{{ type }}</span>
+			</ToggleButton>
+		</FilterSection>
+
+		<!-- Monster Filters -->
+		<template v-if="toggledCoreType === 'Monster'">
+			<!-- Attributes -->
+			<FilterSection title="Attributes" operand="OR" @reset="attributes.resetAndSearch">
+				<ToggleButtonGroup
+					:options="EMonsterAttributes"
+					:model-value="attributes.items.value"
+					@toggle="attributes.toggle"
 				>
-					<Icon
-						icon="material-symbols:credit-card"
-						:class="{
-							'text-card-effect': type === 'Monster',
-							'text-card-spell': type === 'Spell',
-							'text-card-trap': type === 'Trap',
-						}"
-					/>
-					<span class="py-1 w-15 font-bold text-sm">{{ type }}</span>
-				</ToggleButton>
-			</div>
-		</div>
+					<template #default="{option}">
+						<AttributeIcon size="small" :attribute="option" />
+						<span class="w-13 font-bold text-sm">{{ option }}</span>
+					</template>
+				</ToggleButtonGroup>
+			</FilterSection>
 
-		<!-- Monster | Attributes -->
-		<div
-			v-if="toggledCoreType === 'Monster'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
-		>
-			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-				<Button
-					@click="resetAttributes"
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
+			<!-- Card Type -->
+			<FilterSection
+				title="Card Type"
+				:operand="monsterTypes.operand.value"
+				has-operand-toggle
+				@reset="monsterTypes.resetAndSearch"
+				@toggle-operand="monsterTypes.toggleOperand"
+			>
+				<ToggleButtonGroup
+					:options="EMonsterType"
+					:model-value="monsterTypes.items.value"
+					@toggle="monsterTypes.toggle"
 				/>
-				<span>Attributes</span>
-				<span class="text-contrast-400">(OR)</span>
-			</h3>
-			<div class="flex gap-3 flex-wrap items-center justify-center">
-				<ToggleButton
-					v-for="attribute in Object.values(EMonsterAttributes)"
-					:key="attribute"
-					:model-value="toggledAttributes.includes(attribute)"
-					@toggle="toggleAttribute(attribute)"
-				>
-					<AttributeIcon size="small" :attribute="attribute" />
-					<span class="w-13 font-bold text-sm">{{ attribute }}</span>
-				</ToggleButton>
-			</div>
-		</div>
+			</FilterSection>
 
-		<!-- Monster | Type -->
-		<div
-			v-if="toggledCoreType === 'Monster'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
-		>
-			<h3 class="font-bold m-0 grid grid-cols-[auto_1fr_auto] gap-2">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetMonsterTypes"
+			<!-- Monster Race -->
+			<FilterSection title="Monster Type" operand="OR" @reset="monsterRaces.resetAndSearch">
+				<ToggleButtonGroup
+					:options="EMonsterRace"
+					:model-value="monsterRaces.items.value"
+					@toggle="monsterRaces.toggle"
 				/>
-				<span>Card Type</span>
-				<ToggleSwitch
-					:duo-labels="['AND', 'OR']"
-					:model-value="toggledMonsterTypesOperand === 'AND'"
-					@toggle="toggleMonsterTypesOperand"
+			</FilterSection>
+
+			<!-- Level / Rank -->
+			<FilterSection title="Level / Rank" operand="OR" @reset="levels.resetAndSearch">
+				<ToggleButtonGroup
+					:options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]"
+					:model-value="levels.items.value"
+					item-width="w-8"
+					@toggle="levels.toggle"
 				/>
-			</h3>
-			<div class="">
-				<div class="flex gap-3 flex-wrap items-center justify-center">
-					<ToggleButton
-						v-for="type in Object.values(EMonsterType)"
-						:key="type"
-						:model-value="toggledMonsterTypes.includes(type)"
-						@toggle="toggleMonsterType(type)"
-					>
-						<span class="font-bold text-sm">{{ type }}</span>
-					</ToggleButton>
+			</FilterSection>
+
+			<!-- ATK/DEF -->
+			<FilterSection title="Attack & Defense" operand="AND" @reset="resetAtkDefFilters">
+				<div class="flex items-center justify-center flex-col gap-2 w-full">
+					<div class="flex gap-2 items-center">
+						<span class="font-bold">ATK</span>
+						<NumberInputMinMax
+							v-model="atkFilter"
+							:min-val="-1"
+							:max-val="5000"
+							@change="onSearch"
+						/>
+					</div>
+					<div class="flex gap-2 items-center">
+						<span class="font-bold">DEF</span>
+						<NumberInputMinMax
+							v-model="defFilter"
+							:min-val="-1"
+							:max-val="5000"
+							@change="onSearch"
+						/>
+					</div>
+					<span class="text-xm text-contrast-400"> Enter '-1' for ?-Values </span>
 				</div>
-			</div>
-		</div>
+			</FilterSection>
 
-		<!-- Monster | Race -->
-		<div
-			v-if="toggledCoreType === 'Monster'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
-		>
-			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetMonsterRaces"
+			<!-- Pendulum Scale -->
+			<FilterSection title="Pendulum Scale" operand="OR" @reset="scales.resetAndSearch">
+				<ToggleButtonGroup
+					:options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]"
+					:model-value="scales.items.value"
+					item-width="w-8"
+					@toggle="scales.toggle"
 				/>
-				<span>Monster Type</span>
-				<span class="text-contrast-400">(OR)</span>
-			</h3>
-			<div class="">
-				<div class="flex gap-3 flex-wrap items-center justify-center">
-					<ToggleButton
-						v-for="race in Object.values(EMonsterRace)"
-						:key="race"
-						:model-value="toggledMonsterRaces.includes(race)"
-						@toggle="toggleMonsterRace(race)"
-					>
-						<span class="font-bold text-sm">{{ race }}</span>
-					</ToggleButton>
-				</div>
-			</div>
-		</div>
+			</FilterSection>
 
-		<!-- Monster | Level -->
-		<div
-			v-if="toggledCoreType === 'Monster'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
-		>
-			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetLevels"
+			<!-- Link Values -->
+			<FilterSection title="Link Values" operand="OR" @reset="linkvals.resetAndSearch">
+				<ToggleButtonGroup
+					:options="[1, 2, 3, 4, 5, 6, 7, 8]"
+					:model-value="linkvals.items.value"
+					item-width="w-8"
+					@toggle="linkvals.toggle"
 				/>
-				<span>Level / Rank</span>
-				<span class="text-contrast-400">(OR)</span>
-			</h3>
-			<div class="flex flex-wrap gap-2">
-				<ToggleButton
-					v-for="lvl in 13"
-					:key="lvl"
-					:model-value="toggledLevels.includes(lvl)"
-					@toggle="toggleLevel(lvl)"
-				>
-					<span class="w-8 font-bold text-sm">{{ lvl }}</span>
-				</ToggleButton>
-			</div>
-		</div>
+			</FilterSection>
 
-		<!-- Monster | ATK/DEF -->
-		<div
-			v-if="toggledCoreType === 'Monster'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
-		>
-			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetAtkDefFilters"
-				/>
-				<span>Attack & Defense</span>
-				<span class="text-contrast-400">(AND)</span>
-			</h3>
-			<div class="flex items-center justify-center flex-col gap-2">
-				<div class="flex gap-2 items-center">
-					<span class="font-bold">ATK</span>
-					<NumberInputMinMax
-						v-model="atkFilter"
-						:min-val="-1"
-						:max-val="5000"
-						@change="onSearch"
-					/>
-				</div>
-				<div class="flex gap-2 items-center">
-					<span class="font-bold">DEF</span>
-					<NumberInputMinMax
-						v-model="defFilter"
-						:min-val="-1"
-						:max-val="5000"
-						@change="onSearch"
-					/>
-				</div>
-				<span class="text-xm text-contrast-400"> Enter '-1' for ?-Values </span>
-			</div>
-		</div>
-
-		<!-- Monster | Pendulum Scale -->
-		<div
-			v-if="toggledCoreType === 'Monster'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
-		>
-			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetScales"
-				/>
-				<span>Pendulum Scale</span>
-				<span class="text-contrast-400">(OR)</span>
-			</h3>
-			<div class="flex flex-wrap gap-2">
-				<ToggleButton
-					v-for="scale in 13"
-					:key="scale"
-					:model-value="toggledScales.includes(scale)"
-					@toggle="toggleScale(scale)"
-				>
-					<span class="w-8 font-bold text-sm">{{ scale }}</span>
-				</ToggleButton>
-			</div>
-		</div>
-
-		<!-- Monster | Linkvals -->
-		<div
-			v-if="toggledCoreType === 'Monster'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
-		>
-			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetLinkvals"
-				/>
-				<span>Link Values</span>
-				<span class="text-contrast-400">(OR)</span>
-			</h3>
-
-			<div>
-				<div class="flex flex-wrap gap-2">
-					<ToggleButton
-						v-for="linkval in 8"
-						:key="linkval"
-						:model-value="toggledLinkvals.includes(linkval)"
-						@toggle="toggleLinkval(linkval)"
-					>
-						<span class="w-8 font-bold text-sm">{{ linkval }}</span>
-					</ToggleButton>
-				</div>
-			</div>
-		</div>
-
-		<!-- Monster | Linkmarkers -->
-		<div
-			v-if="toggledCoreType === 'Monster'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
-		>
-			<h3 class="font-bold m-0 grid grid-cols-[auto_1fr_auto] gap-2">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetLinkMarkers"
-				/>
-				<span>Links</span>
-				<ToggleSwitch
-					:duo-labels="['AND', 'OR']"
-					:model-value="toggledLinkMarkersOperand === 'AND'"
-					@toggle="toggleMonsterTypesOperandLinkMarkers"
-				/>
-			</h3>
-			<div class="flex justify-center">
+			<!-- Link Markers -->
+			<FilterSection
+				title="Links"
+				:operand="linkMarkers.operand.value"
+				has-operand-toggle
+				@reset="linkMarkers.resetAndSearch"
+				@toggle-operand="linkMarkers.toggleOperand"
+			>
 				<div class="bg-primary-700 rounded-md">
-					<CardLinkSelection v-model="toggledLinkMarkers" @change="onSearch" />
+					<CardLinkSelection v-model="linkMarkers.items.value" @change="onSearch" />
 				</div>
-			</div>
-		</div>
+			</FilterSection>
+		</template>
 
 		<!-- Trap Type -->
-		<div
+		<FilterSection
 			v-if="toggledCoreType === 'Trap'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
+			title="Trap Type"
+			operand="OR"
+			@reset="trapTypes.resetAndSearch"
 		>
-			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetTrapTypes"
-				/>
-				<span>Trap Type</span>
-				<span class="text-contrast-400">(OR)</span>
-			</h3>
-			<div class="">
-				<div class="flex gap-3 flex-wrap items-center justify-center">
-					<ToggleButton
-						v-for="type in Object.values(ETrapTypes)"
-						:key="type"
-						:model-value="toggledTrapTypes.includes(type)"
-						@toggle="toggleTrapType(type)"
-					>
-						<span class="font-bold text-sm">{{ type }}</span>
-					</ToggleButton>
-				</div>
-			</div>
-		</div>
+			<ToggleButtonGroup
+				:options="ETrapTypes"
+				:model-value="trapTypes.items.value"
+				@toggle="trapTypes.toggle"
+			/>
+		</FilterSection>
 
 		<!-- Spell Type -->
-		<div
+		<FilterSection
 			v-if="toggledCoreType === 'Spell'"
-			class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col"
+			title="Spell Type"
+			operand="OR"
+			@reset="spellTypes.resetAndSearch"
 		>
-			<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-				<Button
-					icon="material-symbols:reset-settings-outline-rounded"
-					rounded
-					size="small"
-					@click="resetSpellTypes"
-				/>
-				<span>Spell Type</span>
-				<span class="text-contrast-400">(OR)</span>
-			</h3>
-			<div class="">
-				<div class="flex gap-3 flex-wrap items-center justify-center">
-					<ToggleButton
-						v-for="type in Object.values(ESpellTypes)"
-						:key="type"
-						:model-value="toggledSpellTypes.includes(type)"
-						@toggle="toggleSpellType(type)"
-					>
-						<span class="font-bold text-sm">{{ type }}</span>
-					</ToggleButton>
-				</div>
-			</div>
-		</div>
+			<ToggleButtonGroup
+				:options="ESpellTypes"
+				:model-value="spellTypes.items.value"
+				@toggle="spellTypes.toggle"
+			/>
+		</FilterSection>
 
 		<!-- Info -->
 		<div v-if="!toggledCoreType" class="text-sm font-semibold p-2 rounded-md bg-primary-800">
@@ -689,5 +476,3 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		</div>
 	</div>
 </template>
-
-<style lang="scss" scoped></style>

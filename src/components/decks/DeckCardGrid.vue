@@ -46,6 +46,7 @@ const grayedOutIndices = computed(() => {
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: TCardData[]): void
 	(e: 'cardHover', value: TCardData): void
+	(e: 'cardShiftClick', card: TCardData): void
 }>()
 
 // Drag and drop state
@@ -154,6 +155,7 @@ const CARD_WIDTH = computed(() => {
 				:size="props.cardSize"
 				@mouseenter="() => onCardHover(card)"
 				@click.right="() => onCardRemove(index)"
+				@shift-click="() => emit('cardShiftClick', card)"
 				:gray-override="grayedOutIndices.has(index)"
 				:show-banlist-for="props.showBanlistFor"
 			/>

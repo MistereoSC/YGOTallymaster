@@ -21,7 +21,7 @@ const emit = defineEmits<{
 		:active="props.active === true"
 	>
 		<div
-			class="font-semibold flex gap-2 items-center pl-3 h-10 hover:bg-primary-800 transition-colors 0.2s mr-2 ease rounded-tr-md rounded-br-md"
+			class="font-semibold flex gap-3 items-center pl-3 h-10 hover:bg-primary-800 transition-colors 0.2s mr-2 ease rounded-tr-md rounded-br-md"
 		>
 			<Icon
 				v-if="props.icon"
@@ -39,8 +39,7 @@ const emit = defineEmits<{
 	&::before {
 		content: '';
 		position: absolute;
-		transition: top 0.1s linear, bottom 0.1s linear,
-			background-color 0.2s linear;
+		transition: top 0.1s linear, bottom 0.1s linear, background-color 0.2s linear;
 		left: 0;
 		top: 50%;
 		bottom: 50%;

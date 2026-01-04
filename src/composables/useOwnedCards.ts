@@ -28,26 +28,16 @@ const ownedCardList = ref([] as TCardData[])
 const sortedBy = ref(ESortBy.Name_Asc)
 
 const ownedCards = ref<IMarkedCards | null>(null)
-
-export const useOwnedCards = () => {
+const useOwnedCards = () => {
 	if (initialized.value === 'uninitialized') {
 		initialized.value = 'loading'
 		_init()
 	}
 
 	async function _init() {
-		const e = await Files.exists(PATH)
-		if (!e.exists) {
-			ownedCards.value = {}
-			await Files.write(PATH, {})
-		} else {
-			ownedCards.value = (await Files.read(PATH)) as IMarkedCards
-			if (!ownedCards.value) {
-				ownedCards.value = {}
-			}
-		}
-
 		const cardData = await getFullCardList()
+		await _readOwnedCards()
+
 		ownedCardList.value = cardData.filter(
 			(card) => ownedCards.value && ownedCards.value[card.id] && ownedCards.value[card.id] > 0
 		)
@@ -194,3 +184,27 @@ function _searchTerm(term: string, cardList?: TCardData[]) {
 
 	return results as unknown as TSearchResultCardData[]
 }
+
+async function _readOwnedCards() {
+	if (ownedCards.value) return ownedCards.value
+	const data = await _get()
+	ownedCards.value = data
+	return data
+
+	async function _get() {
+		const e = await Files.exists(PATH)
+		if (!e.exists) {
+			await Files.write(PATH, {})
+			return {}
+		}
+		const read = (await Files.read(PATH)) as IMarkedCards
+		return read || {}
+	}
+}
+
+function getReadyCardIds() {
+	if (ownedCards.value) return ownedCards.value
+	else return {}
+}
+
+export {useOwnedCards, getReadyCardIds}

@@ -1,4 +1,5 @@
 import {getCardList} from '@/libs/CardData'
+import {IMarkedCards} from '@/libs/interfaces/CardSets'
 import {
 	TCardData,
 	TLinkMarkers,
@@ -10,6 +11,7 @@ import {
 } from '@/libs/interfaces/YGOProInterfaces'
 import MiniSearch from 'minisearch'
 import {ref, markRaw} from 'vue'
+import {getReadyCardIds} from './useOwnedCards'
 
 // -----------------------------------------------------------
 // #region Constants
@@ -233,6 +235,8 @@ export type TSearchQuery = {
 	monsterRaces?: TMonsterRace[]
 	spellTypes?: TSpellTypes[]
 	trapTypes?: TTrapTypes[]
+
+	owned?: boolean
 }
 export type TCoreCardType = 'Monster' | 'Spell' | 'Trap'
 
@@ -276,6 +280,11 @@ function _createMinisearchIndex(cardData: TCardData[]) {
 
 function _applyQueryFilters(cardList: TCardData[] | TSearchResultCardData[], query: TSearchQuery) {
 	let cOut = cardList
+	// Apply Owned Filter
+	if (query.owned) {
+		cOut = _searchOwnedCards(cOut)
+	}
+
 	// Apply Core Type Filter
 	if (query.coreCardType) {
 		cOut = _searchCoreCardType(query.coreCardType, cOut)
@@ -331,6 +340,7 @@ function _applyQueryFilters(cardList: TCardData[] | TSearchResultCardData[], que
 function _searchQueryIsEmpty(query: TSearchQuery) {
 	return !(
 		query.term ||
+		query.owned ||
 		query.coreCardType ||
 		(query.attributes && query.attributes.length != 0) ||
 		(query.monsterTypes && query.monsterTypes.terms.length != 0) ||
@@ -472,6 +482,11 @@ function _searchTerm(term: string, cardList?: TCardData[]) {
 	return results as unknown as TSearchResultCardData[]
 }
 
+function _searchOwnedCards(cardList: TCardData[], markedCardIds?: IMarkedCards) {
+	const cIds = markedCardIds ?? getReadyCardIds()
+	return cardList.filter((card) => cIds?.[card.id] && cIds?.[card.id] > 0)
+}
+
 function __getAllViableValues<K extends keyof TCardData>(
 	key: K,
 	cardList: TCardData[] = fullCardList.value
@@ -510,6 +525,7 @@ const _find = {
 	MonsterType: _searchMonsterType,
 	Linkmarkers: _searchLinkmarkers,
 	SpellTrapType: _searchSpellTrapType,
+	Owned: _searchOwnedCards,
 	_ApplyAllQueryFilters: _applyQueryFilters,
 }
 // #endregion

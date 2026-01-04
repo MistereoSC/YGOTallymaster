@@ -26,7 +26,7 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 				<Button
 					size="small"
 					rounded
-					icon="material-symbols:arrow-back-rounded"
+					icon="material-symbols:keyboard-return-rounded"
 					@click="emit('close')"
 				/>
 				<span class="font-bold">{{ props.archetype.name }}</span>

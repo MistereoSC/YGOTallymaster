@@ -22,7 +22,7 @@ const activeRoute = computed(() => route.name as string)
 	<div class="relative">
 		<div
 			class="bg-primary-900 w-40 h-full grid grid-rows-[1fr_auto] shadow-lg py-2 overflow-x-hidden"
-			:class="{'w-11! ': !menu.expanded.value}"
+			:class="{'w-12! ': !menu.expanded.value}"
 			style="transition: width 0.2s ease-out"
 		>
 			<div>
@@ -44,19 +44,19 @@ const activeRoute = computed(() => route.name as string)
 					route-name="Banlist"
 					:active="activeRoute === 'Banlist'"
 				/>
-				<AppMainMenuLink
+				<!-- <AppMainMenuLink
 					label="Sets"
 					icon="material-symbols:cards-star-rounded"
 					route-name="Sets"
 					:active="activeRoute === 'Sets'"
-				/>
+				/> -->
 				<div class="w-full h-px bg-primary-500 my-2"></div>
-				<AppMainMenuLink
+				<!-- <AppMainMenuLink
 					label="Collection"
 					icon="tabler:archive-filled"
 					route-name="Collection"
 					:active="activeRoute === 'Collection'"
-				/>
+				/> -->
 				<AppMainMenuLink
 					label="Decks"
 					icon="material-symbols:stacks-rounded"
@@ -72,12 +72,12 @@ const activeRoute = computed(() => route.name as string)
 			</div>
 			<div>
 				<div class="w-full h-px bg-primary-500 my-2"></div>
-				<AppMainMenuLink
+				<!-- <AppMainMenuLink
 					label="About"
 					icon="material-symbols:chat-info-rounded"
 					route-name="About"
 					:active="activeRoute === 'About'"
-				/>
+				/> -->
 				<AppMainMenuLink
 					label="Settings"
 					icon="material-symbols:settings-rounded"

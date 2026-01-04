@@ -24,10 +24,10 @@ import {
 	TTrapTypes,
 } from '@/libs/interfaces/YGOProInterfaces'
 import AttributeIcon from './AttributeIcon.vue'
-import Button from '../common/Button.vue'
+import Button from '@/components/common/Button.vue'
 import {Icon} from '@iconify/vue'
-import ToggleSwitch from '../common/ToggleSwitch.vue'
-import NumberInputMinMax from '../common/NumberInputMinMax.vue'
+import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import NumberInputMinMax from '@/components/common/NumberInputMinMax.vue'
 import CardLinkSelection from './CardLinkSelection.vue'
 
 const props = defineProps<{
@@ -69,9 +69,13 @@ function onReset(fullReset = true) {
 		toggledCoreType.value = null
 		resetSearch()
 	}
+
+	if (toggledOwned.value) {
+		onSearch()
+	}
 }
 
-const DEBOUNCE_DELYAY = 100
+const DEBOUNCE_DELAY = 100
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null
 function onSearchInput(e: KeyboardEvent) {
 	if (e.key === 'Enter') {
@@ -82,7 +86,7 @@ function onSearchInput(e: KeyboardEvent) {
 	if (debounceTimeout) clearTimeout(debounceTimeout)
 	debounceTimeout = setTimeout(() => {
 		onSearch()
-	}, DEBOUNCE_DELYAY)
+	}, DEBOUNCE_DELAY)
 }
 // #endregion
 // -----------------------------------------
@@ -225,6 +229,11 @@ function toggleMonsterTypesOperandLinkMarkers() {
 	if (toggledLinkMarkers.value.length > 0) onSearch()
 }
 
+const toggledOwned = ref(false)
+function toggleOwned() {
+	toggledOwned.value = !toggledOwned.value
+	onSearch()
+}
 // #endregion
 // -----------------------------------------
 // #region Setup
@@ -234,6 +243,7 @@ onMounted(() => {
 })
 function _applyActiveQuery() {
 	searchInput.value = activeQuery.value.term || ''
+	toggledOwned.value = activeQuery.value.owned || false
 	toggledAttributes.value = activeQuery.value.attributes || []
 	toggledCoreType.value = activeQuery.value.coreCardType || null
 	toggledMonsterRaces.value = activeQuery.value.monsterRaces || []
@@ -257,6 +267,7 @@ function _applyActiveQuery() {
 const query = computed<TSearchQuery>(() => {
 	return {
 		term: searchInput.value,
+		owned: toggledOwned.value,
 		attributes: toggledAttributes.value,
 		coreCardType: toggledCoreType.value ?? undefined,
 		monsterRaces: toggledMonsterRaces.value.length > 0 ? toggledMonsterRaces.value : undefined,
@@ -291,6 +302,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 
 <template>
 	<div class="max-w-2xl mx-auto flex flex-col gap-2">
+		<!-- Sort Order -->
 		<div class="p-2 rounded-md bg-primary-800 grid grid-cols-[auto_1fr] gap-2 items-center">
 			<span>Sort By</span>
 			<select
@@ -302,6 +314,15 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 					{{ label }}
 				</option>
 			</select>
+		</div>
+
+		<!-- Owned Filter -->
+		<div class="p-2 rounded-md bg-primary-800 flex gap-2 items-center justify-center font-bold">
+			<ToggleSwitch
+				:duo-labels="['Owned Cards', 'All Cards']"
+				:model-value="toggledOwned"
+				@toggle="toggleOwned"
+			/>
 		</div>
 
 		<!-- Text Input / Reset -->

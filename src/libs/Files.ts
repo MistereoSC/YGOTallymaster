@@ -142,3 +142,5 @@ const Files = {
 	moveOrRename,
 }
 export default Files
+
+export const RUnsafePathCharactersRegex = /[\\/:*?"<>|]/g

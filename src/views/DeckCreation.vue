@@ -10,6 +10,7 @@ import {useCardSearch} from '@/composables/useCardSearch'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useDeckList} from '@/composables/useDeckList'
 import {TDeckData} from '@/libs/Decks'
+import {RUnsafePathCharactersRegex} from '@/libs/Files'
 import {TCardData, TFrameType} from '@/libs/interfaces/YGOProInterfaces'
 import {Icon} from '@iconify/vue'
 import {onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
@@ -165,6 +166,16 @@ function toggleSettings() {
 }
 
 const nameContent = ref(props.deckData.name)
+
+function onNameInput(event: Event) {
+	const input = event.target as HTMLInputElement
+	const sanitized = input.value.replace(RUnsafePathCharactersRegex, '')
+	if (sanitized !== input.value) {
+		nameContent.value = sanitized
+		input.value = sanitized
+	}
+}
+
 function onReturnClick() {
 	emit('close')
 }
@@ -194,6 +205,7 @@ function onCardShiftLClick(card: TCardData) {
 							v-model="nameContent"
 							maxlength="32"
 							placeholder="Deck Name"
+							@input="onNameInput"
 						/>
 					</div>
 					<span class="flex gap-2">

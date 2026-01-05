@@ -13,6 +13,7 @@ import {
 } from 'reka-ui'
 import Button from '../common/Button.vue'
 import {ref, watch} from 'vue'
+import {RUnsafePathCharactersRegex} from '@/libs/Files'
 
 const props = defineProps<{
 	existingDecks?: TDeckData[]
@@ -20,6 +21,15 @@ const props = defineProps<{
 
 const deckExistsError = ref(false)
 const nameInput = ref('')
+
+function onNameInput(event: Event) {
+	const input = event.target as HTMLInputElement
+	const sanitized = input.value.replace(RUnsafePathCharactersRegex, '')
+	if (sanitized !== input.value) {
+		nameInput.value = sanitized
+		input.value = sanitized
+	}
+}
 
 const emit = defineEmits<{
 	(e: 'create', name: string): void
@@ -80,6 +90,7 @@ watch(
 						type="text"
 						placeholder="Deck Name"
 						class="w-full mt-4 p-2 rounded-md bg-primary-600 outline-none placeholder:text-contrast-500"
+						@input="onNameInput"
 					/>
 				</div>
 				<div class="mt-6 flex justify-end">

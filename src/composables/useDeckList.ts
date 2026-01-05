@@ -45,7 +45,11 @@ const useDeckList = () => {
 	}
 
 	async function saveDeck(deck: TDeckData, renamedFrom?: string) {
-		if (renamedFrom && renamedFrom !== deck.name) {
+		const deckNames = deckList.value.map((d) => d.name)
+		// If renaming, check for name conflicts, revert to old name if conflict found
+		if (renamedFrom && renamedFrom !== deck.name && deckNames.includes(deck.name)) {
+			deck.name = renamedFrom
+		} else if (renamedFrom && renamedFrom !== deck.name) {
 			await renameDeckFile(renamedFrom, deck.name)
 		}
 

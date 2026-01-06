@@ -74,7 +74,7 @@ function onCardHover(card?: TCardData) {
 	settingsToggled.value = false
 }
 
-function onCardAdd(card: TCardData) {
+function onCardAdd(card: TCardData, addToSideDeck = false) {
 	switch (card.frameType) {
 		case 'fusion':
 		case 'fusion_pendulum':
@@ -83,12 +83,22 @@ function onCardAdd(card: TCardData) {
 		case 'xyz':
 		case 'xyz_pendulum':
 		case 'link':
-			if (cards.value.extra.length >= 15 || !checkDeckLimit(card.id)) return
-			cards.value.extra.push(card)
+			if (addToSideDeck) {
+				if (cards.value.side.length >= 15 || !checkDeckLimit(card.id)) return
+				cards.value.side.push(card)
+			} else {
+				if (cards.value.extra.length >= 15 || !checkDeckLimit(card.id)) return
+				cards.value.extra.push(card)
+			}
 			break
 		default:
-			if (cards.value.main.length >= 60 || !checkDeckLimit(card.id)) return
-			cards.value.main.push(card)
+			if (addToSideDeck) {
+				if (cards.value.side.length >= 15 || !checkDeckLimit(card.id)) return
+				cards.value.side.push(card)
+			} else {
+				if (cards.value.main.length >= 60 || !checkDeckLimit(card.id)) return
+				cards.value.main.push(card)
+			}
 			break
 	}
 }
@@ -265,17 +275,9 @@ function onCardShiftLClick(card: TCardData) {
 				</div>
 			</div>
 		</div>
-		<div class="grid grid-rows-[2fr_1fr] overflow-hidden" @wheel="onDeckAreaWheel">
-			<div class="overflow-hidden grid grid-rows-[auto_auto_1fr]">
-				<h3 class="text-xl font-bold pl-4 pt-1">
-					<span>Main Deck</span>
-					<span
-						class="text-contrast-600 pl-8 font-semibold"
-						:class="{'text-red-400': cards.main.length > 60 || cards.main.length < 40}"
-						>[{{ cards.main.length }}]
-					</span>
-				</h3>
-				<div class="overflow-y-scroll scrollable flex flex-wrap gap-2 p-2">
+		<div class="grid grid-rows-[1fr_auto_auto] overflow-hidden" @wheel="onDeckAreaWheel">
+			<div class="overflow-hidden grid grid-rows-[auto_auto_1fr] relative">
+				<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-10">
 					<DeckCardGrid
 						v-model="cards.main"
 						@cardHover="onCardHover"
@@ -284,6 +286,20 @@ function onCardShiftLClick(card: TCardData) {
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 						@card-shift-click="(card) => onCardShiftLClick(card)"
 					/>
+				</div>
+				<div>
+					<h3
+						class="text-xl font-bold absolute top-0 left-0 right-2 pl-4 bg-primary-800/70"
+					>
+						<span>Main Deck</span>
+						<span
+							class="text-contrast-600 pl-8 font-semibold"
+							:class="{
+								'text-red-400': cards.main.length > 60 || cards.main.length < 40,
+							}"
+							>[{{ cards.main.length }}]
+						</span>
+					</h3>
 				</div>
 			</div>
 			<div
@@ -297,13 +313,38 @@ function onCardShiftLClick(card: TCardData) {
 						>[{{ cards.extra.length }}]
 					</span>
 				</h3>
-				<div class="h-full overflow-y-scroll scrollable flex flex-wrap gap-2 p-2">
+				<div class="h-full overflow-y-scroll scrollable pb-1 px-2">
 					<DeckCardGrid
 						v-model="cards.extra"
 						@cardHover="onCardHover"
 						:gray-unowned="settings?.decklistGrayUnownedGrid"
 						:card-size="settings?.decklistGridCardSize || 'tiny'"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
+						@card-shift-click="(card) => onCardShiftLClick(card)"
+						:horizontal="true"
+					/>
+				</div>
+			</div>
+			<div
+				class="border-primary-500 border-t-2 overflow-hidden grid grid-rows-[auto_auto_1fr]"
+			>
+				<h3 class="text-xl font-bold pl-4 pt-1">
+					<span>Side Deck</span>
+					<span
+						class="text-contrast-600 pl-8 font-semibold"
+						:class="{'text-red-400': cards.side.length > 15}"
+						>[{{ cards.side.length }}]
+					</span>
+				</h3>
+				<div class="h-full overflow-y-scroll scrollable pb-1 px-2">
+					<DeckCardGrid
+						v-model="cards.side"
+						@cardHover="onCardHover"
+						:gray-unowned="settings?.decklistGrayUnownedGrid"
+						:card-size="settings?.decklistGridCardSize || 'tiny'"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
+						@card-shift-click="(card) => onCardShiftLClick(card)"
+						:horizontal="true"
 					/>
 				</div>
 			</div>
@@ -324,6 +365,7 @@ function onCardShiftLClick(card: TCardData) {
 						:gray-unowned="settings?.decklistGrayUnownedList"
 						@card-hovered="(card) => onCardHover(card)"
 						@card-clicked="(card) => onCardAdd(card)"
+						@card-shift-clicked="(card) => onCardAdd(card, true)"
 						:item-size="settings?.decklistListSize || 'tiny'"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 					/>

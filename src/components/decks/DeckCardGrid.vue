@@ -11,12 +11,14 @@ interface IProps {
 	grayUnowned?: boolean
 	cardSize?: 'tiny' | 'small' | 'medium' | 'large'
 	showBanlistFor?: TBanlistFormat | 'none'
+	horizontal?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	allowCardRemoval: true,
 	allowReorder: true,
 	grayUnowned: false,
 	cardSize: 'tiny',
+	horizontal: false,
 })
 
 const {getOwned} = useOwnedCards()
@@ -126,14 +128,28 @@ const CARD_WIDTH = computed(() => {
 			return 236
 	}
 })
+
+function onHorizontalWheel(event: WheelEvent) {
+	if (!props.horizontal || event.shiftKey) return
+	const container = event.currentTarget as HTMLElement
+	if (container) {
+		event.preventDefault()
+		container.scrollLeft += event.deltaY
+	}
+}
 </script>
 
 <template>
 	<div
-		class="w-full grid justify-center gap-2"
+		class="scrollable"
 		:style="{
-			gridTemplateColumns: `repeat(auto-fill, ${CARD_WIDTH}px)`,
+			gridTemplateColumns: props.horizontal ? 'none' : `repeat(auto-fill, ${CARD_WIDTH}px)`,
 		}"
+		:class="{
+			'w-full grid justify-center gap-2': !props.horizontal,
+			'flex overflow-x-auto py-2 pl-10 pr-10': props.horizontal,
+		}"
+		@wheel="onHorizontalWheel"
 	>
 		<div
 			v-for="(card, index) in props.modelValue"
@@ -158,6 +174,9 @@ const CARD_WIDTH = computed(() => {
 				@shift-click="() => emit('cardShiftClick', card)"
 				:gray-override="grayedOutIndices.has(index)"
 				:show-banlist-for="props.showBanlistFor"
+				:class="{
+					'hover:z-10 -ml-8': props.horizontal,
+				}"
 			/>
 		</div>
 	</div>

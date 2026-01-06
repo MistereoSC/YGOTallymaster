@@ -311,7 +311,7 @@ function onCardShiftLClick(card: TCardData) {
 		<div
 			class="max-w-180 w-[30vw] bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 		>
-			<div class="h-full grid grid-rows-2 overflow-hidden gap">
+			<div class="h-full grid grid-rows-[auto_auto] overflow-hidden gap">
 				<div class="overflow-y-scroll scrollable border-b-2 border-b-primary-400 p-2">
 					<CardFilter :search-while-typing="true" />
 				</div>
@@ -325,6 +325,7 @@ function onCardShiftLClick(card: TCardData) {
 						@card-hovered="(card) => onCardHover(card)"
 						@card-clicked="(card) => onCardAdd(card)"
 						:item-size="settings?.decklistListSize || 'tiny'"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
 					/>
 				</div>
 			</div>

@@ -18,3 +18,16 @@ export interface IDeckList {
 	creation_date: string
 	preview_card_id?: number
 }
+
+export interface TCardSet {
+	name: string
+	created_at: string
+	updated_at: string
+
+	cards: number[]
+}
+
+export interface TCardCollection {
+	name: string
+	sets: TCardSet[]
+}

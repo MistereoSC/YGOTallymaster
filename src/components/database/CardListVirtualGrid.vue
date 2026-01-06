@@ -23,7 +23,10 @@ const props = withDefaults(defineProps<IProps>(), {
 })
 
 const emit = defineEmits<{
+	(e: 'cardHovered', value: TCardData): void
 	(e: 'cardClicked', value: TCardData): void
+	(e: 'cardRightClicked', value: TCardData): void
+	(e: 'cardShiftClicked', value: TCardData): void
 }>()
 // ----------------------------------------------
 // #region Virtual Scroll
@@ -123,6 +126,10 @@ const handleResize = () => {
 }
 
 let resizeObserver: ResizeObserver | null = null
+
+function onHoverEnter(card: TCardData) {
+	emit('cardHovered', card)
+}
 
 // #endregion
 // ----------------------------------------------
@@ -234,7 +241,10 @@ defineExpose({
 					:card="card"
 					:active="card.id === props.activeCardId"
 					:size="props.itemSize"
+					@click.right.stop.prevent="() => emit('cardRightClicked', card)"
 					@click="onCardClick(card)"
+					@shift-click="() => emit('cardShiftClicked', card)"
+					@mouseenter="() => onHoverEnter(card)"
 					:show-owned-heart="props.showOwnedHeart"
 					:show-owned-number="props.showOwnedNumber"
 					:gray-unowned="props.grayUnowned"

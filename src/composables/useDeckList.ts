@@ -13,6 +13,7 @@ const useDeckList = () => {
 	}
 	async function _init(force = false) {
 		deckList.value = await getSavedDecks()
+		initialized.value = 'ready'
 	}
 
 	async function createDeck(deckName: string) {

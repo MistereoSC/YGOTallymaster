@@ -68,13 +68,18 @@ export type TDeckData = {
 // ----------------------------------------------------
 
 export async function getSavedDecks(): Promise<TDeckData[]> {
-	const files = await Files.readDir(DECK_PATH, 'asc')
+	const files = await Files.readDir(DECK_PATH)
 	if (!files) return []
+	const ydkFiles = files.filter((file) => file.fileExtension === '.ydk')
+	ydkFiles.sort((a, b) => {
+		const dateA = new Date(a.creationDate).getTime()
+		const dateB = new Date(b.creationDate).getTime()
+		return dateA - dateB
+	})
 
 	const decks: TDeckData[] = []
-	for (const file of files) {
-		if (!file.endsWith('.ydk')) continue
-		const deck = await getSavedDeck(file)
+	for (const file of ydkFiles) {
+		const deck = await getSavedDeck(`${file.fileName}${file.fileExtension}`)
 		if (deck) decks.push(deck)
 	}
 	return decks
@@ -127,7 +132,7 @@ export async function saveDeckFile(deckData: TDeckData) {
 export async function renameDeckFile(oldName: string, newName: string) {
 	const oldFileName = oldName.endsWith('.ydk') ? oldName : `${oldName}.ydk`
 	const newFileName = newName.endsWith('.ydk') ? newName : `${newName}.ydk`
-	if(oldFileName === newFileName) return true
+	if (oldFileName === newFileName) return true
 	const e = await Files.exists(`${DECK_PATH}${oldFileName}`)
 	if (!e.exists) return false
 	const success = await Files.moveOrRename(

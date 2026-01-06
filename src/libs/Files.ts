@@ -1,4 +1,4 @@
-import {FSResult} from '../types/electron'
+import {FSResult, TReadDirEntry} from '../types/electron'
 import Path from './Paths'
 
 async function exists(path: string) {
@@ -38,16 +38,11 @@ async function readRaw(path: string): Promise<string | null> {
 	}
 }
 
-async function readDir(
-	path: string,
-	sortByCreationDate?: 'asc' | 'desc'
-): Promise<string[] | null> {
+async function readDir(path: string): Promise<TReadDirEntry[] | null> {
 	const p = await Path.AppRoot()
 	if (!p) return null
 	const subPath = path.startsWith('/') ? path : '/' + path
-	const result: FSResult<string[]> = sortByCreationDate
-		? await window.electronFS.readdirSorted(p + subPath, sortByCreationDate)
-		: await window.electronFS.readdir(p + subPath)
+	const result: FSResult<TReadDirEntry[]> = await window.electronFS.readdir(p + subPath)
 	if (result.success && result.data) {
 		return result.data
 	} else {
@@ -77,6 +72,18 @@ async function writeRaw(path: string, data: string): Promise<boolean> {
 	const result = await window.electronFS.writeFile(p + subPath, data)
 	if (!result.success) {
 		console.error('Failed to write RAW file:', result.error)
+		return false
+	}
+	return true
+}
+
+async function makeDir(path: string): Promise<boolean> {
+	const p = await Path.AppRoot()
+	if (!p) return false
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result = await window.electronFS.mkdir(p + subPath)
+	if (!result.success) {
+		console.error('Failed to create directory:', result.error)
 		return false
 	}
 	return true
@@ -136,6 +143,7 @@ const Files = {
 	readDir,
 	write,
 	writeRaw,
+	makeDir,
 	save,
 	load,
 	remove,
@@ -144,3 +152,8 @@ const Files = {
 export default Files
 
 export const RUnsafePathCharactersRegex = /[\\/:*?"<>|]/g
+export function GenerateUniqueIDHash(): string {
+	const array = new Uint8Array(16)
+	window.crypto.getRandomValues(array)
+	return Array.from(array, (byte) => ('0' + byte.toString(16)).slice(-2)).join('')
+}

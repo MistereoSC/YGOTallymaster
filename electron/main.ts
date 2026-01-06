@@ -208,38 +208,25 @@ function setupIpcHandlers() {
 	ipcMain.handle('fs:readdir', async (_, dirPath: string) => {
 		try {
 			const files = await fs.readdir(dirPath)
-			return {success: true, data: files}
+			const filesWithStats = await Promise.all(
+				files.map(async (file) => {
+					const filePath = path.join(dirPath, file)
+					const stats = await fs.stat(filePath)
+					const ext = path.extname(file)
+					return {
+						fileName: ext ? file.slice(0, -ext.length) : file,
+						fileExtension: ext,
+						creationDate: stats.birthtime.toISOString(),
+						isDirectory: stats.isDirectory(),
+					}
+				})
+			)
+			return {success: true, data: filesWithStats}
 		} catch (error: any) {
 			return {success: false, error: error.message}
 		}
 	})
 
-	// Read directory with stats, sorted by creation date (newest first)
-	ipcMain.handle(
-		'fs:readdirSorted',
-		async (_, dirPath: string, order: 'asc' | 'desc' = 'desc') => {
-			try {
-				const files = await fs.readdir(dirPath)
-				const filesWithStats = await Promise.all(
-					files.map(async (file) => {
-						const filePath = path.join(dirPath, file)
-						const stats = await fs.stat(filePath)
-						return {
-							name: file,
-							birthtime: stats.birthtime.getTime(),
-						}
-					})
-				)
-				// Sort by creation date
-				filesWithStats.sort((a, b) =>
-					order === 'desc' ? b.birthtime - a.birthtime : a.birthtime - b.birthtime
-				)
-				return {success: true, data: filesWithStats.map((f) => f.name)}
-			} catch (error: any) {
-				return {success: false, error: error.message}
-			}
-		}
-	)
 
 	// Show save dialog
 	ipcMain.handle('dialog:showSaveDialog', async (_, options = {}) => {

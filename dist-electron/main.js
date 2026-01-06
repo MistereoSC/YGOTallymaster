@@ -142,35 +142,24 @@ function setupIpcHandlers() {
   ipcMain.handle("fs:readdir", async (_, dirPath) => {
     try {
       const files = await fs.readdir(dirPath);
-      return { success: true, data: files };
+      const filesWithStats = await Promise.all(
+        files.map(async (file) => {
+          const filePath = path.join(dirPath, file);
+          const stats = await fs.stat(filePath);
+          const ext = path.extname(file);
+          return {
+            fileName: ext ? file.slice(0, -ext.length) : file,
+            fileExtension: ext,
+            creationDate: stats.birthtime.toISOString(),
+            isDirectory: stats.isDirectory()
+          };
+        })
+      );
+      return { success: true, data: filesWithStats };
     } catch (error) {
       return { success: false, error: error.message };
     }
   });
-  ipcMain.handle(
-    "fs:readdirSorted",
-    async (_, dirPath, order = "desc") => {
-      try {
-        const files = await fs.readdir(dirPath);
-        const filesWithStats = await Promise.all(
-          files.map(async (file) => {
-            const filePath = path.join(dirPath, file);
-            const stats = await fs.stat(filePath);
-            return {
-              name: file,
-              birthtime: stats.birthtime.getTime()
-            };
-          })
-        );
-        filesWithStats.sort(
-          (a, b) => order === "desc" ? b.birthtime - a.birthtime : a.birthtime - b.birthtime
-        );
-        return { success: true, data: filesWithStats.map((f) => f.name) };
-      } catch (error) {
-        return { success: false, error: error.message };
-      }
-    }
-  );
   ipcMain.handle("dialog:showSaveDialog", async (_, options = {}) => {
     try {
       const result = await dialog.showSaveDialog(win, {

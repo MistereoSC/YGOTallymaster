@@ -27,6 +27,7 @@ const props = withDefaults(defineProps<IProps>(), {
 
 const emit = defineEmits<{
 	(e: 'click', value: TCardData): void
+	(e: 'shiftClick', vlaue: TCardData): void
 	(e: 'hoverEnter'): void
 }>()
 const imageUrl = ref<string | null>(null)
@@ -77,8 +78,9 @@ watch(
 	}
 )
 
-function onClick() {
-	emit('click', props.card)
+function onClick(e: PointerEvent) {
+	if (e.shiftKey) emit('shiftClick', props.card)
+	else emit('click', props.card)
 }
 function onHoverEnter() {
 	emit('hoverEnter')
@@ -97,7 +99,7 @@ const styles = getCardStyles(props.card)
 				? `linear-gradient(180deg, ${styles.vars.border} 35%, ${styles.vars.border2} 65%)`
 				: styles.vars.border,
 		}"
-		@click="onClick"
+		@click="(e) => onClick(e)"
 		@mouseenter="onHoverEnter"
 	>
 		<div

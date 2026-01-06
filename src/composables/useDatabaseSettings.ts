@@ -16,7 +16,6 @@ export const useDatabaseSettings = () => {
 	}
 
 	async function _init() {
-		initialized.value = 'ready'
 		const e = await Files.exists(PATH)
 		if (!e.exists) {
 			settings.value = {...DEFAULT_DATABASE_SETTINGS}
@@ -27,6 +26,7 @@ export const useDatabaseSettings = () => {
 				settings.value = {...DEFAULT_DATABASE_SETTINGS}
 			}
 		}
+		initialized.value = 'ready'
 	}
 	async function save() {
 		await Files.write(PATH, settings.value)
@@ -70,6 +70,26 @@ export const useDatabaseSettings = () => {
 		settings.value.decklistShowOwnedHeartList = to ?? !settings.value.decklistShowOwnedHeartList
 		save()
 	}
+	function setsGrayUnownedGrid(to?: boolean) {
+		if (!settings.value) return
+		settings.value.setsGrayUnownedGrid = to ?? !settings.value.setsGrayUnownedGrid
+		save()
+	}
+	function setsGrayUnownedList(to?: boolean) {
+		if (!settings.value) return
+		settings.value.setsGrayUnownedList = to ?? !settings.value.setsGrayUnownedList
+		save()
+	}
+	function setsShowOwnedHeartList(to?: boolean) {
+		if (!settings.value) return
+		settings.value.setsShowOwnedHeartList = to ?? !settings.value.setsShowOwnedHeartList
+		save()
+	}
+	function setsDisplayAsList(to?: boolean) {
+		if (!settings.value) return
+		settings.value.setsDisplayAsList = to ?? !settings.value.setsDisplayAsList
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -86,6 +106,17 @@ export const useDatabaseSettings = () => {
 		settings.value.decklistListSize = to
 		save()
 	}
+	function setsGridSize(to: TSizes) {
+		if (!settings.value) return
+		settings.value.setsGridCardSize = to
+		save()
+	}
+	function setsListSize(to: TSizes) {
+		if (!settings.value) return
+		settings.value.setsListSize = to
+		save()
+	}
+
 	function showBanlistFor(to: TBanlistFormat | 'none') {
 		if (!settings.value) return
 		settings.value.showBanlistFor = to
@@ -99,11 +130,17 @@ export const useDatabaseSettings = () => {
 		decklistGrayUnownedGrid,
 		decklistGrayUnownedList,
 		decklistShowOwnedHeartList,
+		setsGrayUnownedGrid,
+		setsGrayUnownedList,
+		setsShowOwnedHeartList,
+		setsDisplayAsList,
 	}
 	const setFns = {
 		listSize,
 		decklistGridSize,
 		decklistListSize,
+		setsGridSize,
+		setsListSize,
 		showBanlistFor,
 	}
 
@@ -128,6 +165,13 @@ export type TDatabaseSettings = {
 	decklistShowOwnedHeartList: boolean
 	decklistGridCardSize: TSizes
 	decklistListSize: TSizes
+
+	setsGrayUnownedGrid: boolean
+	setsGrayUnownedList: boolean
+	setsShowOwnedHeartList: boolean
+	setsDisplayAsList: boolean
+	setsGridCardSize: TSizes
+	setsListSize: TSizes
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
@@ -142,4 +186,11 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	decklistShowOwnedHeartList: false,
 	decklistGridCardSize: 'tiny',
 	decklistListSize: 'tiny',
+
+	setsGrayUnownedGrid: false,
+	setsGrayUnownedList: false,
+	setsShowOwnedHeartList: false,
+	setsDisplayAsList: false,
+	setsGridCardSize: 'tiny',
+	setsListSize: 'tiny',
 }

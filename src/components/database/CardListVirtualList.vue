@@ -5,8 +5,10 @@ import CardPreviewListitem from './CardPreviewListitem.vue'
 import {Icon} from '@iconify/vue'
 
 const emit = defineEmits<{
-	(e: 'cardClicked', value: TCardData): void
-	(e: 'cardHovered', value: TCardData): void
+	(e: 'cardHovered', card: TCardData): void
+	(e: 'cardClicked', card: TCardData): void
+	(e: 'cardRightClicked', card: TCardData): void
+	(e: 'cardShiftClicked', card: TCardData): void
 }>()
 
 interface IProps {
@@ -198,6 +200,8 @@ defineExpose({
 					:size="props.itemSize"
 					@click="() => onCardClick(card)"
 					@mouseenter="() => onHoverEnter(card)"
+					@shift-click="() => emit('cardShiftClicked', card)"
+					@click.right="() => emit('cardRightClicked', card)"
 					:show-limited-info="props.showLimitedInfo"
 					:show-owned-heart="props.showOwnedHeart"
 					:show-owned-number="props.showOwnedNumber"

@@ -180,6 +180,7 @@ const useCardSearch = () => {
 		reinitializeIndex,
 		sort,
 		sortedBy,
+		initialized,
 	}
 }
 
@@ -187,7 +188,7 @@ const getFullCardList = async () => {
 	if (fullCardList.value.length === 0) {
 		fullCardList.value = _initialFilterCardData(await getCardList())
 	}
-	return fullCardList.value
+	return fullCardList.value as TCardData[]
 }
 
 export {

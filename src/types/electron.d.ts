@@ -1,3 +1,10 @@
+export type TReadDirEntry = {
+	fileName: string
+	fileExtension: string
+	creationDate: string
+	isDirectory: boolean
+}
+
 export interface ElectronAPI {
 	ipcRenderer: {
 		on: (channel: string, listener: (event: any, ...args: any[]) => void) => void
@@ -14,8 +21,7 @@ export interface ElectronAPI {
 		readJSON: (filePath: string) => Promise<FSResult<any>>
 		writeJSON: (filePath: string, data: any) => Promise<FSResult<void>>
 		mkdir: (dirPath: string) => Promise<FSResult<void>>
-		readdir: (dirPath: string) => Promise<FSResult<string[]>>
-		readdirSorted: (dirPath: string, order?: 'asc' | 'desc') => Promise<FSResult<string[]>>
+		readdir: (dirPath: string) => Promise<FSResult<TReadDirEntry[]>>
 		showSaveDialog: (options?: any) => Promise<DialogResult>
 		showOpenDialog: (options?: any) => Promise<DialogResult>
 	}

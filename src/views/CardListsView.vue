@@ -6,18 +6,18 @@ import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
 import {TFullSet, useCardCollections} from '@/composables/useCardCollections'
 import {Icon} from '@iconify/vue'
-import {onMounted, ref} from 'vue'
+import {ref} from 'vue'
 
-const {collections, createCollection, createSet, initialized, saveSet} = useCardCollections()
-
-onMounted(async () => {})
-
-async function onCreateCollection(name: string) {
-	await createCollection(name)
-}
-async function onCreateSet(collectionName: string, setName: string) {
-	await createSet(collectionName, setName)
-}
+const {
+	collections,
+	createCollection,
+	createSet,
+	initialized,
+	deleteSet,
+	renameSet,
+	deleteCollection,
+	renameCollection,
+} = useCardCollections()
 
 const activeSet = ref<null | {collectionName: string; set: TFullSet}>(null)
 </script>
@@ -42,15 +42,19 @@ const activeSet = ref<null | {collectionName: string; set: TFullSet}>(null)
 				<CollectionList
 					:key="collection.name"
 					:collection="collection"
-					@create-set="(setName) => onCreateSet(collection.name, setName)"
+					@create-set="(setName) => createSet(collection.name, setName)"
 					@click-set="(set) => (activeSet = {collectionName: collection.name, set})"
+					@delete-set="(set) => deleteSet(collection.name, set)"
+					@rename-set="(set, newName) => renameSet(collection.name, set, newName)"
+					@delete-collection="() => deleteCollection(collection.name)"
+					@rename-collection="(c, newName) => renameCollection(collection, newName)"
 				/>
 			</div>
 
 			<div class="w-full flex justify-center" v-if="collections.length < 64">
 				<div class="mb-4">
 					<CollectionCreationModal
-						@create="(name) => onCreateCollection(name)"
+						@create="(name) => createCollection(name)"
 						:existing-collections="collections"
 					>
 						<template #trigger>
@@ -72,7 +76,7 @@ const activeSet = ref<null | {collectionName: string; set: TFullSet}>(null)
 			<p class="text-lg font-medium">No collections found</p>
 			<p class="text-sm opacity-75">Let's start by creating your first collection</p>
 			<div>
-				<CollectionCreationModal @create="(name) => onCreateCollection(name)">
+				<CollectionCreationModal @create="(name) => createCollection(name)">
 					<template #trigger>
 						<Button
 							class="text-contrast-800 mt-4"

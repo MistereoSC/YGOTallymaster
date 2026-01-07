@@ -158,6 +158,16 @@ function setupIpcHandlers() {
 		}
 	})
 
+	// Remove directory
+	ipcMain.handle('fs:removeDir', async (_, dirPath: string) => {
+		try {
+			await fs.rm(dirPath, {recursive: true, force: true})
+			return {success: true}
+		} catch (error: any) {
+			return {success: false, error: error.message}
+		}
+	})
+
 	// Rename/move file
 	ipcMain.handle('fs:renameFile', async (_, oldPath: string, newPath: string) => {
 		try {
@@ -226,7 +236,6 @@ function setupIpcHandlers() {
 			return {success: false, error: error.message}
 		}
 	})
-
 
 	// Show save dialog
 	ipcMain.handle('dialog:showSaveDialog', async (_, options = {}) => {

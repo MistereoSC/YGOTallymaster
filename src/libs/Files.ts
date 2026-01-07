@@ -136,6 +136,15 @@ async function moveOrRename(oldPath: string, newPath: string) {
 	return result.success as boolean
 }
 
+async function removeDir(path: string) {
+	const p = await Path.AppRoot()
+	if (!p) return false
+	const subPath = path.startsWith('/') ? path : '/' + path
+	const result = await window.electronFS.removeDir(p + subPath)
+	console.log('FS:REMOVEDIR', result)
+	return result.success as boolean
+}
+
 const Files = {
 	exists,
 	read,
@@ -147,6 +156,7 @@ const Files = {
 	save,
 	load,
 	remove,
+	removeDir,
 	moveOrRename,
 }
 export default Files

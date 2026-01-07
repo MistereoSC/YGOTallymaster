@@ -102,6 +102,14 @@ function setupIpcHandlers() {
       return { success: false, error: error.message };
     }
   });
+  ipcMain.handle("fs:removeDir", async (_, dirPath) => {
+    try {
+      await fs.rm(dirPath, { recursive: true, force: true });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
   ipcMain.handle("fs:renameFile", async (_, oldPath, newPath) => {
     try {
       const dir = path.dirname(newPath);

@@ -20,7 +20,7 @@ export interface IDeckList {
 }
 
 export interface TCardSet {
-	name: string
+	name?: string
 	created_at: string
 	updated_at: string
 

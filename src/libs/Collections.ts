@@ -20,6 +20,7 @@ export async function loadCollections() {
 				`${COLLECTIONS_PATH}${dirName}/${file.fileName}${file.fileExtension}`
 			)
 			if (data) {
+				data.name = file.fileName
 				sets.push(data as TCardSet)
 			}
 		}
@@ -40,10 +41,13 @@ export async function createCollection(name: string) {
 
 export async function deleteCollection(name: string) {
 	const e = await Files.exists(`${COLLECTIONS_PATH}${name}`)
-	if (!e.exists) return
+	if (!e.exists) return false
+
 	const fullPath = `${COLLECTIONS_PATH}${name}`
-	const result = await Files.remove(fullPath)
-	if (!result) throw new Error('Failed to delete Collection Directory: ' + fullPath)
+	const result = await Files.removeDir(fullPath)
+
+	if (!result) return false
+	return true
 }
 
 export async function createSet(name: string, parentCollection: string) {
@@ -55,7 +59,6 @@ export async function createSet(name: string, parentCollection: string) {
 	if (setE.exists) throw new Error('Set already exists: ' + name)
 
 	const newSet: TCardSet = {
-		name: name,
 		created_at: new Date().toISOString(),
 		updated_at: new Date().toISOString(),
 		cards: [],
@@ -65,33 +68,36 @@ export async function createSet(name: string, parentCollection: string) {
 		newSet
 	)
 	if (!result) throw new Error('Failed to create Set: ' + name)
-    return newSet
+	newSet.name = safeName
+	return newSet
 }
 
-export async function deleteSet(set: TCardSet, parentCollection: string) {
-	const safeName = set.name.replace(RUnsafePathCharactersRegex, '')
+export async function deleteSet(setName: string, parentCollection: string) {
+	const safeName = setName.replace(RUnsafePathCharactersRegex, '')
 	const fullPath = `${COLLECTIONS_PATH}${parentCollection}/${safeName}.json`
 	const e = await Files.exists(fullPath)
-	if (!e.exists) return
+	if (!e.exists) return false
 	const result = await Files.remove(fullPath)
-	if (!result) throw new Error('Failed to delete Set: ' + safeName)
+	if (!result) return false
+	return true
 }
 
-export async function saveSet(set: TCardSet, parentCollection: string) {
-	const safeName = set.name.replace(RUnsafePathCharactersRegex, '')
+export async function saveSet(setName: string, parentCollection: string, set: TCardSet) {
+	const safeName = setName.replace(RUnsafePathCharactersRegex, '')
 	const fullPath = `${COLLECTIONS_PATH}${parentCollection}/${safeName}.json`
+	delete set.name
 	const result = await Files.write(fullPath, set)
 	if (!result) throw new Error('Failed to save Set: ' + safeName)
 }
 
 export async function renameAndMoveSet(
-	set: TCardSet,
 	oldName: string,
+	newName: string,
 	oldParentCollection: string,
 	newParentCollection?: string
 ) {
 	const safeOldName = oldName.replace(RUnsafePathCharactersRegex, '')
-	const safeNewName = set.name.replace(RUnsafePathCharactersRegex, '')
+	const safeNewName = newName.replace(RUnsafePathCharactersRegex, '')
 	const oldPath = `${COLLECTIONS_PATH}${oldParentCollection}/${safeOldName}.json`
 	const newPath = `${COLLECTIONS_PATH}${
 		newParentCollection ?? oldParentCollection
@@ -100,10 +106,25 @@ export async function renameAndMoveSet(
 	if (oldPath === newPath) return
 
 	const e = await Files.exists(oldPath)
-	if (!e.exists) throw new Error('Set does not exist: ' + safeOldName)
+	if (!e.exists) return null
 
 	const success = await Files.moveOrRename(oldPath, newPath)
-	if (!success) throw new Error('Failed to rename/move Set: ' + safeOldName)
+	if (!success) return null
+	return {path: newPath, name: safeNewName}
+}
+
+export async function renameCollection(oldName: string, newName: string) {
+	const safeOldName = oldName.replace(RUnsafePathCharactersRegex, '')
+	const safeNewName = newName.replace(RUnsafePathCharactersRegex, '')
+	const oldPath = `${COLLECTIONS_PATH}${safeOldName}`
+	const newPath = `${COLLECTIONS_PATH}${safeNewName}`
+	if (oldPath === newPath) return false
+
+	const e = await Files.exists(oldPath)
+	if (!e.exists) return false
+	const success = await Files.moveOrRename(oldPath, newPath)
+	if (!success) return false
+	return true
 }
 
 // #endregion

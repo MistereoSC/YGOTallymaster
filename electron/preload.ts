@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('electronFS', {
 		ipcRenderer.invoke('fs:writeFile', filePath, data),
 	exists: (filePath: string) => ipcRenderer.invoke('fs:exists', filePath),
 	deleteFile: (filePath: string) => ipcRenderer.invoke('fs:deleteFile', filePath),
+	removeDir: (dirPath: string) => ipcRenderer.invoke('fs:removeDir', dirPath),
 	renameFile: (oldPath: string, newPath: string) =>
 		ipcRenderer.invoke('fs:renameFile', oldPath, newPath),
 	readJSON: (filePath: string) => ipcRenderer.invoke('fs:readJSON', filePath),

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {ESortArchetypeBy, TArchetype, useArchetypes} from '@/composables/useArchetypes'
-import {ref, watch, nextTick} from 'vue'
+import {ref, watch, nextTick, onMounted, onBeforeUnmount} from 'vue'
 import VirtualListCustom from '@/components/database/VirtualListCustom.vue'
 import ArchetypeListItem from '@/components/database/ArchetypeListItem.vue'
 import Spinner from '@/components/common/Spinner.vue'
@@ -72,6 +72,26 @@ function onArchetypeListClose() {
 		}
 	})
 }
+
+watch(selectedArchetype, (newValue, oldValue) => {
+	if (newValue !== null && oldValue === null) {
+		history.pushState({deckOpen: true}, '')
+	}
+})
+
+const handlePopState = () => {
+	if (selectedArchetype.value !== null) {
+		selectedArchetype.value = null
+	}
+}
+
+onMounted(() => {
+	window.addEventListener('popstate', handlePopState)
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener('popstate', handlePopState)
+})
 </script>
 
 <template>

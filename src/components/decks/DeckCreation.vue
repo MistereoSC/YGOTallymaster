@@ -10,9 +10,7 @@ import {useCardSearch} from '@/composables/useCardSearch'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useDeckList} from '@/composables/useDeckList'
 import {TDeckData} from '@/libs/Decks'
-import {RUnsafePathCharactersRegex} from '@/libs/Files'
 import {TCardData, TFrameType} from '@/libs/interfaces/YGOProInterfaces'
-import {Icon} from '@iconify/vue'
 import {onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
 
 const props = defineProps<{

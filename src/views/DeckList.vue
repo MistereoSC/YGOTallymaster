@@ -4,8 +4,8 @@ import DeckPreview from '@/components/decks/DeckPreview.vue'
 import {getFullCardList} from '@/composables/useCardSearch'
 import {useDeckList} from '@/composables/useDeckList'
 import {TDeckData} from '@/libs/Decks'
-import {onBeforeMount, ref} from 'vue'
-import DeckCreation from './DeckCreation.vue'
+import {onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import DeckCreation from '@/components/decks/DeckCreation.vue'
 import Spinner from '@/components/common/Spinner.vue'
 import ConfirmCancelModal from '@/components/common/ConfirmCancelModal.vue'
 
@@ -55,6 +55,26 @@ async function onDeckRenameConfirm(newName: string) {
 	}
 	onDeckRenameCancel()
 }
+
+watch(activeDeck, (newValue, oldValue) => {
+	if (newValue !== null && oldValue === null) {
+		history.pushState({deckOpen: true}, '')
+	}
+})
+
+const handlePopState = () => {
+	if (activeDeck.value !== null) {
+		activeDeck.value = null
+	}
+}
+
+onMounted(() => {
+	window.addEventListener('popstate', handlePopState)
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener('popstate', handlePopState)
+})
 </script>
 
 <template>

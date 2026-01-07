@@ -6,7 +6,7 @@ import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
 import {TFullSet, useCardCollections} from '@/composables/useCardCollections'
 import {Icon} from '@iconify/vue'
-import {ref} from 'vue'
+import {onBeforeUnmount, onMounted, ref, watch} from 'vue'
 
 const {
 	collections,
@@ -20,6 +20,26 @@ const {
 } = useCardCollections()
 
 const activeSet = ref<null | {collectionName: string; set: TFullSet}>(null)
+
+watch(activeSet, (newValue, oldValue) => {
+	if (newValue !== null && oldValue === null) {
+		history.pushState({deckOpen: true}, '')
+	}
+})
+
+const handlePopState = () => {
+	if (activeSet.value !== null) {
+		activeSet.value = null
+	}
+}
+
+onMounted(() => {
+	window.addEventListener('popstate', handlePopState)
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener('popstate', handlePopState)
+})
 </script>
 
 <template>

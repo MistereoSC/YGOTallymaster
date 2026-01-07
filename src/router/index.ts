@@ -27,11 +27,6 @@ const routes = [
 		component: () => import('../views/DefaultView.vue'),
 	},
 	{
-		path: '/Collection',
-		name: 'Collection',
-		component: () => import('../views/CollectionView.vue'),
-	},
-	{
 		path: '/Decks',
 		name: 'Decks',
 		component: () => import('../views/DeckList.vue'),

@@ -1,4 +1,4 @@
-export const APP_VER: Readonly<string> = '0.1.0'
+export const APP_VER: Readonly<string> = '0.8.0'
 const DEFAULT_CONFIG: Readonly<TConfig> = {
 	appVer: APP_VER,
 	dbVer: '0',
@@ -11,10 +11,7 @@ export async function getConfig(): Promise<TConfig | null> {
 	if (config) return config
 	const exists = (await Files.exists('config.json')).exists
 	if (!exists) {
-		const writeResult = await Files.write<TConfig>(
-			'config.json',
-			DEFAULT_CONFIG
-		)
+		const writeResult = await Files.write<TConfig>('config.json', DEFAULT_CONFIG)
 		if (!writeResult) {
 			console.error('ERR:: Failed to create default config')
 			return null

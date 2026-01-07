@@ -36,10 +36,6 @@ import ToggleButtonGroup from '@/components/common/ToggleButtonGroup.vue'
 const props = defineProps<{
 	searchWhileTyping?: boolean
 }>()
-const emit = defineEmits<{
-	(e: 'submit', value: string): void
-}>()
-
 // #endregion
 // -----------------------------------------
 // #region Search

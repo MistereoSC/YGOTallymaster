@@ -20,7 +20,7 @@ const useArchetypes = () => {
 		_init()
 	}
 
-	async function _init(force = false) {
+	async function _init() {
 		const fullList = await getFullCardList()
 		const tmpArchetypes = {} as {[key: string]: Array<TCardData>}
 		for (const card of fullList) {

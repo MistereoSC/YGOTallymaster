@@ -22,11 +22,6 @@ const routes = [
 		component: () => import('../views/ArchetypeListView.vue'),
 	},
 	{
-		path: '/Sets',
-		name: 'Sets',
-		component: () => import('../views/DefaultView.vue'),
-	},
-	{
 		path: '/Decks',
 		name: 'Decks',
 		component: () => import('../views/DeckList.vue'),

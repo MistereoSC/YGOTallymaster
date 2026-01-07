@@ -1,10 +1,8 @@
 import {app, BrowserWindow, ipcMain, dialog, shell, session} from 'electron'
-import {createRequire} from 'node:module'
 import {fileURLToPath} from 'node:url'
 import path from 'node:path'
 import fs from 'node:fs/promises'
 
-const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // The built directory structure
@@ -37,9 +35,9 @@ function createWindow() {
 			contextIsolation: true,
 			preload: path.join(__dirname, 'preload.mjs'),
 		},
-		width: 1440,
-		height: 810,
-		minWidth: 1024,
+		width: 1512,
+		height: 912,
+		minWidth: 1284,
 		minHeight: 768,
 	})
 

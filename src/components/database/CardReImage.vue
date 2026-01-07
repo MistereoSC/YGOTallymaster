@@ -9,9 +9,7 @@ import CardReImageLinkmarkers from './CardReImageLinkmarkers.vue'
 const props = defineProps<{
 	card: TCardData
 }>()
-const emit = defineEmits<{
-	(e: 'click', value: TCardData): void
-}>()
+
 const imageUrl = ref<string | null>(null)
 const isLoading = ref(true)
 const hasError = ref(false)

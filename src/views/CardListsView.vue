@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 					@delete-set="(set) => deleteSet(collection.name, set)"
 					@rename-set="(set, newName) => renameSet(collection.name, set, newName)"
 					@delete-collection="() => deleteCollection(collection.name)"
-					@rename-collection="(c, newName) => renameCollection(collection, newName)"
+					@rename-collection="(_, newName) => renameCollection(collection.name, newName)"
 				/>
 			</div>
 

@@ -25,12 +25,12 @@ const emit = defineEmits<{
 			/>
 			<span>{{ title }}</span>
 			<ToggleSwitch
-				v-if="hasOperandToggle && operand"
+				v-if="props.hasOperandToggle && props.operand"
 				:duo-labels="['AND', 'OR']"
-				:model-value="operand === 'AND'"
+				:model-value="props.operand === 'AND'"
 				@toggle="emit('toggle-operand')"
 			/>
-			<span v-else-if="operand" class="text-contrast-400">({{ operand }})</span>
+			<span v-else-if="props.operand" class="text-contrast-400">({{ props.operand }})</span>
 		</h3>
 		<div class="flex gap-3 flex-wrap items-center justify-center">
 			<slot />

@@ -1,16 +1,8 @@
 <script lang="ts" setup>
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
-import {onMounted} from 'vue'
 import Checkbox from '@/components/common/Checkbox.vue'
 
 const store = useDatabaseSettings()
-const props = defineProps<{
-	message?: string
-}>()
-const emit = defineEmits([])
-onMounted(() => {
-	return
-})
 
 enum EListSize {
 	'tiny' = 'Tiny',

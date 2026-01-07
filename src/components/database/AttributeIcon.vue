@@ -7,10 +7,6 @@ interface IProps {
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'normal',
 })
-const emit = defineEmits<{
-	(e: 'click'): void
-}>()
-
 function getAttributeIconPath(attribute: TMonsterAttribute | TSpellTrapAttribute | string): string {
 	switch (attribute) {
 		case 'WIND':

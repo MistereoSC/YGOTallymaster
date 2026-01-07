@@ -111,10 +111,10 @@ const useCardCollections = () => {
 		}
 	}
 
-	async function _renameCollection(collection: TFullCollection, newName: string) {
-		const success = await renameCollection(collection.name, newName)
+	async function _renameCollection(collectionName: string, newName: string) {
+		const success = await renameCollection(collectionName, newName)
 		if (success) {
-			const idx = collections.value.findIndex((c) => c.name === collection.name)
+			const idx = collections.value.findIndex((c) => c.name === collectionName)
 			if (idx !== -1) {
 				collections.value[idx].name = newName
 			}

@@ -8,6 +8,8 @@ import {onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import DeckCreation from '@/components/decks/DeckCreation.vue'
 import Spinner from '@/components/common/Spinner.vue'
 import ConfirmCancelModal from '@/components/common/ConfirmCancelModal.vue'
+import {Icon} from '@iconify/vue'
+import Button from '@/components/common/Button.vue'
 
 const {initialized, deckList, createDeck, deleteDeck, renameDeck} = useDeckList()
 onBeforeMount(async () => {
@@ -81,6 +83,25 @@ onBeforeUnmount(() => {
 	<div v-if="activeDeck" class="relative h-full overflow-hidden">
 		<DeckCreation :deck-data="activeDeck" @close="activeDeck = null" />
 	</div>
+	<div
+		v-else-if="initialized && deckList.length === 0"
+		class="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400"
+	>
+		<Icon icon="material-symbols:credit-card-off-rounded" class="text-4xl" />
+		<p class="text-lg font-medium">No decks found</p>
+		<p class="text-sm opacity-75">Let's start by creating your first deck</p>
+		<div>
+			<DeckCreationModal @create="(name) => onCreateDeck(name)">
+				<template #trigger>
+					<Button
+						class="text-contrast-800 mt-4"
+						icon="material-symbols:add-2-rounded"
+						label="Create Deck"
+					/>
+				</template>
+			</DeckCreationModal>
+		</div>
+	</div>
 	<div v-else-if="initialized" class="p-8 w-full flex flex-wrap overflow-auto gap-8">
 		<DeckPreview
 			v-for="deck in deckList"
@@ -90,7 +111,7 @@ onBeforeUnmount(() => {
 			@delete="() => onDeckDelete(deck)"
 			@rename="() => onDeckRename(deck)"
 		/>
-		<div class="w-48 h-77 grid place-items-center" v-if="deckList.length < 100">
+		<div class="w-48 h-77 grid place-items-center" v-if="deckList.length < 200">
 			<DeckCreationModal :existing-decks="deckList" @create="(name) => onCreateDeck(name)">
 				<template #trigger>
 					<div
@@ -130,7 +151,12 @@ onBeforeUnmount(() => {
 		</template>
 	</ConfirmCancelModal>
 
-	<DeckCreationModal :open="deckRenameModalOpen" :existing-decks="deckList" @create="(name) => onDeckRenameConfirm(name)" :existing-deck-name-for-rename="activeDeckForAction?.name"/>
+	<DeckCreationModal
+		:open="deckRenameModalOpen"
+		:existing-decks="deckList"
+		@create="(name) => onDeckRenameConfirm(name)"
+		:existing-deck-name-for-rename="activeDeckForAction?.name"
+	/>
 </template>
 
 <style lang="scss" scoped></style>

@@ -43,7 +43,7 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 					:items="props.archetype.cards"
 					:item-dimensions="{width: 173, height: 258}"
 				>
-					<template #item="{item: card, index}">
+					<template #item="{item: card}">
 						<CardPreview
 							:card="card"
 							size="medium"

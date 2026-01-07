@@ -2,19 +2,11 @@
 import {Icon} from '@iconify/vue'
 import {
 	DropdownMenuArrow,
-	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuItemIndicator,
-	DropdownMenuLabel,
 	DropdownMenuPortal,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
 	DropdownMenuRoot,
 	DropdownMenuSeparator,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from 'reka-ui'
 

@@ -1,17 +1,9 @@
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
+import {computed} from 'vue'
 import {useRoute} from 'vue-router'
 import AppMainMenuLink from './AppMainMenuLink.vue'
 import {useMainMenu} from '@/composables/useMainMenu'
 import {Icon} from '@iconify/vue'
-
-const props = defineProps<{
-	message?: string
-}>()
-const emit = defineEmits([])
-onMounted(() => {
-	return
-})
 
 const menu = useMainMenu()
 const route = useRoute()

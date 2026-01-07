@@ -165,25 +165,12 @@ onBeforeUnmount(async () => {
 	newDeckData.main = cards.value.main.map((c) => c.id)
 	newDeckData.extra = cards.value.extra.map((c) => c.id)
 	newDeckData.side = cards.value.side.map((c) => c.id)
-	newDeckData.name = nameContent.value.trim() || props.deckData.name
-
 	await saveDeck(newDeckData, props.deckData.name)
 })
 
 const settingsToggled = ref(false)
 function toggleSettings() {
 	settingsToggled.value = !settingsToggled.value
-}
-
-const nameContent = ref(props.deckData.name)
-
-function onNameInput(event: Event) {
-	const input = event.target as HTMLInputElement
-	const sanitized = input.value.replace(RUnsafePathCharactersRegex, '')
-	if (sanitized !== input.value) {
-		nameContent.value = sanitized
-		input.value = sanitized
-	}
 }
 
 function onReturnClick() {
@@ -204,19 +191,8 @@ function onCardShiftLClick(card: TCardData) {
 		>
 			<div class="grid grid-rows-[auto_1fr] overflow-hidden">
 				<div class="bg-primary-600 flex items-center justify-between py-1 px-2 gap-2">
-					<div class="flex items-center">
-						<Icon
-							icon="material-symbols:edit-square-rounded"
-							class="text-contrast-300 mr-1"
-						/>
-						<input
-							type="text"
-							class="font-bold truncate :placeholder:text-contrast-500 focus:outline-none w-full border border-transparent focus:border-b-accent-500"
-							v-model="nameContent"
-							maxlength="32"
-							placeholder="Deck Name"
-							@input="onNameInput"
-						/>
+					<div class="font-bold text-lg truncate" :title="props.deckData.name">
+						{{ props.deckData.name }}
 					</div>
 					<span class="flex gap-2">
 						<Button

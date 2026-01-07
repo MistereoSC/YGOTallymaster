@@ -1,4 +1,4 @@
-import {createDeckFile, getSavedDecks, renameDeckFile, saveDeckFile, TDeckData} from '@/libs/Decks'
+import {createDeckFile, getSavedDecks, renameDeckFile, saveDeckFile, TDeckData, deleteDeckFile} from '@/libs/Decks'
 import {ref} from 'vue'
 import {getFullCardList} from './useCardSearch'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
@@ -61,12 +61,27 @@ const useDeckList = () => {
 		}
 	}
 
+	async function deleteDeck(deckName: string) {
+		const index = deckList.value.findIndex((d) => d.name === deckName)
+		if (index === -1) return
+		deckList.value.splice(index, 1)
+		await deleteDeckFile(deckName)
+	}
+	async function renameDeck(oldName: string, newName: string) {
+		const index = deckList.value.findIndex((d) => d.name === oldName)
+		if (index === -1) return
+		deckList.value[index].name = newName
+		await renameDeckFile(oldName, newName)
+	}
+
 	return {
 		deckList,
 		initialized,
 		createDeck,
 		getDeckCards,
 		saveDeck,
+		deleteDeck,
+		renameDeck,
 	}
 }
 

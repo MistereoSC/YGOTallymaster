@@ -12,12 +12,33 @@ import {
 	DialogTrigger,
 } from 'reka-ui'
 import Button from '../common/Button.vue'
-import {ref, watch} from 'vue'
+import {ref, watch, useSlots} from 'vue'
 import {RUnsafePathCharactersRegex} from '@/libs/Files'
 
 const props = defineProps<{
 	existingDecks?: TDeckData[]
+	open?: boolean
+
+	existingDeckNameForRename?: string
 }>()
+
+const slots = useSlots()
+
+const internalOpen = ref(props.open ?? false)
+
+// Sync internal state when prop changes
+watch(
+	() => props.open,
+	(newVal) => {
+		if (newVal !== undefined) {
+			internalOpen.value = newVal
+			if (newVal) {
+				nameInput.value = props.existingDeckNameForRename || ''
+				deckExistsError.value = false
+			}
+		}
+	}
+)
 
 const deckExistsError = ref(false)
 const nameInput = ref('')
@@ -33,15 +54,23 @@ function onNameInput(event: Event) {
 
 const emit = defineEmits<{
 	(e: 'create', name: string): void
+	(e: 'update:open', open: boolean): void
+	(e: 'close'): void
 }>()
+
 function handleCreate() {
 	emit('create', nameInput.value.trim())
+	onOpenChange(false)
 }
 
 function onOpenChange(open: boolean) {
+	internalOpen.value = open
+	emit('update:open', open)
 	if (open) {
 		nameInput.value = ''
 		deckExistsError.value = false
+	} else {
+		emit('close')
 	}
 }
 
@@ -66,8 +95,8 @@ watch(
 </script>
 
 <template>
-	<DialogRoot @update:open="onOpenChange">
-		<DialogTrigger class="w-full h-full">
+	<DialogRoot v-model:open="internalOpen" @update:open="onOpenChange">
+		<DialogTrigger v-if="slots.trigger" class="w-full h-full">
 			<slot name="trigger"></slot>
 		</DialogTrigger>
 		<DialogPortal>
@@ -77,12 +106,19 @@ watch(
 			<DialogContent
 				class="p-4 data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-120 translate-x-[-50%] translate-y-[-50%] rounded-md bg-primary-700 focus:outline-none z-100"
 			>
-				<DialogTitle class="m-0 text-xl font-semibold"> Create Deck </DialogTitle>
+				<DialogTitle class="m-0 text-xl font-semibold">
+					{{ props.existingDeckNameForRename ? 'Rename' : 'Create' }} Deck
+				</DialogTitle>
 				<DialogDescription class="mt-2 h-4">
 					<span class="text-red-400" v-if="deckExistsError">
 						A deck with this name already exists.
 					</span>
-					<span class="text-contrast-500" v-else>Enter a name for your new Deck.</span>
+					<span class="text-contrast-500" v-else>
+						<span v-if="props.existingDeckNameForRename"
+							>Enter a new name for your Deck.</span
+						>
+						<span v-else>Enter a name for your new Deck.</span>
+					</span>
 				</DialogDescription>
 				<div>
 					<input
@@ -94,14 +130,12 @@ watch(
 					/>
 				</div>
 				<div class="mt-6 flex justify-end">
-					<DialogClose as-child>
-						<Button
-							:disabled="deckExistsError || nameInput.trim().length === 0"
-							icon="material-symbols:add-2-rounded"
-							label="Create"
-							@click="handleCreate"
-						/>
-					</DialogClose>
+					<Button
+						:disabled="deckExistsError || nameInput.trim().length === 0"
+						icon="material-symbols:add-2-rounded"
+						:label="props.existingDeckNameForRename ? 'Rename' : 'Create'"
+						@click="handleCreate"
+					/>
 				</div>
 				<DialogClose
 					class="hover:bg-primary-900/20 cursor-pointer absolute top-2.5 right-2.5 inline-flex h-8 w-8 appearance-none items-center justify-center rounded-full"

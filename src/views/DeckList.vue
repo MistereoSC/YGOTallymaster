@@ -7,41 +7,71 @@ import {TDeckData} from '@/libs/Decks'
 import {onBeforeMount, ref} from 'vue'
 import DeckCreation from './DeckCreation.vue'
 import Spinner from '@/components/common/Spinner.vue'
+import ConfirmCancelModal from '@/components/common/ConfirmCancelModal.vue'
 
-const decksStore = useDeckList()
+const {initialized, deckList, createDeck, deleteDeck, renameDeck} = useDeckList()
 onBeforeMount(async () => {
 	await getFullCardList()
 })
 
 async function onCreateDeck(name: string) {
-	await decksStore.createDeck(name)
+	await createDeck(name)
 }
 
 const activeDeck = ref<null | TDeckData>(null)
+
+const deckDeleteModalOpen = ref(false)
+const deckRenameModalOpen = ref(false)
+
+const activeDeckForAction = ref<null | TDeckData>(null)
+function onDeckDelete(deck: TDeckData) {
+	activeDeckForAction.value = deck
+	deckDeleteModalOpen.value = true
+}
+function onDeckRename(deck: TDeckData) {
+	activeDeckForAction.value = deck
+	deckRenameModalOpen.value = true
+}
+
+function onDeckDeleteCancel() {
+	deckDeleteModalOpen.value = false
+	activeDeckForAction.value = null
+}
+function onDeckRenameCancel() {
+	deckRenameModalOpen.value = false
+	activeDeckForAction.value = null
+}
+
+async function onDeckDeleteConfirm() {
+	if (activeDeckForAction.value) {
+		await deleteDeck(activeDeckForAction.value.name)
+	}
+	onDeckDeleteCancel()
+}
+
+async function onDeckRenameConfirm(newName: string) {
+	if (activeDeckForAction.value) {
+		await renameDeck(activeDeckForAction.value.name, newName)
+	}
+	onDeckRenameCancel()
+}
 </script>
 
 <template>
 	<div v-if="activeDeck" class="relative h-full overflow-hidden">
 		<DeckCreation :deck-data="activeDeck" @close="activeDeck = null" />
 	</div>
-	<div
-		v-else-if="decksStore.initialized.value"
-		class="p-8 w-full flex flex-wrap overflow-auto gap-8"
-	>
+	<div v-else-if="initialized" class="p-8 w-full flex flex-wrap overflow-auto gap-8">
 		<DeckPreview
-			v-for="deck in decksStore.deckList.value"
+			v-for="deck in deckList"
 			:key="deck.name"
 			:deck-data="deck"
 			@click="activeDeck = deck"
+			@delete="() => onDeckDelete(deck)"
+			@rename="() => onDeckRename(deck)"
 		/>
-		<div
-			class="w-48 h-77 grid place-items-center"
-			v-if="decksStore.deckList.value.length < 100"
-		>
-			<DeckCreationModal
-				:existing-decks="decksStore.deckList.value"
-				@create="(name) => onCreateDeck(name)"
-			>
+		<div class="w-48 h-77 grid place-items-center" v-if="deckList.length < 100">
+			<DeckCreationModal :existing-decks="deckList" @create="(name) => onCreateDeck(name)">
 				<template #trigger>
 					<div
 						class="h-full w-full rounded-lg text-contrast-400 hover:text-contrast-900 bg-primary-700 cursor-pointer shadow-lg transition-colors hover:bg-primary-600"
@@ -63,6 +93,24 @@ const activeDeck = ref<null | TDeckData>(null)
 			<Spinner />
 		</div>
 	</div>
+
+	<ConfirmCancelModal
+		:open="deckDeleteModalOpen"
+		heading-text="Delete Deck"
+		cancel-text="Cancel"
+		confirm-text="Delete"
+		@cancel="onDeckDeleteCancel"
+		@confirm="onDeckDeleteConfirm"
+	>
+		<template #content>
+			<p>
+				Are you sure you want to delete the deck "{{ activeDeckForAction?.name }}"? This
+				action cannot be undone.
+			</p>
+		</template>
+	</ConfirmCancelModal>
+
+	<DeckCreationModal :open="deckRenameModalOpen" :existing-decks="deckList" @create="(name) => onDeckRenameConfirm(name)" :existing-deck-name-for-rename="activeDeckForAction?.name"/>
 </template>
 
 <style lang="scss" scoped></style>

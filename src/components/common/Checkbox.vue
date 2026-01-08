@@ -6,8 +6,10 @@ interface IProps {
 	label?: string
 	disabled?: boolean
 	size?: 'small' | 'medium' | 'large'
+	allowOnlyCheckToToggle?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
+	allowOnlyCheckToToggle: false,
 	disabled: false,
 	size: 'medium',
 })
@@ -17,8 +19,10 @@ const emit = defineEmits<{
 	(e: 'update:modelValue', value: boolean): void
 }>()
 
-function onToggle() {
+function onToggle(target: 'checkbox' | 'container') {
 	if (props.disabled) return
+	if (props.allowOnlyCheckToToggle && target === 'container') return
+	if (!props.allowOnlyCheckToToggle && target === 'checkbox') return
 	emit('update:modelValue', !props.modelValue)
 	emit('change', !props.modelValue)
 }
@@ -26,14 +30,16 @@ function onToggle() {
 
 <template>
 	<div
-		class="flex items-center gap-2 cursor-pointer select-none"
+		class="flex items-center gap-2 select-none"
 		:class="{
 			'opacity-50 cursor-not-allowed!': props.disabled,
+			'cursor-pointer': props.allowOnlyCheckToToggle === false,
+			'cursor-default': props.allowOnlyCheckToToggle === true,
 		}"
-		@click="onToggle"
+		@click="() => onToggle('container')"
 	>
 		<div
-			class="flex items-center justify-center rounded-sm border-2 transition-colors"
+			class="flex items-center justify-center rounded-sm border-2 transition-colors cursor-pointer"
 			:class="{
 				'w-4 h-4': props.size === 'small',
 				'w-5 h-5': props.size === 'medium',
@@ -41,6 +47,7 @@ function onToggle() {
 				'bg-accent-500 border-accent-500': modelValue,
 				'bg-primary-700 border-primary-500 hover:border-accent-400': !modelValue,
 			}"
+			@click="() => onToggle('checkbox')"
 		>
 			<Icon
 				v-if="modelValue"
@@ -55,11 +62,12 @@ function onToggle() {
 		</div>
 		<label
 			v-if="label"
-			class="font-semibold cursor-pointer"
+			class="font-semibold"
 			:class="{
 				'text-sm': props.size === 'small',
 				'text-base': props.size === 'medium',
 				'text-lg': props.size === 'large',
+				'cursor-pointer': props.allowOnlyCheckToToggle === false,
 			}"
 		>
 			{{ label }}

@@ -1,189 +1,255 @@
-import { app as u, BrowserWindow as h, session as v, ipcMain as n, dialog as m, shell as g } from "electron";
-import { fileURLToPath as S } from "node:url";
-import c from "node:path";
-import a from "node:fs/promises";
-const w = c.dirname(S(import.meta.url));
-process.env.APP_ROOT = c.join(w, "..");
-const l = process.env.VITE_DEV_SERVER_URL, j = c.join(process.env.APP_ROOT, "dist-electron"), y = c.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = l ? c.join(process.env.APP_ROOT, "public") : y;
-let i;
-function _() {
-  i = new h({
-    icon: c.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+import { app, BrowserWindow, session, ipcMain, dialog, shell } from "electron";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import fs from "node:fs/promises";
+const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname$1, "..");
+const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
+let win;
+function createWindow() {
+  win = new BrowserWindow({
+    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
-      nodeIntegration: !1,
-      contextIsolation: !0,
-      preload: c.join(w, "preload.mjs")
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname$1, "preload.mjs")
     },
     width: 1512,
     height: 912,
     minWidth: 1284,
     minHeight: 768
-  }), i.webContents.setWindowOpenHandler(({ url: r }) => (g.openExternal(r), { action: "deny" })), i.webContents.on("did-finish-load", () => {
-    i == null || i.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  }), l ? i.loadURL(l) : i.loadFile(c.join(y, "index.html"));
+  });
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: "deny" };
+  });
+  win.webContents.on("did-finish-load", () => {
+    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  });
+  if (VITE_DEV_SERVER_URL) {
+    win.loadURL(VITE_DEV_SERVER_URL);
+  } else {
+    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+  }
 }
-u.on("window-all-closed", () => {
-  process.platform !== "darwin" && (u.quit(), i = null);
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+    win = null;
+  }
 });
-u.on("activate", () => {
-  h.getAllWindows().length === 0 && _();
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
-u.whenReady().then(() => {
-  v.defaultSession.webRequest.onHeadersReceived((r, s) => {
-    const e = l ? (
+app.whenReady().then(() => {
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const csp = VITE_DEV_SERVER_URL ? (
       // Development
       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.ygoprodeck.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; font-src 'self' data:; connect-src 'self' ws: https://db.ygoprodeck.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; object-src 'none'"
     ) : (
       // Production
       "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://images.ygoprodeck.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; font-src 'self'; connect-src 'self' https://db.ygoprodeck.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; object-src 'none'"
     );
-    s({
+    callback({
       responseHeaders: {
-        ...r.responseHeaders,
-        "Content-Security-Policy": [e]
+        ...details.responseHeaders,
+        "Content-Security-Policy": [csp]
       }
     });
-  }), _(), b();
+  });
+  createWindow();
+  setupIpcHandlers();
 });
-function b() {
-  n.handle("fs:readFile", async (r, s) => {
+function setupIpcHandlers() {
+  ipcMain.handle("fs:readFile", async (_, filePath) => {
     try {
-      return { success: !0, data: await a.readFile(s, "utf-8") };
-    } catch (e) {
-      return { success: !1, error: e.message };
+      const data = await fs.readFile(filePath, "utf-8");
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("fs:writeFile", async (r, s, e) => {
+  });
+  ipcMain.handle("fs:writeFile", async (_, filePath, data) => {
     try {
-      const t = c.dirname(s);
-      return await a.mkdir(t, { recursive: !0 }), await a.writeFile(s, e, "utf-8"), { success: !0 };
-    } catch (t) {
-      return { success: !1, error: t.message };
+      const dir = path.dirname(filePath);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(filePath, data, "utf-8");
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("fs:exists", async (r, s) => {
+  });
+  ipcMain.handle("fs:exists", async (_, filePath) => {
     try {
-      return await a.access(s), { success: !0, exists: !0 };
+      await fs.access(filePath);
+      return { success: true, exists: true };
     } catch {
-      return { success: !0, exists: !1 };
+      return { success: true, exists: false };
     }
-  }), n.handle("fs:deleteFile", async (r, s) => {
+  });
+  ipcMain.handle("fs:deleteFile", async (_, filePath) => {
     try {
-      return await a.unlink(s), { success: !0 };
-    } catch (e) {
-      return { success: !1, error: e.message };
+      await fs.unlink(filePath);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("fs:removeDir", async (r, s) => {
+  });
+  ipcMain.handle("fs:removeDir", async (_, dirPath) => {
     try {
-      return await a.rm(s, { recursive: !0, force: !0 }), { success: !0 };
-    } catch (e) {
-      return { success: !1, error: e.message };
+      await fs.rm(dirPath, { recursive: true, force: true });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("fs:renameFile", async (r, s, e) => {
+  });
+  ipcMain.handle("fs:renameFile", async (_, oldPath, newPath) => {
     try {
-      const t = c.dirname(e);
-      return await a.mkdir(t, { recursive: !0 }), await a.rename(s, e), { success: !0 };
-    } catch (t) {
-      return { success: !1, error: t.message };
+      const dir = path.dirname(newPath);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.rename(oldPath, newPath);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("fs:readJSON", async (r, s) => {
+  });
+  ipcMain.handle("fs:readJSON", async (_, filePath) => {
     try {
-      const e = await a.readFile(s, "utf-8");
-      return { success: !0, data: JSON.parse(e) };
-    } catch (e) {
-      return { success: !1, error: e.message };
+      const data = await fs.readFile(filePath, "utf-8");
+      const json = JSON.parse(data);
+      return { success: true, data: json };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("fs:writeJSON", async (r, s, e) => {
+  });
+  ipcMain.handle("fs:writeJSON", async (_, filePath, data) => {
     try {
-      const t = c.dirname(s);
-      return await a.mkdir(t, { recursive: !0 }), await a.writeFile(s, JSON.stringify(e, null, 2), "utf-8"), { success: !0 };
-    } catch (t) {
-      return { success: !1, error: t.message };
+      const dir = path.dirname(filePath);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("fs:mkdir", async (r, s) => {
+  });
+  ipcMain.handle("fs:mkdir", async (_, dirPath) => {
     try {
-      return await a.mkdir(s, { recursive: !0 }), { success: !0 };
-    } catch (e) {
-      return { success: !1, error: e.message };
+      await fs.mkdir(dirPath, { recursive: true });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("fs:readdir", async (r, s) => {
+  });
+  ipcMain.handle("fs:readdir", async (_, dirPath) => {
     try {
-      const e = await a.readdir(s);
-      return { success: !0, data: await Promise.all(
-        e.map(async (o) => {
-          const d = c.join(s, o), p = await a.stat(d), f = c.extname(o);
+      const files = await fs.readdir(dirPath);
+      const filesWithStats = await Promise.all(
+        files.map(async (file) => {
+          const filePath = path.join(dirPath, file);
+          const stats = await fs.stat(filePath);
+          const ext = path.extname(file);
           return {
-            fileName: f ? o.slice(0, -f.length) : o,
-            fileExtension: f,
-            creationDate: p.birthtime.toISOString(),
-            isDirectory: p.isDirectory()
+            fileName: ext ? file.slice(0, -ext.length) : file,
+            fileExtension: ext,
+            creationDate: stats.birthtime.toISOString(),
+            isDirectory: stats.isDirectory()
           };
         })
-      ) };
-    } catch (e) {
-      return { success: !1, error: e.message };
+      );
+      return { success: true, data: filesWithStats };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("dialog:showSaveDialog", async (r, s = {}) => {
+  });
+  ipcMain.handle("dialog:showSaveDialog", async (_, options = {}) => {
     try {
-      return { success: !0, ...await m.showSaveDialog(i, {
+      const result = await dialog.showSaveDialog(win, {
         filters: [
           { name: "JSON Files", extensions: ["json"] },
           { name: "All Files", extensions: ["*"] }
         ],
-        ...s
-      }) };
-    } catch (e) {
-      return { success: !1, error: e.message };
+        ...options
+      });
+      return { success: true, ...result };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("dialog:showOpenDialog", async (r, s = {}) => {
+  });
+  ipcMain.handle("dialog:showOpenDialog", async (_, options = {}) => {
     try {
-      return { success: !0, ...await m.showOpenDialog(i, {
+      const result = await dialog.showOpenDialog(win, {
         properties: ["openFile"],
         filters: [
           { name: "JSON Files", extensions: ["json"] },
           { name: "All Files", extensions: ["*"] }
         ],
-        ...s
-      }) };
-    } catch (e) {
-      return { success: !1, error: e.message };
+        ...options
+      });
+      return { success: true, ...result };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle(
+  });
+  ipcMain.handle(
     "app:getPath",
-    async (r, s) => {
+    async (_, pathName) => {
       try {
-        return { success: !0, path: u.getPath(s) };
-      } catch (e) {
-        return { success: !1, error: e.message };
+        const pathValue = app.getPath(pathName);
+        return { success: true, path: pathValue };
+      } catch (error) {
+        return { success: false, error: error.message };
       }
     }
-  ), n.handle("image:download", async (r, s, e) => {
+  );
+  ipcMain.handle("image:download", async (_, url, localPath) => {
     try {
-      const t = c.dirname(e);
-      await a.mkdir(t, { recursive: !0 });
-      const o = await fetch(s);
-      if (!o.ok)
-        throw new Error(`HTTP ${o.status}: ${o.statusText}`);
-      const d = Buffer.from(await o.arrayBuffer());
-      return await a.writeFile(e, d), { success: !0, path: e };
-    } catch (t) {
-      return { success: !1, error: t.message };
+      const dir = path.dirname(localPath);
+      await fs.mkdir(dir, { recursive: true });
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const buffer = Buffer.from(await response.arrayBuffer());
+      await fs.writeFile(localPath, buffer);
+      return { success: true, path: localPath };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("image:getDataUrl", async (r, s) => {
+  });
+  ipcMain.handle("image:getDataUrl", async (_, localPath) => {
     try {
-      return { success: !0, data: `data:image/jpeg;base64,${(await a.readFile(s)).toString("base64")}` };
-    } catch (e) {
-      return { success: !1, error: e.message };
+      const buffer = await fs.readFile(localPath);
+      const base64 = buffer.toString("base64");
+      const dataUrl = `data:image/jpeg;base64,${base64}`;
+      return { success: true, data: dataUrl };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-  }), n.handle("shell:openExternal", async (r, s) => {
+  });
+  ipcMain.handle("shell:openExternal", async (_, url) => {
     try {
-      return await g.openExternal(s), { success: !0 };
-    } catch (e) {
-      return { success: !1, error: e.message };
+      await shell.openExternal(url);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+  ipcMain.handle("shell:openPath", async (_, path2) => {
+    try {
+      await shell.openPath(path2);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
   });
 }
 export {
-  j as MAIN_DIST,
-  y as RENDERER_DIST,
-  l as VITE_DEV_SERVER_URL
+  MAIN_DIST,
+  RENDERER_DIST,
+  VITE_DEV_SERVER_URL
 };

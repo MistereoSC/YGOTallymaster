@@ -53,6 +53,7 @@ export interface ElectronAPI {
 	}
 	electronShell: {
 		openExternal: (url: string) => Promise<FSResult<void>>
+		openPath: (path: string) => Promise<FSResult<void>>
 	}
 }
 

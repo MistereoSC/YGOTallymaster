@@ -73,4 +73,5 @@ contextBridge.exposeInMainWorld('electronApp', {
 // --------- Expose shell API ---------
 contextBridge.exposeInMainWorld('electronShell', {
 	openExternal: (url: string) => ipcRenderer.invoke('shell:openExternal', url),
+	openPath: (path: string) => ipcRenderer.invoke('shell:openPath', path),
 })

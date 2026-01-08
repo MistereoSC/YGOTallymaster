@@ -343,4 +343,14 @@ function setupIpcHandlers() {
 			return {success: false, error: error.message}
 		}
 	})
+
+	// Open a folder in the file explorer
+	ipcMain.handle('shell:openPath', async (_, path: string) => {
+		try {
+			await shell.openPath(path)
+			return {success: true}
+		} catch (error: any) {
+			return {success: false, error: error.message}
+		}
+	})
 }

@@ -49,7 +49,7 @@ const routes = [
 	{
 		path: '/Settings',
 		name: 'Settings',
-		component: () => import('../views/debug/APITest.vue'),
+		component: () => import('../views/SettingsView.vue'),
 	},
 	// #endregion
 	// ---------------------------------------------------------

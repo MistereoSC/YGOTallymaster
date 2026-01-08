@@ -36,19 +36,7 @@ const activeRoute = computed(() => route.name as string)
 					route-name="Banlist"
 					:active="activeRoute === 'Banlist'"
 				/>
-				<!-- <AppMainMenuLink
-					label="Sets"
-					icon="material-symbols:cards-star-rounded"
-					route-name="Sets"
-					:active="activeRoute === 'Sets'"
-				/> -->
 				<div class="w-full h-px bg-primary-500 my-2"></div>
-				<!-- <AppMainMenuLink
-					label="Collection"
-					icon="tabler:archive-filled"
-					route-name="Collection"
-					:active="activeRoute === 'Collection'"
-				/> -->
 				<AppMainMenuLink
 					label="Decks"
 					icon="material-symbols:stacks-rounded"
@@ -63,31 +51,19 @@ const activeRoute = computed(() => route.name as string)
 				/>
 			</div>
 			<div>
-				<div class="w-full h-px bg-primary-500 my-2"></div>
-				<!-- <AppMainMenuLink
-					label="About"
-					icon="material-symbols:chat-info-rounded"
-					route-name="About"
-					:active="activeRoute === 'About'"
-				/> -->
+				<!-- <div class="w-full h-px bg-primary-500 my-2"></div> -->
 				<AppMainMenuLink
 					label="Settings"
 					icon="material-symbols:settings-rounded"
 					route-name="Settings"
 					:active="activeRoute === 'Settings'"
 				/>
-				<AppMainMenuLink
-					label="Updater"
-					icon="material-symbols:browser-updated-rounded"
-					route-name="Home"
-					:active="activeRoute === 'Home'"
-				/>
-				<AppMainMenuLink
+				<!-- <AppMainMenuLink
 					label="Theme"
 					icon="material-symbols:frame-bug-rounded"
 					route-name="Debug/ThemePreview"
 					:active="activeRoute === 'Debug/ThemePreview'"
-				/>
+				/> -->
 			</div>
 		</div>
 

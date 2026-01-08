@@ -23,14 +23,16 @@ const emit = defineEmits([])
 					class="shadow-sm shadow-black/50"
 				/>
 			</div>
-			<div class="text-xl font-bold grid grid-cols-[auto_1fr_auto] items-center gap-2">
-				<CardBanIcon
-					:show-banlist-for="props.showBanlistFor"
-					:banlist-info="card.banlist_info"
-					size="small"
-				/>
-				<span class="">{{ card.name }}</span>
-				<span class="">
+			<div class="text-xl font-bold grid grid-cols-[auto_1fr_32px] items-center gap-2">
+				<span>
+					<CardBanIcon
+						:show-banlist-for="props.showBanlistFor"
+						:banlist-info="card.banlist_info"
+						size="small"
+					/>
+				</span>
+				<span>{{ card.name }}</span>
+				<span>
 					<AttributeIcon :attribute="card.attribute ?? card.race" />
 				</span>
 			</div>

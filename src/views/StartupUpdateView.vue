@@ -61,7 +61,7 @@ function skipUpdate() {
 
 <template>
 	<div class="w-full min-h-full">
-		<div class="bg-black/80 absolute inset-0 flex items-center justify-center">
+		<div class="bg-black/80 absolute inset-0 flex items-center justify-center z-200">
 			<div>
 				<div v-if="state === 'checking'" class="text-xl font-bold">
 					<span class="leading-none">Checking for Updates ...</span>

@@ -61,7 +61,7 @@ const activeRoute = computed(() => route.name as string)
 			</div>
 		</div>
 
-		<div class="absolute right-1.5 top-1/2 delay-200 -translate-y-1/2 w-8 h-8 z-50">
+		<div class="absolute right-1.5 top-1/2 delay-200 -translate-y-1/2 w-8 h-8 z-2">
 			<div
 				class="w-full h-full flex justify-center items-center cursor-pointer bg-primary-800 hover:bg-primary-700 rounded-full text-contrast-400 hover:text-contrast-900"
 				@click="menu.expanded.value = !menu.expanded.value"

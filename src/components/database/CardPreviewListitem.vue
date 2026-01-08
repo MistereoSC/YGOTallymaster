@@ -190,16 +190,16 @@ const styles = getCardStyles(props.card)
 								class="h-full grid grid-cols-[74px_74px] gap-2"
 								v-if="card.attribute"
 							>
-								<span>
+								<span class="whitespace-nowrap">
 									Atk/
 									<b class="font-semibold">{{
 										card.atk! >= 0 ? card.atk : '?'
 									}}</b>
 								</span>
-								<span class="font-semibold" v-if="card.linkval">
+								<span v-if="card.linkval" class="font-semibold whitespace-nowrap" >
 									LINK {{ card.linkval }}
 								</span>
-								<span v-else>
+								<span v-else class="whitespace-nowrap">
 									Def/
 									<b class="font-semibold">{{
 										card.def! >= 0 ? card.def : '?'

@@ -1,11 +1,13 @@
-export const APP_VER: Readonly<string> = '0.8.0'
+export const APP_VERSION: Readonly<string> = '0.8.0'
 const DEFAULT_CONFIG: Readonly<TConfig> = {
-	appVer: APP_VER,
+	appVer: APP_VERSION,
 	dbVer: '0',
 	autoUpdate: true,
+	theme: 'dark' as TTheme,
 }
 
 let config = null as null | TConfig
+import {TTheme} from '@/composables/useTheme'
 import Files from './Files'
 export async function getConfig(): Promise<TConfig | null> {
 	if (config) return config
@@ -45,4 +47,5 @@ export type TConfig = {
 	appVer: string
 	dbVer: string
 	autoUpdate: boolean
+	theme: TTheme
 }

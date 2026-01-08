@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import AppMainMenu from '@/components/navigation/AppMainMenu.vue'
+import {useTheme} from '@/composables/useTheme'
+
+const {initTheme} = useTheme()
+initTheme()
 </script>
 
 <template>

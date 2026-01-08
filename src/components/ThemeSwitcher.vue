@@ -2,7 +2,7 @@
 	<div>
 		<button
 			@click="toggleTheme"
-			class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-800 hover:bg-primary-700 text-primary-50 transition-all duration-200 ease-in-out border border-primary-700 hover:border-accent-500/30"
+			class="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-800 hover:bg-primary-700 text-primary-50 transition-all duration-200 ease-in-out border border-primary-700 hover:border-accent-500/30"
 		>
 			<div class="flex items-center gap-1">
 				<div class="flex gap-1">

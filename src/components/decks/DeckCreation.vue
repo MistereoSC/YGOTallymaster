@@ -5,7 +5,6 @@ import CardFilter from '@/components/database/CardFilter.vue'
 import CardFullView from '@/components/database/CardFullView.vue'
 import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import DeckCardGrid from '@/components/decks/DeckCardGrid.vue'
-import DeckDisplaySettings from '@/components/decks/DeckDisplaySettings.vue'
 import {useCardSearch} from '@/composables/useCardSearch'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useDeckList} from '@/composables/useDeckList'
@@ -199,12 +198,12 @@ function onCardShiftLClick(card: TCardData) {
 							icon="material-symbols:keyboard-return-rounded"
 							@click="onReturnClick"
 						/>
-						<Button
+						<!-- <Button
 							rounded
 							size="small"
 							icon="material-symbols:settings-rounded"
 							@click="toggleSettings"
-						/>
+						/> -->
 						<Button
 							size="small"
 							rounded
@@ -242,8 +241,6 @@ function onCardShiftLClick(card: TCardData) {
 								label="Export Unowned Cards List"
 							/>
 						</div> -->
-
-						<DeckDisplaySettings />
 					</div>
 					<CardFullView v-else-if="hoveredCard" :card="hoveredCard" />
 				</div>
@@ -333,14 +330,13 @@ function onCardShiftLClick(card: TCardData) {
 				<div class="h-full overflow-y-scroll scrollable">
 					<CardListVirtualList
 						:card-list="searchResults == null ? fullCardList : searchResults"
-						:show-limited-info="settings?.decklistListSize === 'tiny'"
-						:show-owned-number="true"
-						:show-owned-heart="settings?.decklistShowOwnedHeartList"
-						:gray-unowned="settings?.decklistGrayUnownedList"
+						:show-limited-info="settings?.listSizeSmallList === 'tiny'"
+						:show-owned-heart="true"
+						:gray-unowned="settings?.grayUnownedSmallList"
 						@card-hovered="(card) => onCardHover(card)"
 						@card-clicked="(card) => onCardAdd(card)"
 						@card-shift-clicked="(card) => onCardAdd(card, true)"
-						:item-size="settings?.decklistListSize || 'tiny'"
+						:item-size="settings?.listSizeSmallList || 'tiny'"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 					/>
 				</div>

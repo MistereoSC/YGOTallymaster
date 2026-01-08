@@ -54,20 +54,9 @@ export const useDatabaseSettings = () => {
 		settings.value.grayUnowned = to ?? !settings.value.grayUnowned
 		save()
 	}
-
 	function decklistGrayUnownedGrid(to?: boolean) {
 		if (!settings.value) return
 		settings.value.decklistGrayUnownedGrid = to ?? !settings.value.decklistGrayUnownedGrid
-		save()
-	}
-	function decklistGrayUnownedList(to?: boolean) {
-		if (!settings.value) return
-		settings.value.decklistGrayUnownedList = to ?? !settings.value.decklistGrayUnownedList
-		save()
-	}
-	function decklistShowOwnedHeartList(to?: boolean) {
-		if (!settings.value) return
-		settings.value.decklistShowOwnedHeartList = to ?? !settings.value.decklistShowOwnedHeartList
 		save()
 	}
 	function setsGrayUnownedGrid(to?: boolean) {
@@ -75,19 +64,14 @@ export const useDatabaseSettings = () => {
 		settings.value.setsGrayUnownedGrid = to ?? !settings.value.setsGrayUnownedGrid
 		save()
 	}
-	function setsGrayUnownedList(to?: boolean) {
-		if (!settings.value) return
-		settings.value.setsGrayUnownedList = to ?? !settings.value.setsGrayUnownedList
-		save()
-	}
-	function setsShowOwnedHeartList(to?: boolean) {
-		if (!settings.value) return
-		settings.value.setsShowOwnedHeartList = to ?? !settings.value.setsShowOwnedHeartList
-		save()
-	}
 	function setsDisplayAsList(to?: boolean) {
 		if (!settings.value) return
 		settings.value.setsDisplayAsList = to ?? !settings.value.setsDisplayAsList
+		save()
+	}
+	function grayUnownedSmallList(to?: boolean) {
+		if (!settings.value) return
+		settings.value.grayUnownedSmallList = to ?? !settings.value.grayUnownedSmallList
 		save()
 	}
 
@@ -101,25 +85,14 @@ export const useDatabaseSettings = () => {
 		settings.value.decklistGridCardSize = to
 		save()
 	}
-	function decklistListSize(to: TSizes) {
-		if (!settings.value) return
-		settings.value.decklistListSize = to
-		save()
-	}
-	function setsGridSize(to: TSizes) {
-		if (!settings.value) return
-		settings.value.setsGridCardSize = to
-		save()
-	}
-	function setsListSize(to: TSizes) {
-		if (!settings.value) return
-		settings.value.setsListSize = to
-		save()
-	}
-
 	function showBanlistFor(to: TBanlistFormat | 'none') {
 		if (!settings.value) return
 		settings.value.showBanlistFor = to
+		save()
+	}
+	function listSizeSmallList(to: TSizes) {
+		if (!settings.value) return
+		settings.value.listSizeSmallList = to
 		save()
 	}
 
@@ -128,20 +101,15 @@ export const useDatabaseSettings = () => {
 		showOwnedNumbers,
 		grayUnowned,
 		decklistGrayUnownedGrid,
-		decklistGrayUnownedList,
-		decklistShowOwnedHeartList,
 		setsGrayUnownedGrid,
-		setsGrayUnownedList,
-		setsShowOwnedHeartList,
+		grayUnownedSmallList,
 		setsDisplayAsList,
 	}
 	const setFns = {
 		listSize,
 		decklistGridSize,
-		decklistListSize,
-		setsGridSize,
-		setsListSize,
 		showBanlistFor,
+		listSizeSmallList,
 	}
 
 	return {
@@ -154,43 +122,33 @@ export const useDatabaseSettings = () => {
 
 type TSizes = 'tiny' | 'small' | 'medium' | 'large'
 export type TDatabaseSettings = {
+	showBanlistFor: TBanlistFormat | 'none'
+	listSizeSmallList: TSizes
+	grayUnownedSmallList: boolean
+
 	displayAsList: boolean
 	showOwnedNumbers: boolean
 	grayUnowned: boolean
 	listSize: TSizes
-	showBanlistFor: TBanlistFormat | 'none'
 
 	decklistGrayUnownedGrid: boolean
-	decklistGrayUnownedList: boolean
-	decklistShowOwnedHeartList: boolean
 	decklistGridCardSize: TSizes
-	decklistListSize: TSizes
-
 	setsGrayUnownedGrid: boolean
-	setsGrayUnownedList: boolean
-	setsShowOwnedHeartList: boolean
 	setsDisplayAsList: boolean
-	setsGridCardSize: TSizes
-	setsListSize: TSizes
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
+	showBanlistFor: 'ban_tcg',
+	listSizeSmallList: 'tiny',
+	grayUnownedSmallList: true,
+
 	displayAsList: false,
 	showOwnedNumbers: false,
 	grayUnowned: false,
 	listSize: 'small',
-	showBanlistFor: 'ban_tcg',
 
 	decklistGrayUnownedGrid: false,
-	decklistGrayUnownedList: false,
-	decklistShowOwnedHeartList: false,
 	decklistGridCardSize: 'tiny',
-	decklistListSize: 'tiny',
-
 	setsGrayUnownedGrid: false,
-	setsGrayUnownedList: false,
-	setsShowOwnedHeartList: false,
 	setsDisplayAsList: false,
-	setsGridCardSize: 'tiny',
-	setsListSize: 'tiny',
 }

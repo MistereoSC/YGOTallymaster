@@ -1,8 +1,9 @@
 import {ref, onMounted} from 'vue'
+import {getConfig, setConfig} from '@/libs/Config'
 
-export type Theme = 'dark' | 'light'
+export type TTheme = 'dark' | 'light'
 
-export const themes: Record<Theme, {name: string; description: string}> = {
+export const themes: Record<TTheme, {name: string; description: string}> = {
 	dark: {
 		name: 'Dark',
 		description: 'Default Dark Theme',
@@ -14,9 +15,9 @@ export const themes: Record<Theme, {name: string; description: string}> = {
 }
 
 export function useTheme() {
-	const currentTheme = ref<Theme>('dark')
+	const currentTheme = ref<TTheme>('dark')
 
-	const setTheme = (theme: Theme) => {
+	const setTheme = async (theme: TTheme) => {
 		currentTheme.value = theme
 
 		// Update the HTML class for the new Tailwind v4 theme system
@@ -26,7 +27,7 @@ export function useTheme() {
 			document.documentElement.classList.remove('light')
 		}
 
-		localStorage.setItem('theme', theme)
+		await setConfig({theme})
 	}
 
 	const toggleTheme = () => {
@@ -34,10 +35,17 @@ export function useTheme() {
 		setTheme(newTheme)
 	}
 
-	const initTheme = () => {
-		const savedTheme = localStorage.getItem('theme') as Theme
+	const initTheme = async () => {
+		const config = await getConfig()
+		const savedTheme = config?.theme
 		if (savedTheme && themes[savedTheme]) {
-			setTheme(savedTheme)
+			currentTheme.value = savedTheme
+			// Apply theme to DOM without saving again
+			if (savedTheme === 'light') {
+				document.documentElement.classList.add('light')
+			} else {
+				document.documentElement.classList.remove('light')
+			}
 		} else {
 			// Default to dark theme
 			setTheme('dark')

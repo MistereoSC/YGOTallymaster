@@ -4,6 +4,7 @@ import {getConfig} from '@/libs/Config'
 import {dbNeedsUpdating, performDBUpdate} from '@/libs/Updater'
 import {useRouter} from 'vue-router'
 import ExternalLink from '@/components/common/ExternalLink.vue'
+import {Icon} from '@iconify/vue'
 
 onMounted(async () => {
 	await checkSetupState()

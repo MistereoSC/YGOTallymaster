@@ -11,7 +11,6 @@ import CardFilter from '@/components/database/CardFilter.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useCardSearch} from '@/composables/useCardSearch'
 import Spinner from '@/components/common/Spinner.vue'
-import SetDisplaySettings from './SetDisplaySettings.vue'
 
 const {settings} = useDatabaseSettings()
 const {resetSearch, fullCardList, searchResults, search, initialized} = useCardSearch()
@@ -64,11 +63,7 @@ function onCardShiftLClick(card: TCardData) {
 	search({term: searchTerm})
 }
 
-const activePanel = ref('filter' as 'filter' | 'settings' | 'none')
-function toggleSettings() {
-	if (activePanel.value === 'settings') activePanel.value = 'none'
-	else activePanel.value = 'settings'
-}
+const activePanel = ref('filter' as 'filter' | 'none')
 function toggleFilter() {
 	if (activePanel.value === 'filter') activePanel.value = 'none'
 	else activePanel.value = 'filter'
@@ -119,12 +114,6 @@ function onDeckAreaWheel(e: WheelEvent) {
 				<Button
 					rounded
 					size="small"
-					icon="material-symbols:settings-rounded"
-					@click="toggleSettings"
-				/>
-				<Button
-					rounded
-					size="small"
 					icon="material-symbols:filter-alt"
 					@click="toggleFilter"
 				/>
@@ -148,7 +137,7 @@ function onDeckAreaWheel(e: WheelEvent) {
 					v-else-if="settings?.setsDisplayAsList"
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
-					:item-size="settings?.setsGridCardSize || 'medium'"
+					:item-size="settings?.listSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					@card-Hovered="onCardHover"
 					@card-shift-clicked="(card) => onCardShiftLClick(card)"
@@ -158,7 +147,7 @@ function onDeckAreaWheel(e: WheelEvent) {
 					v-else
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
-					:item-size="settings?.setsGridCardSize || 'tiny'"
+					item-size="medium"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					@card-Hovered="onCardHover"
 					@card-shift-clicked="(card) => onCardShiftLClick(card)"
@@ -179,22 +168,15 @@ function onDeckAreaWheel(e: WheelEvent) {
 					<div class="h-full overflow-hidden">
 						<CardListVirtualList
 							:card-list="searchResults == null ? fullCardList : searchResults"
-							:show-limited-info="settings?.setsListSize === 'tiny'"
-							:show-owned-number="true"
-							:show-owned-heart="settings?.setsShowOwnedHeartList"
-							:gray-unowned="settings?.setsGrayUnownedList"
+							:show-limited-info="settings?.listSizeSmallList === 'tiny'"
+							:show-owned-heart="true"
+							:gray-unowned="settings?.grayUnownedSmallList"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@card-hovered="(card) => onCardHover(card)"
 							@card-clicked="(card) => onCardAdd(card)"
-							:item-size="settings?.setsListSize || 'tiny'"
+							:item-size="settings?.listSizeSmallList || 'tiny'"
 						/>
 					</div>
-				</div>
-				<div
-					v-else-if="activePanel === 'settings'"
-					class="h-full grid grid-rows-2 overflow-hidden p-2"
-				>
-					<SetDisplaySettings />
 				</div>
 			</div>
 		</div>

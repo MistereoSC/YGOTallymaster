@@ -17,7 +17,6 @@ onMounted(async () => {
 		startSetup()
 		return
 	}
-
 	const needsUpdating = await dbNeedsUpdating()
 	if (needsUpdating) {
 		state.value = 'updateAvailable'
@@ -29,7 +28,7 @@ onMounted(async () => {
 	}
 })
 type TState = 'checking' | 'updating' | 'done' | 'updateAvailable' | 'error'
-const state = ref<TState>('checking')
+const state = ref<TState>('updateAvailable')
 
 const updateStep = ref<number>(0)
 const totalSteps = ref<number>(0)

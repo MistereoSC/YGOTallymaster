@@ -58,12 +58,6 @@ const activeRoute = computed(() => route.name as string)
 					route-name="Settings"
 					:active="activeRoute === 'Settings'"
 				/>
-				<!-- <AppMainMenuLink
-					label="Theme"
-					icon="material-symbols:frame-bug-rounded"
-					route-name="Debug/ThemePreview"
-					:active="activeRoute === 'Debug/ThemePreview'"
-				/> -->
 			</div>
 		</div>
 

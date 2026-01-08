@@ -7,7 +7,6 @@ import CardFilter from '@/components/database/CardFilter.vue'
 
 import {useCardSearch} from '@/composables/useCardSearch'
 import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
-import DisplaySettings from '@/components/database/DisplaySettings.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
@@ -26,7 +25,7 @@ watch(searchResults, async () => {
 	}
 })
 
-type TSidePanel = 'filter' | 'settings' | 'none' | 'card'
+type TSidePanel = 'filter' | 'none' | 'card'
 const activePanel = ref<TSidePanel>('filter')
 const previousPanel = ref<TSidePanel>('filter')
 const activeCard = ref<TCardData | null>(null)
@@ -68,23 +67,7 @@ function toggleFilter() {
 	}
 	activePanel.value = 'filter'
 }
-function toggleSettings() {
-	if (activePanel.value === 'settings') {
-		if (activeCard.value) {
-			activePanel.value = 'card'
-		} else {
-			activePanel.value = 'none'
-		}
-		previousPanel.value = 'settings'
-		return
-	}
-	activePanel.value = 'settings'
-}
-function closePanel() {
-	activePanel.value = 'none'
-	activeCard.value = null
-	previousPanel.value = 'filter'
-}
+
 // #endregion
 // ----------------------------------------------
 // #region Settings
@@ -109,19 +92,6 @@ const settingsStore = useDatabaseSettings()
 				<span class="flex justify-between w-full">
 					<span></span>
 					<span class="flex gap-2">
-						<Button
-							v-if="activePanel !== 'none'"
-							rounded
-							size="small"
-							icon="material-symbols:arrow-menu-open-rounded"
-							@click="closePanel"
-						/>
-						<Button
-							rounded
-							size="small"
-							icon="material-symbols:settings-rounded"
-							@click="toggleSettings"
-						/>
 						<Button
 							rounded
 							size="small"
@@ -167,8 +137,6 @@ const settingsStore = useDatabaseSettings()
 				<div class="h-full overflow-y-auto scrollable p-3">
 					<CardFullView v-if="activeCard && activePanel === 'card'" :card="activeCard" />
 					<CardFilter :search-while-typing="true" v-else-if="activePanel === 'filter'" />
-
-					<DisplaySettings v-else-if="activePanel === 'settings'" />
 				</div>
 			</div>
 		</div>

@@ -27,14 +27,10 @@ const emit = defineEmits<{
 		:class="{
 			'opacity-50 cursor-default': props.disabled,
 			// Non-rounded sizes
-			'rounded-sm px-2 py-1 text-xs':
-				!props.rounded && props.size === 'tiny',
-			'rounded-sm px-2 py-1 text-sm':
-				!props.rounded && props.size === 'small',
-			'rounded-sm px-2 py-1.5 text-base':
-				!props.rounded && props.size === 'medium',
-			'rounded-sm px-3 py-2 text-xl':
-				!props.rounded && props.size === 'large',
+			'rounded-sm px-2 py-1 text-xs': !props.rounded && props.size === 'tiny',
+			'rounded-sm px-2 py-1 text-sm': !props.rounded && props.size === 'small',
+			'rounded-sm px-2 py-1.5 text-base': !props.rounded && props.size === 'medium',
+			'rounded-sm px-3 py-2 text-xl': !props.rounded && props.size === 'large',
 			// Rounded sizes (fixed dimensions for perfect circle)
 			'rounded-full w-5 h-5': props.rounded && props.size === 'tiny',
 			'rounded-full w-7 h-7': props.rounded && props.size === 'small',
@@ -42,19 +38,16 @@ const emit = defineEmits<{
 			'rounded-full w-11 h-11': props.rounded && props.size === 'large',
 			// Variants
 			'bg-accent-500 hover:bg-accent-400': props.variant === 'primary',
-			'bg-secondary-500 hover:bg-secondary-400':
-				props.variant === 'secondary',
-			'bg-tertiary-500 hover:bg-tertiary-400':
-				props.variant === 'tertiary',
-			'bg-primary-500/20 hover:bg-primary-500/80':
-				props.variant === 'transparent',
+			'bg-secondary-500 hover:bg-secondary-400': props.variant === 'secondary',
+			'bg-tertiary-500 hover:bg-tertiary-400': props.variant === 'tertiary',
+			'bg-primary-500/20 hover:bg-primary-500/80': props.variant === 'transparent',
 		}"
 		:disabled="props.disabled"
 		@click="() => emit('click')"
 	>
-		<span v-if="icon && !$slots.default">
+		<span v-if="props.icon && !$slots.default">
 			<Icon
-				:icon="icon"
+				:icon="props.icon"
 				:class="{
 					'text-sm': props.size === 'tiny',
 					'text-md': props.size === 'small',
@@ -63,8 +56,8 @@ const emit = defineEmits<{
 				}"
 			/>
 		</span>
-		<span v-if="label && !$slots.default" class="font-medium">
-			{{ label }}
+		<span v-if="label && !$slots.default" class="font-medium whitespace-nowrap">
+			{{ props.label }}
 		</span>
 		<slot></slot>
 	</button>

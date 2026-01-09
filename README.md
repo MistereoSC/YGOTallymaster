@@ -41,6 +41,9 @@
 - [Electron](https://www.electronjs.org/)
 - [Vue 3](https://vuejs.org/)
 - [Vite](https://vitejs.dev/)
+  
+## ♥️ Support
+If you have more disposable income than you know what to do with, you can support me on ☕[ko-fi](https://ko-fi.com/mistereosc), to help me continue working on this project, and many more Video- and Boardgame related Apps!
 
 ---
 Card and image data provided by [YGOProDecks](https://ygoprodeck.com/api-guide/).

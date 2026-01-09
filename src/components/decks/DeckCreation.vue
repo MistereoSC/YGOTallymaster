@@ -320,7 +320,7 @@ function onCardShiftLClick(card: TCardData) {
 		>
 			<div class="h-full grid grid-rows-[auto_auto] overflow-hidden gap">
 				<div class="overflow-y-scroll scrollable border-b-2 border-b-primary-400 p-2">
-					<CardFilter :search-while-typing="true" />
+					<CardFilter :search-while-typing="true" :show-set-filter="true" />
 				</div>
 				<div class="h-full overflow-y-scroll scrollable">
 					<CardListVirtualList

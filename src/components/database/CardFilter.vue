@@ -32,9 +32,11 @@ import CardLinkSelection from './CardLinkSelection.vue'
 import Checkbox from '@/components/common/Checkbox.vue'
 import FilterSection from './FilterSection.vue'
 import ToggleButtonGroup from '@/components/common/ToggleButtonGroup.vue'
+import SetFilterSelector from './SetFilterSelector.vue'
 
 const props = defineProps<{
 	searchWhileTyping?: boolean
+	showSetFilter?: boolean
 }>()
 // #endregion
 // -----------------------------------------
@@ -73,6 +75,7 @@ function onReset(fullReset = true) {
 		searchInput.value = ''
 		toggledStaple.value = false
 		toggledCoreType.value = null
+		setFilter.value = null
 		resetSearch()
 	}
 
@@ -148,6 +151,11 @@ const scales = useToggleArray<number>('OR')
 const linkvals = useToggleArray<number>('OR')
 const linkMarkers = useToggleArray<TLinkMarkers>('AND')
 
+const setFilter = ref<{collectionName: string; setName: string} | null>(null)
+function onSetFilterChange() {
+	onSearch()
+}
+
 const toggledCoreType = ref<TCoreCardType | null>(null)
 function resetCoreType() {
 	toggledCoreType.value = null
@@ -159,7 +167,7 @@ function toggleCoreType(type: TCoreCardType) {
 	} else {
 		toggledCoreType.value = type
 	}
-	onReset(false)
+	onReset(false) // preserveSetFilter = true
 	onSearch()
 }
 
@@ -230,12 +238,14 @@ function _applyActiveQuery() {
 
 	atkFilter.value = [activeQuery.value.atk?.lte ?? null, activeQuery.value.atk?.gte ?? null]
 	defFilter.value = [activeQuery.value.def?.lte ?? null, activeQuery.value.def?.gte ?? null]
+	setFilter.value = activeQuery.value.setFilter ?? null
 }
 
 const query = computed<TSearchQuery>(() => ({
 	term: searchInput.value,
 	owned: toggledOwned.value,
 	staple: toggledStaple.value,
+	setFilter: setFilter.value ?? undefined,
 	attributes: attributes.items.value,
 	coreCardType: toggledCoreType.value ?? undefined,
 	monsterRaces: monsterRaces.items.value.length > 0 ? monsterRaces.items.value : undefined,
@@ -321,6 +331,13 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				@change="toggleStaple"
 			/>
 		</div>
+
+		<!-- Set Filter -->
+		<SetFilterSelector
+			v-if="props.showSetFilter"
+			v-model="setFilter"
+			@change="onSetFilterChange"
+		/>
 
 		<!-- Core Card Types -->
 		<FilterSection title="Monster/Spell/Trap" @reset="resetCoreType">

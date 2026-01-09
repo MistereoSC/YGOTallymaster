@@ -142,4 +142,14 @@ async function getCardListFromSet(set: TCardSet) {
 		.filter((card): card is TCardData => card !== undefined)
 }
 
-export {useCardCollections, getCardListFromSet}
+function getSetCardIds(collectionName: string, setName: string): Set<number> | null {
+	const collection = collections.value.find((c) => c.name === collectionName)
+	if (!collection) return null
+
+	const set = collection.sets.find((s) => s.name === setName)
+	if (!set) return null
+
+	return new Set(set.cards.map((card) => card.id))
+}
+
+export {useCardCollections, getCardListFromSet, getSetCardIds}

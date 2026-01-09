@@ -12,6 +12,7 @@ import {
 import MiniSearch from 'minisearch'
 import {ref, markRaw} from 'vue'
 import {getReadyCardIds} from './useOwnedCards'
+import {getSetCardIds} from './useCardCollections'
 import {ESortBy} from './searchTypes'
 
 // -----------------------------------------------------------
@@ -230,6 +231,7 @@ export type TSearchQuery = {
 
 	owned?: boolean
 	staple?: boolean
+	setFilter?: {collectionName: string; setName: string}
 }
 export type TCoreCardType = 'Monster' | 'Spell' | 'Trap'
 
@@ -273,6 +275,11 @@ function _createMinisearchIndex(cardData: TCardData[]) {
 
 function _applyQueryFilters(cardList: TCardData[] | TSearchResultCardData[], query: TSearchQuery) {
 	let cOut = cardList
+	// Apply Set Filter (apply early to reduce the dataset)
+	if (query.setFilter) {
+		cOut = _searchBySet(cOut, query.setFilter)
+	}
+
 	// Apply Owned/Staple Filter
 	if (query.owned) {
 		cOut = _searchOwnedCards(cOut)
@@ -338,6 +345,7 @@ function _searchQueryIsEmpty(query: TSearchQuery) {
 		query.term ||
 		query.owned ||
 		query.staple ||
+		query.setFilter ||
 		query.coreCardType ||
 		(query.attributes && query.attributes.length != 0) ||
 		(query.monsterTypes && query.monsterTypes.terms.length != 0) ||
@@ -490,6 +498,12 @@ function _searchStapleCards(cardList: TCardData[]) {
 	})
 }
 
+function _searchBySet(cardList: TCardData[], setFilter: {collectionName: string; setName: string}) {
+	const setCardIds = getSetCardIds(setFilter.collectionName, setFilter.setName)
+	if (!setCardIds || setCardIds.size === 0) return []
+	return cardList.filter((card) => setCardIds.has(card.id))
+}
+
 function __getAllViableValues<K extends keyof TCardData>(
 	key: K,
 	cardList: TCardData[] = fullCardList.value
@@ -530,6 +544,7 @@ const _find = {
 	SpellTrapType: _searchSpellTrapType,
 	Owned: _searchOwnedCards,
 	Staples: _searchStapleCards,
+	BySet: _searchBySet,
 	_ApplyAllQueryFilters: _applyQueryFilters,
 }
 // #endregion

@@ -40,6 +40,7 @@ const menuItems = [
 						size="medium"
 						:gray-unowned="false"
 						:gray-override="false"
+						show-banlist-for="none"
 					/>
 
 					<div

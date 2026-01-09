@@ -165,7 +165,6 @@ onBeforeUnmount(async () => {
 	await saveDeck(newDeckData, props.deckData.name)
 })
 
-
 function onReturnClick() {
 	emit('close')
 }
@@ -316,13 +315,15 @@ function onCardShiftLClick(card: TCardData) {
 			</div>
 		</div>
 		<div
-			class="border-l border-primary-600 max-w-180 w-[30vw] bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+			class="border-l border-primary-600 max-w-180 w-[30vw] bg-primary-700 h-full overflow-hidden"
 		>
-			<div class="h-full grid grid-rows-[auto_auto] overflow-hidden gap">
-				<div class="overflow-y-scroll scrollable border-b-2 border-b-primary-400 p-2">
+			<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden gap">
+				<div
+					class="max-h-[50vh] overflow-y-scroll scrollable border-b border-primary-500 p-2 pr-1"
+				>
 					<CardFilter :search-while-typing="true" :show-set-filter="true" />
 				</div>
-				<div class="h-full overflow-y-scroll scrollable">
+				<div class="h-full overflow-y-hidden">
 					<CardListVirtualList
 						:card-list="searchResults == null ? fullCardList : searchResults"
 						:show-limited-info="settings?.listSizeSmallList === 'tiny'"

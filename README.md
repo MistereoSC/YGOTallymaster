@@ -1,18 +1,45 @@
-# Vue 3 + TypeScript + Vite
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-## Recommended IDE Setup
+# YGO Tallymaster
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+**YGO Tallymaster** is your all-in-one desktop companion for Yu-Gi-Oh! card enthusiasts! Built with Electron and Vue 3, this app makes managing your collection fun, fast, and flexible.
 
-## Type Support For `.vue` Imports in TS
+## ✨ Features
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+- 🗂️ **Organize your cards** in Collections and Sets (use them directly in Deck creation!)
+- 🏗️ **Create and manage Decks** for any playstyle
+- 🔍 **Browse and search** the entire Yu-Gi-Oh! card database (data from [YGOProDecks](https://ygoprodeck.com/api-guide/))
+- 🏆 **Banlists for all formats** – always up-to-date, so you can check card legality for any official format
+- 🧩 **Explore all Card Archetypes** – discover, filter, and learn about every archetype in the game
+- 🖼️ **Images stored locally** after first download for fast, offline browsing
+- ⚡ Modern, responsive UI powered by Electron + Vue 3
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+## 💾 Data & Storage
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+- Card and set data is fetched from YGOProDecks API
+- **Images and API data** are stored locally after the initial fetch
+- Up to **2.5GB** of storage may be used for images and card data
+
+## 🚀 Getting Started
+
+1. **Install dependencies:**
+   ```sh
+   npm install
+   ```
+2. **Start the app in development mode:**
+   ```sh
+   npm run dev
+   ```
+3. **Build the app for production:**
+   ```sh
+   npm run build
+   ```
+
+## 🛠️ Tech Stack
+
+- [Electron](https://www.electronjs.org/) (desktop app framework)
+- [Vue 3](https://vuejs.org/) (frontend framework)
+- [Vite](https://vitejs.dev/) (build tool)
+
+---
+Card and image data provided by [YGOProDecks](https://ygoprodeck.com/api-guide/).

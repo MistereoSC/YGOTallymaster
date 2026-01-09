@@ -175,7 +175,9 @@ function onDeckAreaWheel(e: WheelEvent) {
 					v-if="activePanel === 'filter'"
 					class="h-full grid grid-rows-[auto_auto] overflow-hidden"
 				>
-					<div class="overflow-y-scroll scrollable border-b-2 border-b-primary-400 p-2">
+					<div
+						class="max-h-[50vh] overflow-y-scroll scrollable border-b border-primary-500 p-2 pr-1"
+					>
 						<CardFilter :search-while-typing="true" />
 					</div>
 					<div class="h-full overflow-hidden">

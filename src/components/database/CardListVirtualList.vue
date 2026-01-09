@@ -172,7 +172,7 @@ defineExpose({
 <template>
 	<div
 		ref="scrollContainer"
-		class="w-full h-full overflow-y-scroll scrollable p-4"
+		class="w-full h-full overflow-y-scroll scrollable p-3"
 		@scroll="handleScroll"
 	>
 		<!-- Empty state -->

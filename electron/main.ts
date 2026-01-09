@@ -29,7 +29,7 @@ let win: BrowserWindow | null
 
 function createWindow() {
 	win = new BrowserWindow({
-		icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+		icon: path.join(process.env.VITE_PUBLIC, 'Icon.png'),
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,
@@ -40,6 +40,9 @@ function createWindow() {
 		minWidth: 1284,
 		minHeight: 768,
 	})
+
+	// Remove the default menu bar (File, Edit, View, etc.)
+	win.removeMenu()
 
 	// Prevent new window creation and open external links in default browser
 	win.webContents.setWindowOpenHandler(({url}) => {

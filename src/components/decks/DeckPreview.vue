@@ -68,6 +68,7 @@ const menuItems = [
 							v-if="previewCard"
 							:card="previewCard"
 							size="medium"
+							show-banlist-for="none"
 							class="pointer-events-none center-shell-image"
 						/>
 						<!-- Gradient overlay for better text readability -->

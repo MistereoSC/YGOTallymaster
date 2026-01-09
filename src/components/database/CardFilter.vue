@@ -497,7 +497,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		</FilterSection>
 
 		<!-- Info -->
-		<div
+		<!-- <div
 			v-if="!toggledCoreType"
 			class="px-2 py-2 rounded-lg bg-primary-800/50 border border-primary-600 flex items-center gap-3"
 		>
@@ -506,6 +506,6 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				<span class="font-medium text-contrast-600">(Monster / Spell / Trap)</span>
 				to see more filters.
 			</p>
-		</div>
+		</div> -->
 	</div>
 </template>

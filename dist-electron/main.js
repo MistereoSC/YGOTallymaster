@@ -11,7 +11,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win;
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    icon: path.join(process.env.VITE_PUBLIC, "Icon.png"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -22,6 +22,7 @@ function createWindow() {
     minWidth: 1284,
     minHeight: 768
   });
+  win.removeMenu();
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: "deny" };

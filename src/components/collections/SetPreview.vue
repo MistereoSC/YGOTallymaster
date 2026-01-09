@@ -48,7 +48,7 @@ const menuItems = [
 					<div
 						class="absolute bottom-0 left-0 right-0 p-3 text-white pointer-events-none"
 					>
-						<p class="font-bold truncate text-sm drop-shadow-lg">
+						<p class="font-bold text-sm drop-shadow-lg">
 							{{ set.name }}
 						</p>
 						<div class="flex items-center gap-3 mt-1 text-xs text-contrast-400">
@@ -72,7 +72,7 @@ const menuItems = [
 						class="text-4xl text-contrast-300 mb-2 transition-transform duration-200 group-hover:text-accent-400"
 					/>
 					<span
-						class="font-bold transition-colors duration-200 group-hover:text-contrast-700"
+						class="font-bold transition-colors duration-200 group-hover:text-contrast-700 text-center px-2"
 						>{{ set.name }}</span
 					>
 					<span class="text-contrast-500">(No Cards)</span>

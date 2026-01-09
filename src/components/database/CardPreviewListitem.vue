@@ -186,24 +186,34 @@ const styles = getCardStyles(props.card)
 								<span class="font-bold">{{ card.scale }}</span>
 								<div class="rotate-45 w-2 h-2 bg-red-500"></div>
 							</span>
-							<div
-								class="h-full grid grid-cols-[74px_74px] gap-2"
-								v-if="card.attribute"
-							>
-								<span class="whitespace-nowrap">
-									Atk/
-									<b class="font-semibold">{{
-										card.atk! >= 0 ? card.atk : '?'
-									}}</b>
+							<div class="h-full grid grid-cols-[72px_72px]" v-if="card.attribute">
+								<span class="flex items-center gap-1">
+									<Icon
+										icon="material-symbols:swords-rounded"
+										class="text-red-400"
+									/>
+									<b class="font-semibold">
+										{{ card.atk! >= 0 ? card.atk : '?' }}
+									</b>
 								</span>
-								<span v-if="card.linkval" class="font-semibold whitespace-nowrap" >
-									LINK {{ card.linkval }}
+								<span v-if="card.linkval" class="flex items-center gap-1">
+									<Icon
+										icon="material-symbols:link-rounded"
+										class="text-accent-400"
+									/>
+
+									<b class="font-semibold">
+										{{ card.linkval }}
+									</b>
 								</span>
-								<span v-else class="whitespace-nowrap">
-									Def/
-									<b class="font-semibold">{{
-										card.def! >= 0 ? card.def : '?'
-									}}</b>
+								<span v-else class="flex items-center gap-1">
+									<Icon
+										icon="material-symbols:shield-rounded"
+										class="text-blue-400"
+									/>
+									<b class="font-semibold">
+										{{ card.def! >= 0 ? card.def : '?' }}
+									</b>
 								</span>
 							</div>
 						</div>

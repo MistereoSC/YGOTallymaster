@@ -78,10 +78,12 @@ const menuItems = [
 						<div
 							class="absolute bottom-0 left-0 right-0 p-3 text-white pointer-events-none"
 						>
-							<p class="font-bold truncate text-sm drop-shadow-lg">
+							<p class="font-bold text-sm drop-shadow-lg">
 								{{ deckData.name }}
 							</p>
-							<div class="flex items-center gap-3 mt-1 text-xs text-contrast-400">
+							<div
+								class="flex justify-center items-center gap-3 mt-1 text-xs text-contrast-400"
+							>
 								<span
 									class="flex items-center gap-1"
 									:class="{

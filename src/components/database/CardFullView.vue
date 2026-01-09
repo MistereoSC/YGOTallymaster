@@ -38,9 +38,7 @@ const emit = defineEmits([])
 							size="small"
 						/>
 					</span>
-					<span class="text-xl font-bold text-contrast-700 flex-1 truncate">{{
-						card.name
-					}}</span>
+					<span class="text-xl font-bold text-contrast-700 flex-1">{{ card.name }}</span>
 					<span class="shrink-0 w-8 h-8 flex items-center justify-center">
 						<AttributeIcon :attribute="card.attribute ?? card.race" />
 					</span>

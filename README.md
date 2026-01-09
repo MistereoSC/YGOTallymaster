@@ -2,11 +2,12 @@
 
 # YGO Tallymaster
 
-**YGO Tallymaster** is your all-in-one desktop companion for Yu-Gi-Oh! card enthusiasts! Built with Electron and Vue 3, this app makes managing your collection fun, fast, and flexible.
+**YGO Tallymaster** is a all-in-one desktop companion for Yu-Gi-Oh! Built with Electron and Vue 3, this app makes managing your collection fast, and flexible.
 
 ## ✨ Features
 
 - 🗂️ **Organize your cards** in Collections and Sets (use them directly in Deck creation!)
+- 💖 **Mark Owned Cards** for Deck Creation and Collection Management
 - 🏗️ **Create and manage Decks** for any playstyle
 - 🔍 **Browse and search** the entire Yu-Gi-Oh! card database (data from [YGOProDecks](https://ygoprodeck.com/api-guide/))
 - 🏆 **Banlists for all formats** – always up-to-date, so you can check card legality for any official format
@@ -37,9 +38,24 @@
 
 ## 🛠️ Tech Stack
 
-- [Electron](https://www.electronjs.org/) (desktop app framework)
-- [Vue 3](https://vuejs.org/) (frontend framework)
-- [Vite](https://vitejs.dev/) (build tool)
+- [Electron](https://www.electronjs.org/)
+- [Vue 3](https://vuejs.org/)
+- [Vite](https://vitejs.dev/)
 
 ---
 Card and image data provided by [YGOProDecks](https://ygoprodeck.com/api-guide/).
+---
+
+# Images
+## Card Database
+![Database Filters](https://i.imgur.com/FRYgE7D.png)
+![Card Details](https://i.imgur.com/yKJcrWs.png)
+## Card Archetypes
+![Card Archetypes](https://i.imgur.com/uIz1RLX.png)
+## Banlist
+![Banlists](https://i.imgur.com/Fuc33KR.png)
+## Decks
+![Deck List](https://i.imgur.com/k8urOjH.png)
+![Deck Creation](https://i.imgur.com/3YiUC3O.png)
+## Collections
+![Collections](https://i.imgur.com/WcgAvD5.png)

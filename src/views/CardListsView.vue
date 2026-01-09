@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import CollectionCreationModal from '@/components/collections/CollectionCreationModal.vue'
 import CollectionList from '@/components/collections/CollectionList.vue'
 import SetView from '@/components/collections/SetView.vue'
 import Button from '@/components/common/Button.vue'
+import NameInputModal from '@/components/common/NameInputModal.vue'
 import Spinner from '@/components/common/Spinner.vue'
 import {TFullSet, useCardCollections} from '@/composables/useCardCollections'
 import {Icon} from '@iconify/vue'
@@ -65,9 +65,10 @@ onBeforeUnmount(() => {
 					</div>
 				</div>
 				<div v-if="collections.length < 64">
-					<CollectionCreationModal
-						@create="(name) => createCollection(name)"
-						:existing-collections="collections"
+					<NameInputModal
+						@confirm="(newName) => createCollection(newName)"
+						:existing-items="collections"
+						item-type="Collection"
 					>
 						<template #trigger>
 							<Button
@@ -76,7 +77,7 @@ onBeforeUnmount(() => {
 								size="small"
 							/>
 						</template>
-					</CollectionCreationModal>
+					</NameInputModal>
 				</div>
 			</div>
 			<!-- Collections List -->
@@ -108,11 +109,15 @@ onBeforeUnmount(() => {
 			<p class="text-lg font-medium text-contrast-700">No collections found</p>
 			<p class="text-sm text-contrast-500">Let's start by creating your first collection</p>
 			<div class="mt-2">
-				<CollectionCreationModal @create="(name) => createCollection(name)">
+				<NameInputModal
+					@confirm="(newName) => createCollection(newName)"
+					:existing-items="collections"
+					item-type="Collection"
+				>
 					<template #trigger>
 						<Button icon="material-symbols:add-rounded" label="Create Collection" />
 					</template>
-				</CollectionCreationModal>
+				</NameInputModal>
 			</div>
 		</div>
 	</div>

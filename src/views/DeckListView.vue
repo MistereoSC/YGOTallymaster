@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import DeckCreationModal from '@/components/decks/DeckCreationModal.vue'
 import DeckPreview from '@/components/decks/DeckPreview.vue'
 import {getFullCardList} from '@/composables/useCardSearch'
 import {useDeckList} from '@/composables/useDeckList'
@@ -10,6 +9,7 @@ import Spinner from '@/components/common/Spinner.vue'
 import ConfirmCancelModal from '@/components/common/ConfirmCancelModal.vue'
 import {Icon} from '@iconify/vue'
 import Button from '@/components/common/Button.vue'
+import NameInputModal from '@/components/common/NameInputModal.vue'
 
 const {initialized, deckList, createDeck, deleteDeck, renameDeck} = useDeckList()
 onBeforeMount(async () => {
@@ -96,11 +96,11 @@ onBeforeUnmount(() => {
 		<p class="text-lg font-medium text-contrast-700">No decks found</p>
 		<p class="text-sm text-contrast-500">Let's start by creating your first deck</p>
 		<div class="mt-2">
-			<DeckCreationModal @create="(name) => onCreateDeck(name)">
+			<NameInputModal @confirm="(name) => onCreateDeck(name)" item-type="Deck">
 				<template #trigger>
 					<Button icon="material-symbols:add-rounded" label="Create Deck" />
 				</template>
-			</DeckCreationModal>
+			</NameInputModal>
 		</div>
 	</div>
 	<div v-else-if="initialized" class="h-full flex flex-col overflow-hidden">
@@ -126,9 +126,10 @@ onBeforeUnmount(() => {
 					@rename="() => onDeckRename(deck)"
 				/>
 				<div class="w-48 h-77 grid place-items-center" v-if="deckList.length < 200">
-					<DeckCreationModal
-						:existing-decks="deckList"
-						@create="(name) => onCreateDeck(name)"
+					<NameInputModal
+						:existing-items="deckList"
+						item-type="Deck"
+						@confirm="(name) => onCreateDeck(name)"
 					>
 						<template #trigger>
 							<div
@@ -153,7 +154,7 @@ onBeforeUnmount(() => {
 								</div>
 							</div>
 						</template>
-					</DeckCreationModal>
+					</NameInputModal>
 				</div>
 			</div>
 		</div>
@@ -181,12 +182,13 @@ onBeforeUnmount(() => {
 		</template>
 	</ConfirmCancelModal>
 
-	<DeckCreationModal
+	<NameInputModal
 		:open="deckRenameModalOpen"
-		:existing-decks="deckList"
-		@create="(name) => onDeckRenameConfirm(name)"
+		:existing-items="deckList"
+		:existing-name="activeDeckForAction?.name"
+		item-type="Deck"
+		@confirm="(newName) => onDeckRenameConfirm(newName)"
 		@close="onDeckRenameCancel"
-		:existing-deck-name-for-rename="activeDeckForAction?.name"
 	/>
 </template>
 

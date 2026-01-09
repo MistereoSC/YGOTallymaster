@@ -1,19 +1,7 @@
 <script setup lang="ts">
-import {
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogOverlay,
-	AlertDialogPortal,
-	AlertDialogRoot,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from 'reka-ui'
 import Button from './Button.vue'
-import {useSlots} from 'vue'
+import {onMounted, onUnmounted} from 'vue'
 
-const slots = useSlots()
 const props = defineProps<{
 	open: boolean
 	headingText: string
@@ -25,35 +13,67 @@ const emit = defineEmits<{
 	(e: 'cancel'): void
 	(e: 'confirm'): void
 }>()
+
+function onKeydown(e: KeyboardEvent) {
+	if (e.key === 'Escape' && props.open) {
+		emit('cancel')
+	}
+}
+
+onMounted(() => {
+	window.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('keydown', onKeydown)
+})
 </script>
 
 <template>
-	<AlertDialogRoot :open="props.open">
-		<AlertDialogTrigger as-child v-if="slots.trigger">
-			<slot name="trigger" />
-		</AlertDialogTrigger>
-		<AlertDialogPortal>
-			<AlertDialogOverlay
-				class="bg-primary-800/90 dark:bg-blackA9 data-[state=open]:animate-overlayShow fixed inset-0 z-30"
-			/>
-			<AlertDialogContent
-				class="z-100 text-sm data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-126 translate-x-[-50%] translate-y-[-50%] rounded-lg bg-primary-700 p-6 shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none"
+	<slot name="trigger" />
+
+	<Teleport to="body">
+		<Transition name="modal">
+			<div
+				v-if="props.open"
+				class="fixed inset-0 bg-primary-900/90 z-200 grid place-items-center backdrop-blur-sm"
+				@click.self="emit('cancel')"
 			>
-				<AlertDialogTitle class="text-mauve12 m-0 text-[17px] font-semibold">
-					{{ props.headingText }}
-				</AlertDialogTitle>
-				<AlertDialogDescription class="text-mauve11 mt-4 mb-5 text-sm leading-normal">
-					<slot name="content" />
-				</AlertDialogDescription>
-				<div class="flex justify-end gap-4">
-					<AlertDialogCancel @click="emit('cancel')">
-						<Button :label="props.cancelText || 'Cancel'" @click="emit('cancel')" />
-					</AlertDialogCancel>
-					<AlertDialogAction>
-						<Button :label="props.confirmText || 'Confirm'" @click="emit('confirm')" />
-					</AlertDialogAction>
+				<div
+					class="w-full max-w-md bg-primary-800 p-5 rounded-xl border border-primary-600 shadow-2xl"
+				>
+					<h2 class="text-lg font-semibold text-contrast-700 mb-4">
+						{{ props.headingText }}
+					</h2>
+					<div class="text-sm text-contrast-500 mb-5">
+						<slot name="content" />
+					</div>
+					<div class="flex justify-end gap-3">
+						<Button
+							:label="props.cancelText || 'Cancel'"
+							size="small"
+							@click="emit('cancel')"
+						/>
+						<Button
+							:label="props.confirmText || 'Confirm'"
+							size="small"
+							@click="emit('confirm')"
+						/>
+					</div>
 				</div>
-			</AlertDialogContent>
-		</AlertDialogPortal>
-	</AlertDialogRoot>
+			</div>
+		</Transition>
+	</Teleport>
 </template>
+
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+	transition: opacity 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+	opacity: 0;
+}
+</style>

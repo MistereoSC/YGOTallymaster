@@ -24,7 +24,7 @@ const routes = [
 	{
 		path: '/Decks',
 		name: 'Decks',
-		component: () => import('../views/DeckList.vue'),
+		component: () => import('../views/DeckListView.vue'),
 	},
 	{
 		path: '/Lists',

@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import {TFullCollection, TFullSet} from '@/composables/useCardCollections'
-import SetCreationModal from './SetCreationModal.vue'
+import {TFullCollection, TFullSet, useCardCollections} from '@/composables/useCardCollections'
 import SetPreview from './SetPreview.vue'
-import ConfirmCancelModal from '../common/ConfirmCancelModal.vue'
+import ConfirmCancelModal from '@/components/common/ConfirmCancelModal.vue'
 import {ref} from 'vue'
-import Button from '../common/Button.vue'
+import Button from '@/components/common/Button.vue'
 import DropdownMenu from './DropdownMenu.vue'
-import CollectionCreationModal from './CollectionCreationModal.vue'
 import {Icon} from '@iconify/vue'
+import NameInputModal from '@/components/common/NameInputModal.vue'
+
+const {collections} = useCardCollections()
 
 const props = defineProps<{
 	collection: TFullCollection
@@ -128,9 +129,10 @@ function onCancelRenameCollection() {
 				class="w-43.25 h-64.5 grid place-items-center"
 				v-if="props.collection.sets.length < 64"
 			>
-				<SetCreationModal
-					:existing-sets="props.collection.sets"
-					@create="(name) => emit('createSet', name)"
+				<NameInputModal
+					:existing-items="props.collection.sets"
+					item-type="Set"
+					@confirm="(name) => emit('createSet', name)"
 				>
 					<template #trigger>
 						<div
@@ -155,7 +157,7 @@ function onCancelRenameCollection() {
 							</div>
 						</div>
 					</template>
-				</SetCreationModal>
+				</NameInputModal>
 			</div>
 		</div>
 
@@ -171,12 +173,13 @@ function onCancelRenameCollection() {
 				<p>Are you sure you want to delete this set? This action cannot be undone.</p>
 			</template>
 		</ConfirmCancelModal>
-		<SetCreationModal
+		<NameInputModal
 			:open="confirmRenameOpen"
-			:existing-sets="props.collection.sets"
-			:existing-set-name-for-rename="activeActionForSet?.name"
+			:existing-name="activeActionForSet?.name"
+			:existing-items="props.collection.sets"
+			item-type="Set"
+			@confirm="(newName) => onConfirmRenameSet(newName)"
 			@close="onCancelRenameSet"
-			@create="onConfirmRenameSet"
 		/>
 
 		<ConfirmCancelModal
@@ -194,11 +197,12 @@ function onCancelRenameCollection() {
 				</p>
 			</template>
 		</ConfirmCancelModal>
-		<CollectionCreationModal
+		<NameInputModal
 			:open="confirmRenameCollectionOpen"
-			:existing-collections="[]"
-			:existing-collection-name-for-rename="props.collection.name"
-			@create="onConfirmRenameCollection"
+			:existing-name="props.collection.name"
+			:existing-items="collections"
+			item-type="Collection"
+			@confirm="(newName) => onConfirmRenameCollection(newName)"
 			@close="onCancelRenameCollection"
 		/>
 	</div>

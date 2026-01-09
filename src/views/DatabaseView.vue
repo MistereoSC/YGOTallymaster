@@ -10,7 +10,6 @@ import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
-import {Icon} from '@iconify/vue'
 const {searchResults, fullCardList, resetSearch} = useCardSearch()
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)

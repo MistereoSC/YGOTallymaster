@@ -69,7 +69,6 @@ onUnmounted(() => {
 const hoveredCard = ref<null | TCardData>(null)
 function onCardHover(card?: TCardData) {
 	hoveredCard.value = card || null
-	settingsToggled.value = false
 }
 
 function onCardAdd(card: TCardData, addToSideDeck = false) {
@@ -166,10 +165,6 @@ onBeforeUnmount(async () => {
 	await saveDeck(newDeckData, props.deckData.name)
 })
 
-const settingsToggled = ref(false)
-function toggleSettings() {
-	settingsToggled.value = !settingsToggled.value
-}
 
 function onReturnClick() {
 	emit('close')
@@ -201,12 +196,6 @@ function onCardShiftLClick(card: TCardData) {
 							icon="material-symbols:keyboard-return-rounded"
 							@click="onReturnClick"
 						/>
-						<!-- <Button
-							rounded
-							size="small"
-							icon="material-symbols:settings-rounded"
-							@click="toggleSettings"
-						/> -->
 						<Button
 							size="small"
 							rounded
@@ -216,8 +205,7 @@ function onCardShiftLClick(card: TCardData) {
 					</span>
 				</div>
 				<div class="p-2 h-full overflow-y-auto scrollable" ref="cardFullViewContainer">
-					<div v-if="settingsToggled" class="flex flex-col gap-4"></div>
-					<CardFullView v-else-if="hoveredCard" :card="hoveredCard" />
+					<CardFullView v-if="hoveredCard" :card="hoveredCard" />
 				</div>
 			</div>
 		</div>

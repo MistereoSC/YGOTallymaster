@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {Icon} from '@iconify/vue'
-import {onMounted} from 'vue'
 
 const props = defineProps<{
 	label?: string

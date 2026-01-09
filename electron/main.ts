@@ -29,7 +29,7 @@ let win: BrowserWindow | null
 
 function createWindow() {
 	win = new BrowserWindow({
-		icon: path.join(process.env.VITE_PUBLIC, 'Icon.png'),
+		icon: path.join(process.env.VITE_PUBLIC, 'Icon.ico'),
 		webPreferences: {
 			nodeIntegration: false,
 			contextIsolation: true,

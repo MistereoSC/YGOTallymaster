@@ -15,7 +15,7 @@
     "target": [
       "dmg"
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+    "artifactName": "${productName}-Installer_v${version}.${ext}"
   },
   "win": {
     "target": [
@@ -26,18 +26,22 @@
         ]
       }
     ],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "${productName}-Setup_v${version}.${ext}"
+     ,"icon": "public/Icon.ico"
   },
   "nsis": {
     "oneClick": false,
     "perMachine": false,
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": false
+     ,"installerIcon": "public/Icon.ico"
+     ,"uninstallerIcon": "public/Icon.ico"
+     ,"shortcutName": "YGO Tallymaster"
   },
   "linux": {
     "target": [
       "AppImage"
     ],
-    "artifactName": "${productName}-Linux-${version}.${ext}"
+    "artifactName": "${productName}_v${version}.${ext}"
   }
 }

@@ -140,7 +140,7 @@ export type TDatabaseSettings = {
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	showBanlistFor: 'ban_tcg',
 	listSizeSmallList: 'tiny',
-	grayUnownedSmallList: true,
+	grayUnownedSmallList: false,
 
 	displayAsList: false,
 	showOwnedNumbers: false,

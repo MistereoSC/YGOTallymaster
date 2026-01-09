@@ -15,24 +15,36 @@ const emit = defineEmits<{
 </script>
 
 <template>
-	<div class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col">
-		<h3 class="font-bold m-0 gap-2 grid grid-cols-[auto_1fr_auto]">
-			<Button
-				icon="material-symbols:reset-settings-outline-rounded"
-				rounded
-				size="small"
-				@click="emit('reset')"
-			/>
-			<span>{{ title }}</span>
+	<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600">
+		<div
+			class="px-3 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between"
+			:class="{'grid grid-cols-[1fr_auto_1fr]': props.hasOperandToggle && props.operand}"
+		>
+			<div class="flex items-center gap-2">
+				<span class="font-semibold text-contrast-600">{{ title }}</span>
+				<span
+					v-if="props.operand && !props.hasOperandToggle"
+					class="text-xs px-1.5 py-0.5 rounded bg-primary-600 text-contrast-400"
+				>
+					{{ props.operand }}
+				</span>
+			</div>
 			<ToggleSwitch
 				v-if="props.hasOperandToggle && props.operand"
 				:duo-labels="['AND', 'OR']"
 				:model-value="props.operand === 'AND'"
 				@toggle="emit('toggle-operand')"
 			/>
-			<span v-else-if="props.operand" class="text-contrast-400">({{ props.operand }})</span>
-		</h3>
-		<div class="flex gap-3 flex-wrap items-center justify-center">
+			<span class="flex justify-end">
+				<Button
+					icon="material-symbols:refresh-rounded"
+					rounded
+					size="small"
+					@click="emit('reset')"
+				/>
+			</span>
+		</div>
+		<div class="p-3 flex gap-2 flex-wrap items-center justify-center">
 			<slot />
 		</div>
 	</div>

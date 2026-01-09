@@ -21,7 +21,9 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 
 <template>
 	<div class="grid grid-rows-[auto_1fr] overflow-hidden h-full">
-		<div class="bg-primary-600 p-1 flex justify-between items-center">
+		<div
+			class="h-12 w-full flex justify-between px-4 py-1 items-center bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
+		>
 			<div class="flex items-center gap-4">
 				<Button
 					size="small"
@@ -29,10 +31,17 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 					icon="material-symbols:keyboard-return-rounded"
 					@click="emit('close')"
 				/>
-				<span class="font-bold">{{ props.archetype.name }}</span>
-				<span class="font-bold text-contrast-600 pl-8">
-					{{ props.archetype.count }} Cards
-				</span>
+				<div class="flex gap-3 items-center">
+					<div class="flex flex-col">
+						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+							{{ props.archetype.name }}
+						</h2>
+						<p class="text-xs text-contrast-500">
+							<span class="font-medium">{{ props.archetype.count }}</span>
+							cards
+						</p>
+					</div>
+				</div>
 			</div>
 			<div></div>
 		</div>
@@ -57,7 +66,7 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 			</div>
 			<div
 				v-if="activeCard"
-				class="min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+				class="border-l border-primary-600 min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
 				<div class="h-full overflow-y-auto scrollable p-3">
 					<CardFullView :card="activeCard" />

@@ -96,7 +96,9 @@ function onDeckAreaWheel(e: WheelEvent) {
 
 <template>
 	<div v-if="initialized === 'ready'" class="grid grid-rows-[auto_1fr] h-full overflow-hidden">
-		<div class="bg-primary-600 w-full py-1 px-1 gap-4 items-center grid grid-cols-2">
+		<div
+			class="h-12 w-full flex justify-between px-4 py-1 items-center bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
+		>
 			<span class="flex gap-4 items-center">
 				<Button
 					size="small"
@@ -105,10 +107,18 @@ function onDeckAreaWheel(e: WheelEvent) {
 					@click="onReturnClick"
 				/>
 
-				<h2 class="font-bold flex gap-2 items-center">
-					<div class="text-contrast-500">{{ set.name }}</div>
-					<div>{{ collectionName }}</div>
-				</h2>
+				<div class="flex gap-3 items-center">
+					<div class="flex flex-col">
+						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+							{{ props.set.name }}
+						</h2>
+						<p class="text-xs text-contrast-500">
+							<span class="font-medium">
+								{{ collectionName }}
+							</span>
+						</p>
+					</div>
+				</div>
 			</span>
 			<span class="flex gap-2 items-center justify-end">
 				<Button
@@ -116,11 +126,14 @@ function onDeckAreaWheel(e: WheelEvent) {
 					size="small"
 					icon="material-symbols:filter-alt"
 					@click="toggleFilter"
+					:class="activePanel === 'filter' ? 'ring-2 ring-accent-500/50' : ''"
 				/>
 			</span>
 		</div>
 		<div class="grid h-full grid-cols-[auto_1fr_auto] overflow-hidden">
-			<div class="min-w-86 w-[25vw] max-w-132 bg-primary-700 grid h-full overflow-hidden">
+			<div
+				class="border-r border-primary-600 min-w-86 w-[25vw] max-w-132 bg-primary-700 grid h-full overflow-hidden"
+			>
 				<div class="p-2 h-full overflow-y-auto scrollable" ref="cardFullViewContainer">
 					<CardFullView v-if="hoveredCard" :card="hoveredCard" />
 				</div>
@@ -155,7 +168,7 @@ function onDeckAreaWheel(e: WheelEvent) {
 				/>
 			</div>
 			<div
-				class="max-w-180 w-[30vw] bg-primary-700 h-full overflow-hidden"
+				class="border-l border-primary-600 max-w-180 w-[30vw] bg-primary-700 h-full overflow-hidden"
 				v-if="activePanel !== 'none'"
 			>
 				<div

@@ -85,47 +85,77 @@ onBeforeUnmount(() => {
 	</div>
 	<div
 		v-else-if="initialized && deckList.length === 0"
-		class="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400"
+		class="flex flex-col items-center justify-center h-full gap-2"
 	>
-		<Icon icon="material-symbols:credit-card-off-rounded" class="text-4xl" />
-		<p class="text-lg font-medium">No decks found</p>
-		<p class="text-sm opacity-75">Let's start by creating your first deck</p>
-		<div>
+		<div class="w-16 h-16 rounded-2xl bg-tertiary-500/20 flex items-center justify-center mb-2">
+			<Icon
+				icon="material-symbols:credit-card-off-rounded"
+				class="text-tertiary-400 text-4xl"
+			/>
+		</div>
+		<p class="text-lg font-medium text-contrast-700">No decks found</p>
+		<p class="text-sm text-contrast-500">Let's start by creating your first deck</p>
+		<div class="mt-2">
 			<DeckCreationModal @create="(name) => onCreateDeck(name)">
 				<template #trigger>
-					<Button
-						class="text-contrast-800 mt-4"
-						icon="material-symbols:add-2-rounded"
-						label="Create Deck"
-					/>
+					<Button icon="material-symbols:add-rounded" label="Create Deck" />
 				</template>
 			</DeckCreationModal>
 		</div>
 	</div>
-	<div v-else-if="initialized" class="p-8 w-full flex flex-wrap overflow-auto gap-8">
-		<DeckPreview
-			v-for="deck in deckList"
-			:key="deck.name"
-			:deck-data="deck"
-			@click="activeDeck = deck"
-			@delete="() => onDeckDelete(deck)"
-			@rename="() => onDeckRename(deck)"
-		/>
-		<div class="w-48 h-77 grid place-items-center" v-if="deckList.length < 200">
-			<DeckCreationModal :existing-decks="deckList" @create="(name) => onCreateDeck(name)">
-				<template #trigger>
-					<div
-						class="h-full w-full rounded-lg text-contrast-400 hover:text-contrast-900 bg-primary-700 cursor-pointer shadow-lg transition-colors hover:bg-primary-600"
+	<div v-else-if="initialized" class="h-full flex flex-col overflow-hidden">
+		<!-- Page Header -->
+		<div
+			class="w-full px-4 py-1 h-12 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between shrink-0"
+		>
+			<div class="flex items-center gap-3">
+				<div class="flex flex-col">
+					<h1 class="font-semibold text-contrast-700">Decks</h1>
+				</div>
+			</div>
+		</div>
+		<!-- Deck Grid -->
+		<div class="flex-1 overflow-auto scrollable p-6">
+			<div class="flex flex-wrap gap-6">
+				<DeckPreview
+					v-for="deck in deckList"
+					:key="deck.name"
+					:deck-data="deck"
+					@click="activeDeck = deck"
+					@delete="() => onDeckDelete(deck)"
+					@rename="() => onDeckRename(deck)"
+				/>
+				<div class="w-48 h-77 grid place-items-center" v-if="deckList.length < 200">
+					<DeckCreationModal
+						:existing-decks="deckList"
+						@create="(name) => onCreateDeck(name)"
 					>
-						<div
-							class="select-none h-full w-full flex justify-center items-center flex-col font-bold"
-						>
-							<span class="text-4xl">+</span>
-							<span class="">Add Deck</span>
-						</div>
-					</div>
-				</template>
-			</DeckCreationModal>
+						<template #trigger>
+							<div
+								class="h-full w-full rounded-lg bg-primary-700/50 cursor-pointer shadow-lg transition-all duration-200 hover:bg-primary-600/70 border-2 border-dashed border-primary-500 hover:border-accent-500/50 group"
+							>
+								<div
+									class="select-none h-full w-full flex justify-center items-center flex-col gap-2"
+								>
+									<div
+										class="w-12 h-12 rounded-full bg-primary-600 group-hover:bg-accent-500/20 flex items-center justify-center transition-colors"
+									>
+										<Icon
+											icon="material-symbols:add-rounded"
+											class="text-3xl text-contrast-400 group-hover:text-accent-400 transition-colors"
+										/>
+									</div>
+									<span
+										class="font-semibold text-contrast-400 group-hover:text-contrast-600 transition-colors"
+									>
+										Add Deck
+									</span>
+								</div>
+							</div>
+						</template>
+					</DeckCreationModal>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -155,6 +185,7 @@ onBeforeUnmount(() => {
 		:open="deckRenameModalOpen"
 		:existing-decks="deckList"
 		@create="(name) => onDeckRenameConfirm(name)"
+		@close="onDeckRenameCancel"
 		:existing-deck-name-for-rename="activeDeckForAction?.name"
 	/>
 </template>

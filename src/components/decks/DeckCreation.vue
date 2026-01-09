@@ -10,6 +10,7 @@ import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useDeckList} from '@/composables/useDeckList'
 import {TDeckData} from '@/libs/Decks'
 import {TCardData, TFrameType} from '@/libs/interfaces/YGOProInterfaces'
+import {Icon} from '@iconify/vue'
 import {onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
 
 const props = defineProps<{
@@ -184,10 +185,12 @@ function onCardShiftLClick(card: TCardData) {
 <template>
 	<div class="grid h-full grid-cols-[auto_1fr_auto]" v-if="!loading">
 		<div
-			class="min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+			class="border-r border-primary-600 min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 		>
 			<div class="grid grid-rows-[auto_1fr] overflow-hidden">
-				<div class="bg-primary-600 flex items-center justify-between py-1 px-2 gap-2">
+				<div
+					class="h-12 w-full flex justify-between pl-4 pr-2 py-1 items-center bg-linear-to-r from-primary-800 to-primary-700 border-b border-primary-600"
+				>
 					<div class="font-bold text-lg truncate" :title="props.deckData.name">
 						{{ props.deckData.name }}
 					</div>
@@ -213,42 +216,14 @@ function onCardShiftLClick(card: TCardData) {
 					</span>
 				</div>
 				<div class="p-2 h-full overflow-y-auto scrollable" ref="cardFullViewContainer">
-					<div v-if="settingsToggled" class="flex flex-col gap-4">
-						<!-- <div class="p-2 rounded-md bg-primary-800 gap-2 flex flex-col">
-							<Button
-								size="small"
-								icon="material-symbols:sort-rounded"
-								label="Sort Deck"
-								@click="onSortClick"
-							/>
-							<div class="flex gap-2 w-full">
-								<Button
-									class="grow"
-									size="small"
-									icon="material-symbols:sort-rounded"
-									label="Import Deck"
-								/>
-								<Button
-									class="grow"
-									size="small"
-									icon="material-symbols:sort-rounded"
-									label="Export Deck"
-								/>
-							</div>
-							<Button
-								size="small"
-								icon="material-symbols:sort-rounded"
-								label="Export Unowned Cards List"
-							/>
-						</div> -->
-					</div>
+					<div v-if="settingsToggled" class="flex flex-col gap-4"></div>
 					<CardFullView v-else-if="hoveredCard" :card="hoveredCard" />
 				</div>
 			</div>
 		</div>
 		<div class="grid grid-rows-[1fr_auto_auto] overflow-hidden" @wheel="onDeckAreaWheel">
 			<div class="overflow-hidden grid grid-rows-[auto_auto_1fr] relative">
-				<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-10">
+				<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-12">
 					<DeckCardGrid
 						v-model="cards.main"
 						@cardHover="onCardHover"
@@ -259,32 +234,52 @@ function onCardShiftLClick(card: TCardData) {
 					/>
 				</div>
 				<div>
-					<h3
-						class="text-xl font-bold absolute top-0 left-0 right-2 pl-4 bg-primary-800/70"
+					<div
+						class="absolute h-12 items-center flex top-0 left-0 right-0 px-3 py-1 bg-linear-to-r from-primary-700/95 to-primary-800/90 backdrop-blur-sm border-b border-primary-600"
 					>
-						<span>Main Deck</span>
-						<span
-							class="text-contrast-600 pl-8 font-semibold"
-							:class="{
-								'text-red-400': cards.main.length > 60 || cards.main.length < 40,
-							}"
-							>[{{ cards.main.length }}]
-						</span>
-					</h3>
+						<div class="flex items-center gap-2">
+							<Icon
+								icon="material-symbols:playing-cards-rounded"
+								class="text-accent-400 text-base"
+							/>
+							<span class="font-semibold text-contrast-700">Main Deck</span>
+							<span
+								class="text-sm font-medium px-2 py-0.5 rounded-md"
+								:class="
+									cards.main.length > 60 || cards.main.length < 40
+										? 'bg-red-500/20 text-red-400'
+										: 'bg-primary-600 text-contrast-500'
+								"
+							>
+								{{ cards.main.length }}
+							</span>
+						</div>
+					</div>
 				</div>
 			</div>
-			<div
-				class="border-primary-500 border-t-2 overflow-hidden grid grid-rows-[auto_auto_1fr]"
-			>
-				<h3 class="text-xl font-bold pl-4 pt-1">
-					<span>Extra Deck</span>
-					<span
-						class="text-contrast-600 pl-8 font-semibold"
-						:class="{'text-red-400': cards.extra.length > 15}"
-						>[{{ cards.extra.length }}]
-					</span>
-				</h3>
-				<div class="h-full overflow-y-scroll scrollable pb-1 px-2">
+			<div class="border-primary-600 border-t overflow-hidden grid grid-rows-[auto_1fr]">
+				<div
+					class="px-3 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
+				>
+					<div class="flex items-center gap-2">
+						<Icon
+							icon="material-symbols:auto-awesome-rounded"
+							class="text-secondary-400 text-base"
+						/>
+						<span class="font-semibold text-contrast-700">Extra Deck</span>
+						<span
+							class="text-sm font-medium px-2 py-0.5 rounded-md"
+							:class="
+								cards.extra.length > 15
+									? 'bg-red-500/20 text-red-400'
+									: 'bg-primary-600 text-contrast-500'
+							"
+						>
+							{{ cards.extra.length }}
+						</span>
+					</div>
+				</div>
+				<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-1">
 					<DeckCardGrid
 						v-model="cards.extra"
 						@cardHover="onCardHover"
@@ -296,18 +291,30 @@ function onCardShiftLClick(card: TCardData) {
 					/>
 				</div>
 			</div>
-			<div
-				class="border-primary-500 border-t-2 overflow-hidden grid grid-rows-[auto_auto_1fr]"
-			>
-				<h3 class="text-xl font-bold pl-4 pt-1">
-					<span>Side Deck</span>
-					<span
-						class="text-contrast-600 pl-8 font-semibold"
-						:class="{'text-red-400': cards.side.length > 15}"
-						>[{{ cards.side.length }}]
-					</span>
-				</h3>
-				<div class="h-full overflow-y-scroll scrollable pb-1 px-2">
+			<div class="border-primary-600 border-t overflow-hidden grid grid-rows-[auto_1fr]">
+				<div
+					class="px-3 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
+				>
+					<div class="flex items-center gap-2">
+						<Icon
+							icon="material-symbols:swap-horiz-rounded"
+							class="text-tertiary-400 text-base"
+						/>
+
+						<span class="font-semibold text-contrast-700">Side Deck</span>
+						<span
+							class="text-sm font-medium px-2 py-0.5 rounded-md"
+							:class="
+								cards.side.length > 15
+									? 'bg-red-500/20 text-red-400'
+									: 'bg-primary-600 text-contrast-500'
+							"
+						>
+							{{ cards.side.length }}
+						</span>
+					</div>
+				</div>
+				<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-1">
 					<DeckCardGrid
 						v-model="cards.side"
 						@cardHover="onCardHover"
@@ -321,7 +328,7 @@ function onCardShiftLClick(card: TCardData) {
 			</div>
 		</div>
 		<div
-			class="max-w-180 w-[30vw] bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+			class="border-l border-primary-600 max-w-180 w-[30vw] bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 		>
 			<div class="h-full grid grid-rows-[auto_auto] overflow-hidden gap">
 				<div class="overflow-y-scroll scrollable border-b-2 border-b-primary-400 p-2">

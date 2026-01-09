@@ -141,7 +141,6 @@ async function removeDir(path: string) {
 	if (!p) return false
 	const subPath = path.startsWith('/') ? path : '/' + path
 	const result = await window.electronFS.removeDir(p + subPath)
-	console.log('FS:REMOVEDIR', result)
 	return result.success as boolean
 }
 

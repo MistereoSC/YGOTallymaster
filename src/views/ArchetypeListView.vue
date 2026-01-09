@@ -103,8 +103,21 @@ onBeforeUnmount(() => {
 			v-else-if="initialized === 'ready' && archetypes.length > 0"
 			class="h-full overflow-hidden grid grid-rows-[auto_1fr]"
 		>
-			<div class="bg-primary-600 py-1 flex justify-between items-center px-4 h-10">
-				<h2 class="font-bold">{{ archetypes.length }} Archetypes</h2>
+			<div
+				class="h-12 w-full flex justify-between px-4 py-1 items-center bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
+			>
+				<div class="flex gap-3 items-center">
+					<div class="flex flex-col">
+						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+							Archetypes
+						</h2>
+						<p class="text-xs text-contrast-500">
+							<span class="font-medium">{{ archetypes.length }}</span>
+							archetypes
+						</p>
+					</div>
+				</div>
+
 				<div class="grid grid-cols-[1fr_auto] gap-2 items-center">
 					<input
 						v-model="searchInput"
@@ -120,25 +133,21 @@ onBeforeUnmount(() => {
 						size="small"
 					/>
 				</div>
-				<div>
-					<div class="items-center">
-						<span class="font-bold pr-2">Sort</span>
-						<select
-							v-model="sortedBy"
-							@change="sort(sortedBy)"
-							class="bg-primary-800 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-46"
-						>
-							<option
-								v-for="(label, key) in ESortArchetypeBy"
-								:key="key"
-								:value="label"
-							>
-								{{ label }}
-							</option>
-						</select>
-					</div>
+
+				<div class="items-center">
+					<span class="font-bold pr-2">Sort</span>
+					<select
+						v-model="sortedBy"
+						@change="sort(sortedBy)"
+						class="bg-primary-800 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-46"
+					>
+						<option v-for="(label, key) in ESortArchetypeBy" :key="key" :value="label">
+							{{ label }}
+						</option>
+					</select>
 				</div>
 			</div>
+
 			<VirtualListCustom
 				ref="virtualListRef"
 				:items="archetypesFiltered ?? archetypes"

@@ -21,13 +21,13 @@ const emit = defineEmits<{
 		:active="props.active === true"
 	>
 		<div
-			class="font-semibold flex gap-3 items-center pl-3 h-10 hover:bg-primary-800 transition-colors 0.2s mr-2 ease rounded-tr-md rounded-br-md"
+			class="group font-semibold flex gap-3 items-center pl-3 h-10 hover:bg-primary-800 transition-colors 0.2s mr-2 ease rounded-tr-md rounded-br-md"
 		>
 			<Icon
 				v-if="props.icon"
 				:icon="props.icon"
-				class="text-2xl transition-colors"
-				:class="`${props.iconClass ?? ''}`"
+				class="text-2xl transition-colors group-hover:text-accent-400"
+				:class="`${props.iconClass ?? '', props.active ? 'text-accent-500' : 'text-contrast-500'}`"
 			/>
 			<span>{{ props.label }}</span>
 		</div>

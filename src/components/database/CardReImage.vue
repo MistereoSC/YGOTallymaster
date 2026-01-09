@@ -67,7 +67,7 @@ watch(
 		}"
 	>
 		<div
-			class="rounded-sm relative"
+			class="rounded-sm relative w-full h-full"
 			:style="{
 				transition: 'outline-width 0.1s ease',
 			}"
@@ -75,7 +75,7 @@ watch(
 			<!-- Error state -->
 			<div
 				v-if="hasError"
-				class="aspect-square flex flex-col items-center justify-center p-2"
+				class="w-full h-full flex flex-col items-center justify-center p-2"
 			>
 				<Icon icon="material-symbols:imagesmode-outline" class="text-4xl text-red-400" />
 				<div class="text-sm text-center font-semibold">
@@ -86,7 +86,7 @@ watch(
 				</div>
 			</div>
 			<!-- Loading state -->
-			<div v-else-if="isLoading" class="aspect-square flex items-center justify-center">
+			<div v-else-if="isLoading" class="w-full h-full flex items-center justify-center">
 				<i class="animate-spin text-4xl"><Icon icon="tabler:loader-2" /></i>
 			</div>
 			<!-- Image loaded -->

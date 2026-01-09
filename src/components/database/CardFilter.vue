@@ -264,12 +264,17 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 <template>
 	<div class="max-w-2xl mx-auto flex flex-col gap-2">
 		<!-- Sort Order -->
-		<div class="p-2 rounded-md bg-primary-800 grid grid-cols-[auto_1fr] gap-2 items-center">
-			<span>Sort By</span>
+		<div
+			class="px-3 py-2 rounded-lg bg-primary-800 border border-primary-600 flex items-center justify-between gap-3"
+		>
+			<span class="text-sm font-medium text-contrast-500 flex items-center gap-2">
+				<Icon icon="material-symbols:sort-rounded" class="text-base" />
+				Sort By
+			</span>
 			<select
 				v-model="selectedSort"
 				@change="sort(selectedSort)"
-				class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+				class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 text-sm focus:outline-none focus:border-accent-500 flex-1 max-w-48"
 			>
 				<option v-for="(label, key) in ESortBy" :key="key" :value="label">
 					{{ label }}
@@ -278,7 +283,9 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		</div>
 
 		<!-- Owned Filter -->
-		<div class="p-2 rounded-md bg-primary-800 flex gap-2 items-center justify-center font-bold">
+		<div
+			class="px-3 py-2 rounded-lg bg-primary-800 border border-primary-600 flex items-center justify-center"
+		>
 			<ToggleSwitch
 				:duo-labels="['Owned Cards', 'All Cards']"
 				:model-value="toggledOwned"
@@ -287,19 +294,27 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		</div>
 
 		<!-- Text Input / Reset -->
-		<div class="p-2 rounded-md bg-primary-800 grid grid-cols-[1fr_auto] gap-2">
+		<div
+			class="px-3 py-2 rounded-lg bg-primary-800 border border-primary-600 flex items-center gap-2"
+		>
+			<Icon icon="material-symbols:search-rounded" class="text-contrast-400 text-lg" />
 			<input
 				v-model="searchInput"
 				@keyup="(e) => onSearchInput(e)"
 				type="text"
-				placeholder="Search Cards..."
-				class="w-full px-2 py-1 rounded-md bg-primary-700 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-500"
+				placeholder="Search cards by name..."
+				class="flex-1 px-2 py-1 rounded-md bg-primary-700 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-400 text-sm"
 			/>
-			<Button icon="material-symbols:filter-alt-off-rounded" @click="onReset" />
+			<Button
+				icon="material-symbols:filter-alt-off-rounded"
+				class="aspect-square"
+				size="small"
+				@click="onReset"
+			/>
 		</div>
 
 		<!-- Staple Filter -->
-		<div class="p-2 rounded-md bg-primary-800 flex gap-2 items-center">
+		<div class="px-3 py-2 rounded-lg bg-primary-800 border border-primary-600">
 			<Checkbox
 				label="Show only 'Staple' Cards"
 				:model-value="toggledStaple"
@@ -465,10 +480,15 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		</FilterSection>
 
 		<!-- Info -->
-		<div v-if="!toggledCoreType" class="text-sm font-semibold p-2 rounded-md bg-primary-800">
-			Select a Card Type
-			<span class="text-contrast-500"> (Monster / Spell / Trap) </span>
-			for more Filters.
+		<div
+			v-if="!toggledCoreType"
+			class="px-2 py-2 rounded-lg bg-primary-800/50 border border-primary-600 flex items-center gap-3"
+		>
+			<p class="text-xs text-contrast-500">
+				Select a card type
+				<span class="font-medium text-contrast-600">(Monster / Spell / Trap)</span>
+				to see more filters.
+			</p>
 		</div>
 	</div>
 </template>

@@ -7,6 +7,7 @@ import {ref} from 'vue'
 import Button from '../common/Button.vue'
 import DropdownMenu from './DropdownMenu.vue'
 import CollectionCreationModal from './CollectionCreationModal.vue'
+import {Icon} from '@iconify/vue'
 
 const props = defineProps<{
 	collection: TFullCollection
@@ -93,18 +94,28 @@ function onCancelRenameCollection() {
 </script>
 
 <template>
-	<div class="pr-4">
+	<div class="px-4 py-3">
+		<!-- Collection Header -->
 		<div
-			class="w-full bg-primary-600 rounded-r-md px-2 py-1 font-bold flex items-center justify-between"
+			class="w-full bg-linear-to-r from-primary-800 to-primary-700 rounded-lg px-4 py-1 flex items-center justify-between border border-primary-600 shadow-sm"
 		>
-			<span>{{ props.collection.name }}</span>
+			<div class="flex items-center gap-3">
+				<div class="flex flex-col">
+					<span class="font-semibold text-contrast-700">{{ props.collection.name }}</span>
+					<span class="text-xs text-contrast-500">
+						{{ props.collection.sets.length }}
+						{{ props.collection.sets.length === 1 ? 'set' : 'sets' }}
+					</span>
+				</div>
+			</div>
 			<DropdownMenu :items="menuItems">
 				<template #trigger>
-					<Button rounded size="small" icon="material-symbols:menu-rounded" />
+					<Button rounded size="small" icon="material-symbols:more-vert" />
 				</template>
 			</DropdownMenu>
 		</div>
-		<div class="p-2 flex flex-wrap w-full gap-4">
+		<!-- Sets Grid -->
+		<div class="p-3 flex flex-wrap w-full gap-4">
 			<div v-for="set in props.collection.sets" :key="set.name">
 				<SetPreview
 					:set="set"
@@ -123,13 +134,24 @@ function onCancelRenameCollection() {
 				>
 					<template #trigger>
 						<div
-							class="h-full w-full rounded-lg text-contrast-400 hover:text-contrast-900 bg-primary-700 cursor-pointer shadow-lg transition-colors hover:bg-primary-600"
+							class="h-full w-full rounded-lg bg-primary-700/50 cursor-pointer shadow-lg transition-all duration-200 hover:bg-primary-600/70 border-2 border-dashed border-primary-500 hover:border-accent-500/50 group"
 						>
 							<div
-								class="select-none h-full w-full flex justify-center items-center flex-col font-bold"
+								class="select-none h-full w-full flex justify-center items-center flex-col gap-2"
 							>
-								<span class="text-4xl">+</span>
-								<span class="">Add Set</span>
+								<div
+									class="w-12 h-12 rounded-full bg-primary-600 group-hover:bg-accent-500/20 flex items-center justify-center transition-colors"
+								>
+									<Icon
+										icon="material-symbols:add-rounded"
+										class="text-3xl text-contrast-400 group-hover:text-accent-400 transition-colors"
+									/>
+								</div>
+								<span
+									class="font-semibold text-contrast-400 group-hover:text-contrast-600 transition-colors"
+								>
+									Add Set
+								</span>
 							</div>
 						</div>
 					</template>

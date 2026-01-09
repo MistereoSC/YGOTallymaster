@@ -53,14 +53,23 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 	<div class="w-full h-full">
 		<div v-if="banlist" class="h-full grid grid-rows-[auto_1fr]">
 			<div
-				class="py-1 px-4 flex items-center justify-between gap-4 bg-primary-600 font-bold h-10"
+				class="h-12 w-full flex justify-between px-4 py-1 items-center bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
 			>
-				<span class="font-bold">
-					{{ banlist.forbidden.length }} Forbidden | {{ banlist.limited.length }} Limited
-					| {{ banlist.semi_limited.length }} Semi-Limited
-				</span>
-				<div class="grid grid-cols-[3fr_5fr] items-center gap-2">
-					<span>Banlist</span>
+				<div class="flex gap-3 items-center">
+					<div class="flex flex-col">
+						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+							Banlist
+						</h2>
+						<p class="text-xs text-contrast-500">
+							<span class="font-medium">
+								{{ banlist.forbidden.length }} Forbidden |
+								{{ banlist.limited.length }} Limited |
+								{{ banlist.semi_limited.length }} Semi-Limited
+							</span>
+						</p>
+					</div>
+				</div>
+				<div class="grid items-center gap-2">
 					<select
 						:value="activeBanlist"
 						@change="(e) => switchBanlist((e.target as HTMLSelectElement).value as keyof typeof EBanlistFormat)"
@@ -81,7 +90,7 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 					:show-banlist-for="activeBanlist ?? 'ban_tcg'"
 				/>
 				<div
-					class="min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full overflow-hidden"
+					class="border-l border-primary-600 min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full overflow-hidden"
 				>
 					<div class="h-full overflow-y-auto scrollable p-3">
 						<CardFullView

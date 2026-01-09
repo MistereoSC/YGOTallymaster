@@ -10,6 +10,7 @@ import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
+import {Icon} from '@iconify/vue'
 const {searchResults, fullCardList, resetSearch} = useCardSearch()
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
@@ -80,28 +81,34 @@ const settingsStore = useDatabaseSettings()
 
 <template>
 	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden">
-		<div class="w-full grid grid-cols-[1fr_auto] bg-primary-600 h-10">
-			<div class="flex gap-4 items-center px-4 py-1">
-				<h2 class="font-bold">
-					Displaying
-					<span v-if="searchResults !== null"> {{ searchResults.length }} /</span>
-					{{ fullCardList.length }} Cards
-				</h2>
+		<div
+			class="h-12 flex items-center justify-between pl-4 pr-2 py-1 w-full g bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
+		>
+			<div class="flex gap-3 items-center">
+				<div class="flex flex-col">
+					<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+						Card Database
+					</h2>
+					<p class="text-xs text-contrast-500">
+						<span v-if="searchResults !== null" class="text-accent-400 font-medium">
+							{{ searchResults.length }}
+						</span>
+						<span v-if="searchResults !== null"> of </span>
+						<span class="font-medium">{{ fullCardList.length }}</span>
+						cards
+					</p>
+				</div>
 			</div>
-			<div class="min-w-116 w-[33vw] max-w-174 px-2 py-1">
-				<span class="flex justify-between w-full">
-					<span></span>
-					<span class="flex gap-2">
-						<Button
-							rounded
-							size="small"
-							icon="material-symbols:filter-alt"
-							@click="toggleFilter"
-						/>
-					</span>
-				</span>
-			</div>
+
+			<Button
+				rounded
+				size="small"
+				icon="material-symbols:filter-alt"
+				@click="toggleFilter"
+				:class="activePanel === 'filter' ? 'ring-2 ring-accent-500/50' : ''"
+			/>
 		</div>
+
 		<div
 			class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden"
 			v-if="fullCardList.length > 0"
@@ -132,7 +139,7 @@ const settingsStore = useDatabaseSettings()
 
 			<div
 				v-if="activePanel !== 'none'"
-				class="min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+				class="border-l border-primary-600 min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
 				<div class="h-full overflow-y-auto scrollable p-3">
 					<CardFullView v-if="activeCard && activePanel === 'card'" :card="activeCard" />

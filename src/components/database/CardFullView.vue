@@ -13,91 +13,137 @@ const emit = defineEmits([])
 </script>
 
 <template>
-	<div class="max-w-2xl mx-auto flex flex-col gap-2">
-		<div class="p-4 rounded-md bg-primary-800">
-			<div class="flex justify-center w-full pt-4 pb-6">
+	<div class="max-w-2xl mx-auto flex flex-col gap-3">
+		<!-- Card Image & Name Section -->
+		<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600">
+			<!-- Card Image with gradient background -->
+			<div
+				class="relative flex justify-center w-full py-6 bg-linear-to-b from-primary-600/30 to-transparent"
+			>
 				<CardReImage
 					:card="card"
 					size="cropped"
 					:no-hover="true"
-					class="shadow-sm shadow-black/50"
+					class="shadow-lg shadow-black/50"
 				/>
 			</div>
-			<div class="text-xl font-bold grid grid-cols-[auto_1fr_32px] items-center gap-2">
-				<span>
-					<CardBanIcon
-						:show-banlist-for="props.showBanlistFor"
-						:banlist-info="card.banlist_info"
-						size="small"
-					/>
-				</span>
-				<span>{{ card.name }}</span>
-				<span>
-					<AttributeIcon :attribute="card.attribute ?? card.race" />
-				</span>
-			</div>
-			<div
-				v-if="card.level"
-				class="flex text-xl items-center gap-1 pt-2"
-				:class="['xyz', 'xyz_pendulum'].includes(card.frameType) ? '' : 'flex-row-reverse'"
-			>
-				<span v-for="n in card.level" :key="n">
-					<span
-						class="leading-none rounded-full w-6 h-6 grid place-items-center text-card-effecttext"
-						:class="
-							['xyz', 'xyz_pendulum'].includes(card.frameType)
-								? 'bg-black'
-								: 'bg-card-effect'
-						"
-					>
-						<Icon icon="material-symbols:star-rounded" />
+
+			<!-- Card Name & Attribute Bar -->
+			<div class="px-2 pb-4">
+				<div class="flex items-center gap-2">
+					<span class="shrink-0">
+						<CardBanIcon
+							:show-banlist-for="props.showBanlistFor"
+							:banlist-info="card.banlist_info"
+							size="small"
+						/>
 					</span>
-				</span>
-				<span class="font-semibold mb-1 text-md leading-none text-contrast-500"
-					>({{ card.level }})</span
+					<span class="text-xl font-bold text-contrast-700 flex-1 truncate">{{
+						card.name
+					}}</span>
+					<span class="shrink-0 w-8 h-8 flex items-center justify-center">
+						<AttributeIcon :attribute="card.attribute ?? card.race" />
+					</span>
+				</div>
+
+				<!-- Level/Rank Stars -->
+				<div
+					v-if="card.level"
+					class="flex items-center gap-1.5 mt-3 px-1"
+					:class="
+						['xyz', 'xyz_pendulum'].includes(card.frameType) ? '' : 'flex-row-reverse'
+					"
 				>
+					<span v-for="n in card.level" :key="n">
+						<span
+							class="leading-none rounded-full w-5 h-5 grid place-items-center text-card-effecttext shadow-sm"
+							:class="
+								['xyz', 'xyz_pendulum'].includes(card.frameType)
+									? 'bg-black'
+									: 'bg-card-effect'
+							"
+						>
+							<Icon icon="material-symbols:star-rounded" class="text-sm" />
+						</span>
+					</span>
+					<span class="font-semibold text-sm text-contrast-400 ml-1"
+						>{{ ['xyz', 'xyz_pendulum'].includes(card.frameType) ? 'Rank' : 'Level' }}
+						{{ card.level }}</span
+					>
+				</div>
 			</div>
 		</div>
 
-		<div class="rounded-md bg-primary-800 overflow-hidden">
-			<div class="grid grid-cols-[auto_1fr_auto]" v-if="card.attribute">
+		<!-- Stats Section (for monsters) -->
+		<div
+			v-if="card.attribute"
+			class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600"
+		>
+			<div class="grid grid-cols-[auto_1fr_auto]">
+				<!-- Left Pendulum Scale -->
 				<div class="min-h-12">
 					<div
 						v-if="card.scale"
-						class="flex flex-col items-center gap-1 px-4 pb-2 pt-3 bg-primary-600"
+						class="flex flex-col h-full items-center gap-1 px-4 py-3 bg-linear-to-b from-blue-500/20 to-transparent border-r border-primary-600"
 					>
-						<div class="rotate-45 w-3 h-3 bg-blue-500"></div>
-						<span class="font-bold">{{ card.scale }}</span>
+						<div
+							class="rotate-45 w-3 h-3 bg-blue-500 shadow-sm shadow-blue-500/50"
+						></div>
+						<span class="font-bold text-blue-400">{{ card.scale }}</span>
 					</div>
 				</div>
-				<div class="flex flex-col justify-center items-center gap-2">
-					<div>
-						<span v-if="card.typeline" class="font-bold px-4"
-							>[{{ card.typeline.join(' / ') }}]</span
+
+				<!-- Type & Stats -->
+				<div class="flex flex-col justify-center items-center gap-2 py-3">
+					<div v-if="card.typeline">
+						<span
+							class="text-sm font-semibold text-contrast-500 px-3 py-1 bg-primary-700 rounded-full"
+							>{{ card.typeline.join(' / ') }}</span
 						>
 					</div>
-					<div class="h-full flex flex-row gap-4 px-4 pb-1 font-bold">
-						<span>Atk/ {{ card.atk! >= 0 ? card.atk : '?' }}</span>
-						<span v-if="card.linkval">LINK {{ card.linkval }}</span>
-						<span v-else>Def/ {{ card.def! >= 0 ? card.def : '?' }}</span>
+					<div class="flex flex-row gap-6 font-bold text-contrast-600">
+						<span class="flex items-center gap-1">
+							<Icon icon="material-symbols:swords-rounded" class="text-red-400" />
+							{{ card.atk! >= 0 ? card.atk : '?' }}
+						</span>
+						<span v-if="card.linkval" class="flex items-center gap-1">
+							<Icon icon="material-symbols:link-rounded" class="text-accent-400" />
+							{{ card.linkval }}
+						</span>
+						<span v-else class="flex items-center gap-1">
+							<Icon icon="material-symbols:shield-rounded" class="text-blue-400" />
+							{{ card.def! >= 0 ? card.def : '?' }}
+						</span>
 					</div>
 				</div>
+
+				<!-- Right Pendulum Scale -->
 				<div>
 					<div
 						v-if="card.scale"
-						class="flex flex-col items-center gap-1 px-4 pb-2 pt-3 bg-primary-600"
+						class="flex flex-col h-full items-center gap-1 px-4 py-3 bg-linear-to-b from-red-500/20 to-transparent border-l border-primary-600"
 					>
-						<div class="rotate-45 w-3 h-3 bg-red-500"></div>
-						<span class="font-bold">{{ card.scale }}</span>
+						<div class="rotate-45 w-3 h-3 bg-red-500 shadow-sm shadow-red-500/50"></div>
+						<span class="font-bold text-red-400">{{ card.scale }}</span>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="p-4 rounded-md bg-primary-800">
-			<span class="leading-relaxed whitespace-pre-line">
-				{{ card.desc }}
-			</span>
+		<!-- Card Description Section -->
+		<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600">
+			<div class="px-4 py-2 bg-primary-700/50 border-b border-primary-600">
+				<span class="text-xs font-semibold text-contrast-400 uppercase tracking-wider"
+					>Effect</span
+				>
+			</div>
+			<div class="p-4">
+				<span
+					class="leading-relaxed whitespace-pre-line font-semibold text-contrast-600 text-sm"
+				>
+					{{ card.desc }}
+				</span>
+			</div>
 		</div>
 	</div>
 </template>

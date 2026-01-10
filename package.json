@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.2.0",
   "type": "module",
+  "author": "Mistereo",
+  "description": "Electron App for organizing YuGiOh Cards",
+
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build && electron-builder",

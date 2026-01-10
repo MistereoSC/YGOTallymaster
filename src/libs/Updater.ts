@@ -1,4 +1,4 @@
-import {fetchCardData, fetchDatabaseVersion, fetchCardSets} from './api/YGOProAPI'
+import {fetchCardData, fetchDatabaseVersion} from './api/YGOProAPI'
 import {getConfig, setConfig, _appIsUpToDate} from './Config'
 import Files from './Files'
 import {TLanguageCodes} from './interfaces/Localization'
@@ -92,19 +92,19 @@ async function updateCoreCardData(language: TLanguageCodes = 'en') {
 	return cardData.data.length
 }
 
-async function updateStapleData() {
-	const cardData = await fetchCardData('en', ['&staple=yes'])
-	if (!cardData) return null
-	await Files.write('data/staples_en.json', cardData)
-	return cardData.data.length
-}
+// async function updateStapleData() {
+// 	const cardData = await fetchCardData('en', ['&staple=yes'])
+// 	if (!cardData) return null
+// 	await Files.write('data/staples_en.json', cardData)
+// 	return cardData.data.length
+// }
 
-async function updateCardSets() {
-	const cardSets = await fetchCardSets()
-	if (!cardSets) return null
-	await Files.write('data/sets_en.json', cardSets)
-	return cardSets.length
-}
+// async function updateCardSets() {
+// 	const cardSets = await fetchCardSets()
+// 	if (!cardSets) return null
+// 	await Files.write('data/sets_en.json', cardSets)
+// 	return cardSets.length
+// }
 
 async function createFolderStructure() {
 	const folders = [

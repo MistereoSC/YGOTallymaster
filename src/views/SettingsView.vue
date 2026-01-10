@@ -15,7 +15,7 @@ import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 import {useRouter} from 'vue-router'
 
 const router = useRouter()
-const SHOW_DEBUG_SETTINGS = true
+const SHOW_DEBUG_SETTINGS = false
 
 const config = ref<null | TConfig>(null)
 const autoUpdateChecked = ref(false)

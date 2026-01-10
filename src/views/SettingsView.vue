@@ -15,7 +15,7 @@ import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 import {useRouter} from 'vue-router'
 
 const router = useRouter()
-const SHOW_DEBUG_SETTINGS = false
+const SHOW_DEBUG_SETTINGS = true
 
 const config = ref<null | TConfig>(null)
 const autoUpdateChecked = ref(false)
@@ -45,13 +45,20 @@ enum EBanlistFormat {
 	'ban_ocg' = 'OCG',
 	'ban_goat' = 'GOAT',
 }
+enum ELanguageCodes {
+	'en' = 'English (en)',
+	'de' = 'German (de)',
+	'fr' = 'French (fr)',
+	'it' = 'Italian (it)',
+	'pt' = 'Portuguese (pt)',
+}
 
 // #endregion
 // ------------------------------------------------------
 // #region Update Settings
 // ------------------------------------------------------
 const checkForUpdatesModalOpen = ref(false)
-const forceReset = ref(false)
+const forceReset = ref(null as null | 'completeReset' | 'reInit')
 
 function onAutoUpdateChange() {
 	if (!config.value) return
@@ -69,10 +76,18 @@ async function onOpenFolder() {
 
 function onUpdateModalClose() {
 	checkForUpdatesModalOpen.value = false
-	forceReset.value = false
+	forceReset.value = null
 }
 function onForceReset() {
-	forceReset.value = true
+	forceReset.value = 'completeReset'
+	nextTick(() => {
+		checkForUpdatesModalOpen.value = true
+	})
+}
+
+function onLanguageChange(language: keyof typeof ELanguageCodes) {
+	displayStore.set.cardLanguage(language)
+	forceReset.value = 'reInit'
 	nextTick(() => {
 		checkForUpdatesModalOpen.value = true
 	})
@@ -108,6 +123,23 @@ function onForceReset() {
 					title="Display Settings"
 					description="Configure how cards are displayed"
 				>
+					<!-- Card Language -->
+					<SettingsItem
+						icon="material-symbols:language"
+						iconColorClass="text-secondary-400"
+						title="Card Language"
+						description="Language only affects card names and descriptions. Card images are only available in English. Changing language may require downloading additional data."
+					>
+						<select
+							:value="displayStore.settings.value?.cardLanguage"
+							@change="(e) => onLanguageChange((e.target as HTMLSelectElement).value as keyof typeof ELanguageCodes)"
+							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+						>
+							<option v-for="(label, key) in ELanguageCodes" :key="key" :value="key">
+								{{ label }}
+							</option>
+						</select>
+					</SettingsItem>
 					<!-- Banlist Format -->
 					<SettingsItem
 						icon="material-symbols:block-outline"
@@ -118,7 +150,7 @@ function onForceReset() {
 						<select
 							:value="displayStore.settings.value?.showBanlistFor"
 							@change="(e) => displayStore.set.showBanlistFor((e.target as HTMLSelectElement).value as keyof typeof EBanlistFormat)"
-							class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option v-for="(label, key) in EBanlistFormat" :key="key" :value="key">
 								{{ label }}
@@ -217,7 +249,7 @@ function onForceReset() {
 						<select
 							:value="displayStore.settings.value?.listSize"
 							@change="(e) => displayStore.set.listSize((e.target as HTMLSelectElement).value as keyof typeof EListSize)"
-							class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option v-for="(label, key) in EListSize" :key="key" :value="key">
 								{{ label }}
@@ -239,7 +271,7 @@ function onForceReset() {
 						<select
 							:value="displayStore.settings.value?.listSizeSmallList"
 							@change="(e) => displayStore.set.listSizeSmallList((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoLarge)"
-							class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option
 								v-for="(label, key) in EListSizeNoLarge"
@@ -261,7 +293,7 @@ function onForceReset() {
 						<select
 							:value="displayStore.settings.value?.decklistGridCardSize"
 							@change="(e) => displayStore.set.decklistGridSize((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoLarge)"
-							class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option
 								v-for="(label, key) in EListSizeNoLarge"

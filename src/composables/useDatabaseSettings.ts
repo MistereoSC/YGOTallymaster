@@ -1,6 +1,7 @@
 import {ref, toRaw} from 'vue'
 import Files from '@/libs/Files'
 import {TBanlistFormat} from '@/libs/interfaces/YGOProInterfaces'
+import {TLanguageCodes} from '@/libs/interfaces/Localization'
 
 const SAVE_DEBOUNCE_MS = 1000
 const PATH = 'userdata/db_settings.json'
@@ -16,16 +17,8 @@ export const useDatabaseSettings = () => {
 	}
 
 	async function _init() {
-		const e = await Files.exists(PATH)
-		if (!e.exists) {
-			settings.value = {...DEFAULT_DATABASE_SETTINGS}
-			await save()
-		} else {
-			settings.value = (await Files.read(PATH)) as TDatabaseSettings
-			if (!settings.value) {
-				settings.value = {...DEFAULT_DATABASE_SETTINGS}
-			}
-		}
+		await getSettings()
+		await save()
 		initialized.value = 'ready'
 	}
 	async function save() {
@@ -95,6 +88,11 @@ export const useDatabaseSettings = () => {
 		settings.value.listSizeSmallList = to
 		save()
 	}
+	function cardLanguage(to: TLanguageCodes) {
+		if (!settings.value) return
+		settings.value.cardLanguage = to
+		save()
+	}
 
 	const toggleFns = {
 		displayAsList,
@@ -110,6 +108,7 @@ export const useDatabaseSettings = () => {
 		decklistGridSize,
 		showBanlistFor,
 		listSizeSmallList,
+		cardLanguage,
 	}
 
 	return {
@@ -118,6 +117,27 @@ export const useDatabaseSettings = () => {
 		toggle: toggleFns,
 		set: setFns,
 	}
+}
+
+export async function getSettings() {
+	if (settings.value) return settings.value
+
+	const e = await Files.exists(PATH)
+	if (!e.exists) {
+		settings.value = {...DEFAULT_DATABASE_SETTINGS}
+	} else {
+		settings.value = (await Files.read(PATH)) as TDatabaseSettings
+		if (!settings.value) {
+			settings.value = {...DEFAULT_DATABASE_SETTINGS}
+		}
+		// Add all settings missing from the DEFAULT_DATABASE_SETTINGS
+		for (const key in DEFAULT_DATABASE_SETTINGS) {
+			if (!(key in settings.value)) {
+				;(settings.value as any)[key] = (DEFAULT_DATABASE_SETTINGS as any)[key]
+			}
+		}
+	}
+	return settings.value
 }
 
 type TSizes = 'tiny' | 'small' | 'medium' | 'large'
@@ -135,6 +155,8 @@ export type TDatabaseSettings = {
 	decklistGridCardSize: TSizes
 	setsGrayUnownedGrid: boolean
 	setsDisplayAsList: boolean
+
+	cardLanguage?: TLanguageCodes
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
@@ -151,4 +173,6 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	decklistGridCardSize: 'tiny',
 	setsGrayUnownedGrid: false,
 	setsDisplayAsList: false,
+
+	cardLanguage: 'en',
 }

@@ -13,7 +13,8 @@ import MiniSearch from 'minisearch'
 import {ref, markRaw} from 'vue'
 import {getReadyCardIds} from './useOwnedCards'
 import {getSetCardIds} from './useCardCollections'
-import {ESortBy} from './searchTypes'
+import {ESortBy} from '@/libs/interfaces/searchTypes'
+import {getSettings} from './useDatabaseSettings'
 
 // -----------------------------------------------------------
 // #region Constants
@@ -96,7 +97,7 @@ const TOKENIZE_FN = (text: string) => {
 }
 
 // Re-export ESortBy from searchTypes to maintain backwards compatibility
-export {ESortBy} from './searchTypes'
+export {ESortBy} from '@/libs/interfaces/searchTypes'
 
 // #endregion
 // -----------------------------------------------------------
@@ -116,10 +117,11 @@ const useCardSearch = () => {
 		_init()
 	}
 
-	async function _init(force = false) {
-		const cardData = force
-			? _initialFilterCardData(await getCardList())
-			: _initialFilterCardData(await getFullCardList())
+	async function _init() {
+		let cardData = [] as TCardData[]
+		const settings = await getSettings()
+		const language = settings.cardLanguage || 'en'
+		cardData = _initialFilterCardData(await getCardList(language))
 
 		fullCardList.value = cardData
 		miniSearchIndex = _createMinisearchIndex(cardData)
@@ -158,7 +160,7 @@ const useCardSearch = () => {
 	function reinitializeIndex() {
 		initialized.value = 'uninitialized'
 		fullCardList.value = []
-		_init(true)
+		_init()
 	}
 
 	function sort(by?: ESortBy) {
@@ -188,6 +190,16 @@ const useCardSearch = () => {
 // -----------------------------------------------------------
 // #region Public Functions
 // -----------------------------------------------------------
+function invalidateUseCardSearch() {
+	console.debug('INVALIDATE::useCardSearch')
+	miniSearchIndex = null
+	initialized.value = 'uninitialized'
+	searchResults.value = []
+	activeQuery.value = {}
+	fullCardList.value = []
+	sortedBy.value = ESortBy.Name_Asc
+}
+
 async function getFullCardList() {
 	if (fullCardList.value.length === 0) {
 		fullCardList.value = _initialFilterCardData(await getCardList())
@@ -208,6 +220,7 @@ export {
 	_sort,
 	_createMinisearchIndex,
 	_searchQueryIsEmpty,
+	invalidateUseCardSearch,
 }
 
 // -----------------------------------------------------------

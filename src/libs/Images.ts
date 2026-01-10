@@ -23,11 +23,12 @@ export async function loadImage(
 		// Check if image already exists locally
 		const existsResult = (await Files.exists(localPath)).exists
 		if (existsResult) {
+			// console.debug('Image:::Download::Card already on disk', cardId)
 			return {success: true, localPath: fullLocalPath}
 		}
 
 		// Image doesn't exist, download it
-		console.debug('Downloading image for card', cardId)
+		// console.debug('Image:::Download::Downloading image for card', cardId)
 		const downloadResult = await window.electronImage.downloadImage(
 			imageUrl,
 			fullLocalPath

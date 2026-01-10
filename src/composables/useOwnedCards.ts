@@ -11,7 +11,7 @@ import {
 	TSearchQuery,
 	TSearchResultCardData,
 } from './useCardSearch'
-import {ESortBy} from './searchTypes'
+import {ESortBy} from '@/libs/interfaces/searchTypes'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import MiniSearch from 'minisearch'
 
@@ -207,4 +207,15 @@ function getReadyCardIds() {
 	else return {}
 }
 
-export {useOwnedCards, getReadyCardIds}
+function invalidateUseOwnedCards() {
+	console.debug('INVALIDATE::useOwnedCards')
+	miniSearchIndex = null as null | MiniSearch<TCardData>
+	initialized.value = 'uninitialized'
+	searchResults.value = null
+	activeQuery.value = {}
+	ownedCardList.value = []
+	sortedBy.value = ESortBy.Name_Asc
+	ownedCards.value = null
+}
+
+export {useOwnedCards, getReadyCardIds, invalidateUseOwnedCards}

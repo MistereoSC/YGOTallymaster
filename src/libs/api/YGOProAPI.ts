@@ -1,6 +1,7 @@
+import { TLanguageCodes } from '../interfaces/Localization'
 import {TCardData, TDBVersionData, TSetItemData, TSetListData} from '../interfaces/YGOProInterfaces'
 
-export async function fetchCardData(language: 'en' | 'de' = 'en', args?: string[]) {
+export async function fetchCardData(language: TLanguageCodes = 'en', args?: string[]) {
 	let url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
 	url += '?misc=yes'
 	if (args && args.length > 0) {

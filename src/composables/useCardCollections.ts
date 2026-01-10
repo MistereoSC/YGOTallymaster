@@ -151,5 +151,10 @@ function getSetCardIds(collectionName: string, setName: string): Set<number> | n
 
 	return new Set(set.cards.map((card) => card.id))
 }
+function invalidateUseCardCollections() {
+	console.debug('INVALIDATE::useCardCollections')
+	initialized.value = 'uninitialized'
+	collections.value = []
+}
 
-export {useCardCollections, getCardListFromSet, getSetCardIds}
+export {useCardCollections, getCardListFromSet, getSetCardIds, invalidateUseCardCollections}

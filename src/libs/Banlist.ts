@@ -2,7 +2,7 @@ import {getFullCardList, _sort, ESortBy} from '@/composables/useCardSearch'
 import {TBanlistFormat, TCardData} from './interfaces/YGOProInterfaces'
 
 export async function getBanlist(format: TBanlistFormat = 'ban_tcg') {
-	const cardList = _sort(ESortBy.TCG_Date_Desc, [...(await getFullCardList())])
+	const cardList = _sort(ESortBy.TCG_Date_Desc, await getFullCardList())
 	const banlist = {
 		limited: [] as TCardData[],
 		semi_limited: [] as TCardData[],

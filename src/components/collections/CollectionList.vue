@@ -164,8 +164,8 @@ function onCancelRenameCollection() {
 		<ConfirmCancelModal
 			:open="confirmDeleteOpen"
 			headingText="Delete Set"
-			yesText="Delete Set"
-			noText="Cancel"
+			confirmText="Delete Set"
+			cancelText="Cancel"
 			@cancel="onCancelDeleteSet"
 			@confirm="onConfirmDeleteSet"
 		>
@@ -185,8 +185,8 @@ function onCancelRenameCollection() {
 		<ConfirmCancelModal
 			:open="confirmDeleteCollectionOpen"
 			headingText="Delete Collection"
-			yesText="Delete Collection"
-			noText="Cancel"
+			confirmText="Delete Collection"
+			cancelText="Cancel"
 			@cancel="onCancelDeleteCollection"
 			@confirm="onConfirmDeleteCollection"
 		>

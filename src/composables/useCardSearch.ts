@@ -184,17 +184,25 @@ const useCardSearch = () => {
 		initialized,
 	}
 }
-
-const getFullCardList = async () => {
+// #endregion
+// -----------------------------------------------------------
+// #region Public Functions
+// -----------------------------------------------------------
+async function getFullCardList() {
 	if (fullCardList.value.length === 0) {
 		fullCardList.value = _initialFilterCardData(await getCardList())
 	}
 	return fullCardList.value as TCardData[]
 }
+async function getCardFromId(cardId: number) {
+	const cardList = await getFullCardList()
+	return _findCardById(cardId, cardList)
+}
 
 export {
 	useCardSearch,
 	getFullCardList,
+	getCardFromId,
 	__getAllViableValues,
 	_find,
 	_sort,

@@ -1,1 +1,46 @@
-"use strict";const r=require("electron");r.contextBridge.exposeInMainWorld("ipcRenderer",{on(...e){const[n,i]=e;return r.ipcRenderer.on(n,(o,...d)=>i(o,...d))},off(...e){const[n,...i]=e;return r.ipcRenderer.off(n,...i)},send(...e){const[n,...i]=e;return r.ipcRenderer.send(n,...i)},invoke(...e){const[n,...i]=e;return r.ipcRenderer.invoke(n,...i)}});r.contextBridge.exposeInMainWorld("electronFS",{readFile:e=>r.ipcRenderer.invoke("fs:readFile",e),writeFile:(e,n)=>r.ipcRenderer.invoke("fs:writeFile",e,n),exists:e=>r.ipcRenderer.invoke("fs:exists",e),deleteFile:e=>r.ipcRenderer.invoke("fs:deleteFile",e),removeDir:e=>r.ipcRenderer.invoke("fs:removeDir",e),renameFile:(e,n)=>r.ipcRenderer.invoke("fs:renameFile",e,n),readJSON:e=>r.ipcRenderer.invoke("fs:readJSON",e),writeJSON:(e,n)=>r.ipcRenderer.invoke("fs:writeJSON",e,n),mkdir:e=>r.ipcRenderer.invoke("fs:mkdir",e),readdir:e=>r.ipcRenderer.invoke("fs:readdir",e),readdirSorted:(e,n)=>r.ipcRenderer.invoke("fs:readdirSorted",e,n),showSaveDialog:e=>r.ipcRenderer.invoke("dialog:showSaveDialog",e),showOpenDialog:e=>r.ipcRenderer.invoke("dialog:showOpenDialog",e)});r.contextBridge.exposeInMainWorld("electronImage",{downloadImage:(e,n)=>r.ipcRenderer.invoke("image:download",e,n),getDataUrl:e=>r.ipcRenderer.invoke("image:getDataUrl",e)});r.contextBridge.exposeInMainWorld("electronApp",{getPath:e=>r.ipcRenderer.invoke("app:getPath",e)});r.contextBridge.exposeInMainWorld("electronShell",{openExternal:e=>r.ipcRenderer.invoke("shell:openExternal",e),openPath:e=>r.ipcRenderer.invoke("shell:openPath",e)});
+"use strict";
+const electron = require("electron");
+electron.contextBridge.exposeInMainWorld("ipcRenderer", {
+  on(...args) {
+    const [channel, listener] = args;
+    return electron.ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
+  },
+  off(...args) {
+    const [channel, ...omit] = args;
+    return electron.ipcRenderer.off(channel, ...omit);
+  },
+  send(...args) {
+    const [channel, ...omit] = args;
+    return electron.ipcRenderer.send(channel, ...omit);
+  },
+  invoke(...args) {
+    const [channel, ...omit] = args;
+    return electron.ipcRenderer.invoke(channel, ...omit);
+  }
+});
+electron.contextBridge.exposeInMainWorld("electronFS", {
+  readFile: (filePath) => electron.ipcRenderer.invoke("fs:readFile", filePath),
+  writeFile: (filePath, data) => electron.ipcRenderer.invoke("fs:writeFile", filePath, data),
+  exists: (filePath) => electron.ipcRenderer.invoke("fs:exists", filePath),
+  deleteFile: (filePath) => electron.ipcRenderer.invoke("fs:deleteFile", filePath),
+  removeDir: (dirPath) => electron.ipcRenderer.invoke("fs:removeDir", dirPath),
+  renameFile: (oldPath, newPath) => electron.ipcRenderer.invoke("fs:renameFile", oldPath, newPath),
+  readJSON: (filePath) => electron.ipcRenderer.invoke("fs:readJSON", filePath),
+  writeJSON: (filePath, data) => electron.ipcRenderer.invoke("fs:writeJSON", filePath, data),
+  mkdir: (dirPath) => electron.ipcRenderer.invoke("fs:mkdir", dirPath),
+  readdir: (dirPath) => electron.ipcRenderer.invoke("fs:readdir", dirPath),
+  readdirSorted: (dirPath, order) => electron.ipcRenderer.invoke("fs:readdirSorted", dirPath, order),
+  showSaveDialog: (options) => electron.ipcRenderer.invoke("dialog:showSaveDialog", options),
+  showOpenDialog: (options) => electron.ipcRenderer.invoke("dialog:showOpenDialog", options)
+});
+electron.contextBridge.exposeInMainWorld("electronImage", {
+  downloadImage: (url, localPath) => electron.ipcRenderer.invoke("image:download", url, localPath),
+  getDataUrl: (localPath) => electron.ipcRenderer.invoke("image:getDataUrl", localPath)
+});
+electron.contextBridge.exposeInMainWorld("electronApp", {
+  getPath: (pathName) => electron.ipcRenderer.invoke("app:getPath", pathName)
+});
+electron.contextBridge.exposeInMainWorld("electronShell", {
+  openExternal: (url) => electron.ipcRenderer.invoke("shell:openExternal", url),
+  openPath: (path) => electron.ipcRenderer.invoke("shell:openPath", path)
+});

@@ -7,8 +7,6 @@ import {
 	deleteDeckFile,
 } from '@/libs/Decks'
 import {ref} from 'vue'
-import {getFullCardList} from './useCardSearch'
-import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 
 const initialized = ref<'uninitialized' | 'loading' | 'ready'>('uninitialized')
 const deckList = ref([] as Array<TDeckData>)
@@ -23,33 +21,11 @@ const useDeckList = () => {
 		initialized.value = 'ready'
 	}
 
-	async function createDeck(deckName: string) {
-		const s = await createDeckFile(deckName)
+	async function createDeck(deckName: string, deckData?: TDeckData) {
+		const s = await createDeckFile(deckName, deckData)
 		if (!s) throw new Error('Error while creating YDK file')
 		deckList.value.push(s)
 		return s
-	}
-
-	async function getDeckCards(deck: TDeckData) {
-		const fullCardList = await getFullCardList()
-		const out = {
-			main: [] as TCardData[],
-			extra: [] as TCardData[],
-			side: [] as TCardData[],
-		}
-		for (const cardId of deck.main) {
-			const card = fullCardList.find((c) => c.id === cardId)
-			if (card) out.main.push(card)
-		}
-		for (const cardId of deck.extra) {
-			const card = fullCardList.find((c) => c.id === cardId)
-			if (card) out.extra.push(card)
-		}
-		for (const cardId of deck.side) {
-			const card = fullCardList.find((c) => c.id === cardId)
-			if (card) out.side.push(card)
-		}
-		return out
 	}
 
 	async function saveDeck(deck: TDeckData, renamedFrom?: string) {
@@ -85,7 +61,6 @@ const useDeckList = () => {
 		deckList,
 		initialized,
 		createDeck,
-		getDeckCards,
 		saveDeck,
 		deleteDeck,
 		renameDeck,

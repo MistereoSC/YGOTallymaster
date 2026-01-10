@@ -144,6 +144,31 @@ async function removeDir(path: string) {
 	return result.success as boolean
 }
 
+async function readFileFromDialog(fsDialogOptions?: any) {
+	const result = await window.electronFS.showOpenDialog({
+		properties: ['openFile'],
+		...fsDialogOptions,
+	})
+	if (result.success && !result.canceled && result.filePaths?.length) {
+		const fileResult : (FSResult<string> & { name?: string }) = await window.electronFS.readFile(result.filePaths[0])
+		fileResult.name = result.filePaths[0].split(/(\/|\\)/).pop() || 'unknown'
+		return fileResult
+	}
+	return {success: false, error: 'Load canceled or failed'}
+}
+
+async function writeFileFromDialog(defaultFileName: string, data: string, fsDialogOptions?: any) {
+	const result = await window.electronFS.showSaveDialog({
+		defaultPath: defaultFileName,
+		...fsDialogOptions,
+	})
+	if (result.success && !result.canceled && result.filePath) {
+		const writeResult = await window.electronFS.writeFile(result.filePath, data)
+		return writeResult
+	}
+	return {success: false, error: 'Save canceled or failed'}
+}
+
 const Files = {
 	exists,
 	read,
@@ -157,6 +182,9 @@ const Files = {
 	remove,
 	removeDir,
 	moveOrRename,
+
+	readFileFromDialog,
+	writeFileFromDialog,
 }
 export default Files
 

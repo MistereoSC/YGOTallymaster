@@ -1,11 +1,8 @@
 import {fetchCardData, fetchDatabaseVersion, fetchCardSets} from './api/YGOProAPI'
-import {getConfig, setConfig, APP_VERSION} from './Config'
+import {getConfig, setConfig, _appIsUpToDate} from './Config'
 import Files from './Files'
-export async function appNeedsUpdating(): Promise<boolean> {
-	const cfg = await getConfig()
-	if (!cfg) return false
-	if (cfg.appVer !== APP_VERSION) return true
-	return false
+export async function appNeedsUpdating() {
+	return await _appIsUpToDate()
 }
 export async function dbNeedsUpdating(): Promise<boolean> {
 	const cfg = await getConfig()

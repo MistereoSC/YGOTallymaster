@@ -10,6 +10,7 @@ import ConfirmCancelModal from '@/components/common/ConfirmCancelModal.vue'
 import {Icon} from '@iconify/vue'
 import Button from '@/components/common/Button.vue'
 import NameInputModal from '@/components/common/NameInputModal.vue'
+import DeckImportZone from '@/components/decks/DeckImportZone.vue'
 
 const {initialized, deckList, createDeck, deleteDeck, renameDeck} = useDeckList()
 onBeforeMount(async () => {
@@ -77,6 +78,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
 	window.removeEventListener('popstate', handlePopState)
 })
+
+function onDeckImport(deck: TDeckData) {
+	createDeck(deck.name, deck)
+}
 </script>
 
 <template>
@@ -116,7 +121,7 @@ onBeforeUnmount(() => {
 		</div>
 		<!-- Deck Grid -->
 		<div class="flex-1 overflow-auto scrollable p-6">
-			<div class="flex flex-wrap gap-6">
+			<div class="flex flex-wrap gap-8">
 				<DeckPreview
 					v-for="deck in deckList"
 					:key="deck.name"
@@ -125,7 +130,10 @@ onBeforeUnmount(() => {
 					@delete="() => onDeckDelete(deck)"
 					@rename="() => onDeckRename(deck)"
 				/>
-				<div class="w-48 h-77 grid place-items-center" v-if="deckList.length < 200">
+				<div
+					class="w-56 h-77 grid grid-rows-2 gap-2 place-items-center"
+					v-if="deckList.length < 200"
+				>
 					<NameInputModal
 						:existing-items="deckList"
 						item-type="Deck"
@@ -136,25 +144,30 @@ onBeforeUnmount(() => {
 								class="h-full w-full rounded-lg bg-primary-700/50 cursor-pointer shadow-lg transition-all duration-200 hover:bg-primary-600/70 border-2 border-dashed border-primary-500 hover:border-accent-500/50 group"
 							>
 								<div
-									class="select-none h-full w-full flex justify-center items-center flex-col gap-2"
+									class="select-none h-full w-full flex justify-center items-center flex-col"
 								>
 									<div
-										class="w-12 h-12 rounded-full bg-primary-600 group-hover:bg-accent-500/20 flex items-center justify-center transition-colors"
+										class="w-8 h-8 rounded-full bg-primary-600 group-hover:bg-accent-500/20 flex items-center justify-center transition-colors"
 									>
 										<Icon
 											icon="material-symbols:add-rounded"
-											class="text-3xl text-contrast-400 group-hover:text-accent-400 transition-colors"
+											class="text-2xl text-contrast-500 group-hover:text-accent-400 transition-colors"
 										/>
 									</div>
 									<span
-										class="font-semibold text-contrast-400 group-hover:text-contrast-600 transition-colors"
+										class="font-semibold text-contrast-500 group-hover:text-contrast-600 transition-colors"
 									>
-										Add Deck
+										Create Deck
 									</span>
 								</div>
 							</div>
 						</template>
 					</NameInputModal>
+
+					<DeckImportZone
+						:existing-decks-names="deckList.map((deck) => deck.name)"
+						@import-deck="(deck) => onDeckImport(deck)"
+					/>
 				</div>
 			</div>
 		</div>

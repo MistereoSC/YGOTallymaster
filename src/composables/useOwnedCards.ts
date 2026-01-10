@@ -36,7 +36,7 @@ const useOwnedCards = () => {
 
 	async function _init() {
 		const cardData = await getFullCardList()
-		await _readOwnedCards()
+		await getOwnedCards()
 
 		ownedCardList.value = cardData.filter(
 			(card) => ownedCards.value && ownedCards.value[card.id] && ownedCards.value[card.id] > 0
@@ -185,7 +185,7 @@ function _searchTerm(term: string, cardList?: TCardData[]) {
 	return results as unknown as TSearchResultCardData[]
 }
 
-async function _readOwnedCards() {
+export async function getOwnedCards() {
 	if (ownedCards.value) return ownedCards.value
 	const data = await _get()
 	ownedCards.value = data

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppMainMenu from '@/components/navigation/AppMainMenu.vue'
+import ToastContainer from '@/components/common/ToastContainer.vue'
 import {useTheme} from '@/composables/useTheme'
 
 const {initTheme} = useTheme()
@@ -13,6 +14,7 @@ initTheme()
 			<RouterView />
 		</div>
 	</div>
+	<ToastContainer position="bottom-right" />
 </template>
 
 <style scoped></style>

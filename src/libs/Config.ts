@@ -1,4 +1,4 @@
-export const APP_VERSION: Readonly<string> = '1.0.0'
+export const APP_VERSION: Readonly<string> = '1.1.0'
 const DEFAULT_CONFIG: Readonly<TConfig> = {
 	appVer: APP_VERSION,
 	dbVer: '0',
@@ -21,9 +21,12 @@ export async function getConfig(): Promise<TConfig | null> {
 		return DEFAULT_CONFIG
 	}
 
-	const cfg = await Files.read<TConfig>('config.json')
+	const cfg: null | (TConfig & {oldVer?: string}) = await Files.read<TConfig>('config.json')
 	if (cfg) {
 		config = cfg
+		//@ts-ignore
+		config.oldVer = cfg.appVer
+		config.appVer = APP_VERSION
 		return config
 	}
 	console.error('ERR:: Failed to load config')
@@ -41,6 +44,13 @@ export async function setConfig(options: Partial<TConfig>): Promise<boolean> {
 	}
 	config = newConfig
 	return true
+}
+
+export async function _appIsUpToDate() {
+	const cfg = await getConfig()
+	if (!cfg) return false
+	// @ts-ignore
+	return {oldVer: cfg.oldVer, newVer: cfg.appVer, isUpToDate: cfg.oldVer === cfg.appVer}
 }
 
 export type TConfig = {

@@ -18,7 +18,7 @@ const emit = defineEmits([])
 		<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600">
 			<!-- Card Image with gradient background -->
 			<div
-				class="relative flex justify-center w-full py-6 bg-linear-to-b from-primary-600/30 to-transparent"
+				class="relative flex justify-center w-full p-4 bg-linear-to-b from-primary-600/30 to-transparent"
 			>
 				<CardReImage
 					:card="card"

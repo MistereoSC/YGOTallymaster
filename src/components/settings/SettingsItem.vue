@@ -6,7 +6,7 @@ const props = defineProps<{
 	icon: string
 	iconColorClass?: string
 	title: string
-	description: string
+	description?: string
 }>()
 const emit = defineEmits([])
 onMounted(() => {
@@ -16,7 +16,7 @@ onMounted(() => {
 
 <template>
 	<div
-		class="flex items-start gap-4 p-3 rounded-md bg-primary-700/50 hover:bg-primary-700 transition-colors"
+		class="flex items-center gap-4 p-2 rounded-md bg-primary-700/50 hover:bg-primary-700 transition-colors"
 	>
 		<div
 			class="w-10 h-10 rounded-lg bg-accent-500/20 flex items-center justify-center shrink-0"
@@ -31,7 +31,7 @@ onMounted(() => {
 			<div class="flex items-center justify-between gap-4">
 				<div>
 					<h3 class="font-medium text-contrast-700">{{ props.title }}</h3>
-					<p class="text-sm text-contrast-500 mt-0.5">
+					<p v-if="props.description" class="text-sm text-contrast-500 mt-0.5">
 						{{ props.description }}
 					</p>
 				</div>

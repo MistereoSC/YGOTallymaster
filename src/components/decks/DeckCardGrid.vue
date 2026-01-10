@@ -146,8 +146,8 @@ function onHorizontalWheel(event: WheelEvent) {
 			gridTemplateColumns: props.horizontal ? 'none' : `repeat(auto-fill, ${CARD_WIDTH}px)`,
 		}"
 		:class="{
-			'w-full grid justify-center gap-2': !props.horizontal,
-			'flex overflow-x-auto py-2 pl-10 pr-10': props.horizontal,
+			'w-full grid justify-center gap-2 pb-3': !props.horizontal,
+			'flex overflow-x-auto py-2 pl-10 pr-2': props.horizontal,
 		}"
 		@wheel="onHorizontalWheel"
 	>

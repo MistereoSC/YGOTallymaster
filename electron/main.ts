@@ -41,8 +41,10 @@ function createWindow() {
 		minHeight: 768,
 	})
 
-	// Remove the default menu bar (File, Edit, View, etc.)
-	win.removeMenu()
+	// Remove the default menu bar (File, Edit, View, etc.) in production
+	if (!VITE_DEV_SERVER_URL) {
+		win.removeMenu()
+	}
 
 	// Prevent new window creation and open external links in default browser
 	win.webContents.setWindowOpenHandler(({url}) => {
@@ -242,10 +244,6 @@ function setupIpcHandlers() {
 	ipcMain.handle('dialog:showSaveDialog', async (_, options = {}) => {
 		try {
 			const result = await dialog.showSaveDialog(win!, {
-				filters: [
-					{name: 'JSON Files', extensions: ['json']},
-					{name: 'All Files', extensions: ['*']},
-				],
 				...options,
 			})
 			return {success: true, ...result}
@@ -259,10 +257,6 @@ function setupIpcHandlers() {
 		try {
 			const result = await dialog.showOpenDialog(win!, {
 				properties: ['openFile'],
-				filters: [
-					{name: 'JSON Files', extensions: ['json']},
-					{name: 'All Files', extensions: ['*']},
-				],
 				...options,
 			})
 			return {success: true, ...result}

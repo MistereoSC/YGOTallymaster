@@ -11,6 +11,7 @@ import {
 import {useToast} from '@/composables/useToast'
 import {getOwnedCards} from '@/composables/useOwnedCards'
 import Files from '@/libs/Files'
+import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 
 const {addToast} = useToast()
 const props = defineProps<{
@@ -153,9 +154,28 @@ async function importYdkFile() {
 async function _getOwnedMarketString() {
 	const cardArray = [...props.deckCards.main, ...props.deckCards.extra, ...props.deckCards.side]
 	const ownedCards = await getOwnedCards()
-	const unownedCards = cardArray.filter((card) => {
-		return ownedCards[card.id] === undefined || ownedCards[card.id] === 0
-	})
+
+	// Track remaining owned count for each card as we iterate
+	const remainingOwned = new Map<number, number>()
+
+	// Build unowned cards array preserving original order
+	const unownedCards: TCardData[] = []
+	for (const card of cardArray) {
+		// Initialize remaining owned count on first encounter
+		if (!remainingOwned.has(card.id)) {
+			remainingOwned.set(card.id, ownedCards[card.id] ?? 0)
+		}
+
+		const remaining = remainingOwned.get(card.id)!
+		if (remaining > 0) {
+			// This copy is owned, decrement remaining
+			remainingOwned.set(card.id, remaining - 1)
+		} else {
+			// This copy is not owned, add to unowned list
+			unownedCards.push(card)
+		}
+	}
+
 	return exportPopulatedToMarketString(unownedCards)
 }
 

@@ -3,6 +3,7 @@ import {onMounted, ref, computed, onUnmounted, nextTick, watch} from 'vue'
 import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardPreview from '@/components/database/CardPreview.vue'
 import {Icon} from '@iconify/vue'
+import {useOwnedCards} from '@/composables/useOwnedCards'
 
 interface IProps {
 	cardList: TCardData[]
@@ -31,6 +32,31 @@ const emit = defineEmits<{
 	(e: 'cardShiftClicked', value: TCardData): void
 	(e: 'reorder', fromIndex: number, toIndex: number): void
 }>()
+
+const {getOwned} = useOwnedCards()
+
+// Compute which cards should be grayed out based on occurrence vs owned count
+const grayedOutIndices = computed(() => {
+	if (!props.grayUnowned) return new Set<number>()
+
+	const grayed = new Set<number>()
+	const occurrenceCount: Record<number, number> = {}
+
+	props.cardList.forEach((card, index) => {
+		const cardId = card.id
+		occurrenceCount[cardId] = (occurrenceCount[cardId] || 0) + 1
+		const currentOccurrence = occurrenceCount[cardId]
+		const ownedCount = getOwned(cardId)
+
+		// Gray out if this occurrence exceeds the owned count
+		if (currentOccurrence > ownedCount) {
+			grayed.add(index)
+		}
+	})
+
+	return grayed
+})
+
 // ----------------------------------------------
 // #region Virtual Scroll
 // ----------------------------------------------
@@ -309,7 +335,7 @@ defineExpose({
 						@mouseenter="() => onHoverEnter(card)"
 						:show-owned-heart="props.showOwnedHeart"
 						:show-owned-number="props.showOwnedNumber"
-						:gray-unowned="props.grayUnowned"
+						:gray-override="grayedOutIndices.has(index)"
 						:show-banlist-for="props.showBanlistFor"
 						:class="props.draggable ? 'cursor-grab active:cursor-grabbing' : ''"
 					/>

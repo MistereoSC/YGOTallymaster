@@ -17,6 +17,7 @@ interface IProps {
 
 	showLimitedInfo?: boolean
 	grayUnowned?: boolean
+	grayOverride?: boolean
 	showOwnedHeart?: boolean
 	showOwnedNumber?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
@@ -90,7 +91,7 @@ const styles = getCardStyles(props.card)
 
 <template>
 	<div
-		class="overflow-hidden select-none rounded-sm w-full px-1 hover:outline-2 hover:outline-accent-500 cursor-pointer"
+		class="overflow-hidden select-none rounded-sm w-full px-1 hover:outline-2 hover:outline-accent-500 cursor-pointer cardItemContainer"
 		:class="{
 			'outline-secondary-500 outline-2': props.active,
 		}"
@@ -101,10 +102,10 @@ const styles = getCardStyles(props.card)
 		}"
 		@click="(e) => onClick(e)"
 		@mouseenter="onHoverEnter"
+		:grayscale="props.grayOverride || (props.grayUnowned && numOwned === 0) ? 'true' : 'false'"
 	>
 		<div
 			class="cardItemFrame bg-primary-900/90 hover:bg-primary-900 w-full grid grid-cols-[auto_1fr_auto] gap-2"
-			:grayscale="props.grayUnowned && numOwned === 0 ? 'true' : 'false'"
 			:class="{
 				'h-8': props.size === 'tiny',
 				'h-12': props.size === 'small',
@@ -288,16 +289,24 @@ const styles = getCardStyles(props.card)
 </template>
 
 <style lang="scss" scoped>
-.cardItemFrame[grayscale='true'] {
-	background-color: color-mix(in srgb, var(--color-primary-600) 90%, transparent);
-
-	.cardItemImage {
-		filter: grayscale(1);
-		transition: filter 0.2s ease;
-	}
+.cardItemContainer[grayscale='true'] {
+	opacity: 0.4;
+	transition: opacity 0.2s;
 	&:hover {
+		opacity: 1;
+	}
+
+	.cardItemFrame {
+		background-color: color-mix(in srgb, var(--color-primary-600) 90%, transparent);
+
 		.cardItemImage {
-			filter: grayscale(0);
+			filter: grayscale(1);
+			transition: filter 0.2s ease;
+		}
+		&:hover {
+			.cardItemImage {
+				filter: grayscale(0);
+			}
 		}
 	}
 }

@@ -14,7 +14,14 @@ import Spinner from '@/components/common/Spinner.vue'
 import DraggableCardListVirtualGrid from '@/components/collections/DraggableCardListVirtualGrid.vue'
 import DraggableCardListVirtualList from '@/components/collections/DraggableCardListVirtualList.vue'
 import {sortByDeckOrder} from '@/composables/useDeckList'
+import SettingsSection from '@/components/settings/SettingsSection.vue'
+import SettingsItem from '@/components/settings/SettingsItem.vue'
+import {useToast} from '@/composables/useToast'
+import {getOwnedCards} from '@/composables/useOwnedCards'
+import {exportPopulatedToMarketString} from '@/libs/DeckParsers'
+import Files from '@/libs/Files'
 
+const {addToast} = useToast()
 const {settings} = useDatabaseSettings()
 const {resetSearch, fullCardList, searchResults, search, initialized} = useCardSearch()
 const {saveSet} = useCardCollections()
@@ -174,6 +181,85 @@ function removeDuplicates() {
 // #region Import / Export
 // ----------------------------------------------
 
+async function exportUnowned() {
+	const list = await _getUnownedMarketString()
+	try {
+		const fsDialogOptions = {
+			filters: [{name: 'Text Files', extensions: ['txt']}],
+		}
+		const e = await Files.writeFileFromDialog(
+			`${props.set.name}_missing.txt`,
+			list,
+			fsDialogOptions
+		)
+		if (e.success) {
+			addToast('Card list exported successfully!', 'success', 3000)
+		} else {
+			addToast('Failed to export card list', 'error', 3000)
+		}
+	} catch (err) {
+		console.error('Error exporting card list:', err)
+		addToast('Failed to export card list', 'error', 3000)
+		return
+	}
+}
+async function clipboardUnowned() {
+	try {
+		const list = await _getUnownedMarketString()
+		await navigator.clipboard.writeText(list)
+		addToast('Card list copied to clipboard!', 'success', 3000)
+	} catch (err) {
+		addToast('Failed to copy unowned deck list to clipboard', 'error', 3000)
+		console.error('Clipboard error:', err)
+	}
+}
+
+async function exportAsText() {
+	const list = exportPopulatedToMarketString(props.set.cards)
+	try {
+		const fsDialogOptions = {
+			filters: [{name: 'Text Files', extensions: ['txt']}],
+		}
+		const e = await Files.writeFileFromDialog(`${props.set.name}.txt`, list, fsDialogOptions)
+		if (e.success) {
+			addToast('Set exported successfully!', 'success', 3000)
+		} else {
+			addToast('Failed to export set as .txt file', 'error', 3000)
+		}
+	} catch (err) {
+		console.error('Error exporting set as .txt file:', err)
+		addToast('Failed to export set as .txt file', 'error', 3000)
+		return
+	}
+}
+
+async function _getUnownedMarketString() {
+	const ownedCards = await getOwnedCards()
+
+	// Track remaining owned count for each card as we iterate
+	const remainingOwned = new Map<number, number>()
+
+	// Build unowned cards array preserving original order
+	const unownedCards: TCardData[] = []
+	for (const card of props.set.cards) {
+		// Initialize remaining owned count on first encounter
+		if (!remainingOwned.has(card.id)) {
+			remainingOwned.set(card.id, ownedCards[card.id] ?? 0)
+		}
+
+		const remaining = remainingOwned.get(card.id)!
+		if (remaining > 0) {
+			// This copy is owned, decrement remaining
+			remainingOwned.set(card.id, remaining - 1)
+		} else {
+			// This copy is not owned, add to unowned list
+			unownedCards.push(card)
+		}
+	}
+
+	return exportPopulatedToMarketString(unownedCards)
+}
+
 // #endregion
 // ----------------------------------------------
 </script>
@@ -294,66 +380,58 @@ function removeDuplicates() {
 				>
 					<div class="space-y-4">
 						<!-- Sort Section -->
-						<div>
-							<h3
-								class="text-sm font-semibold text-contrast-600 mb-2 flex items-center gap-2"
+						<SettingsSection
+							title="Sort Cards"
+							icon="material-symbols:sort"
+							:pt-classes="{content: 'gap-3!'}"
+						>
+							<button
+								v-for="option in sortOptions"
+								:key="option.value"
+								@click="sortCards(option.value)"
+								class="cursor-pointer flex items-center gap-2 px-3 py-2 text-sm text-left rounded-lg bg-primary-600 hover:bg-accent-500 text-contrast-600 hover:text-contrast-700 transition-colors"
 							>
-								<Icon
-									icon="material-symbols:sort"
-									class="text-accent-400 text-lg"
-								/>
-								Sort Cards
-							</h3>
-							<div class="grid grid-cols-1 gap-1.5">
-								<button
-									v-for="option in sortOptions"
-									:key="option.value"
-									@click="sortCards(option.value)"
-									class="cursor-pointer flex items-center gap-2 px-3 py-2 text-sm text-left rounded-lg bg-primary-600 hover:bg-accent-500 text-contrast-600 hover:text-contrast-700 transition-colors"
-								>
-									<Icon :icon="option.icon" class="text-base opacity-70" />
-									{{ option.label }}
-								</button>
-							</div>
-						</div>
+								<Icon :icon="option.icon" class="text-base opacity-70" />
+								{{ option.label }}
+							</button>
+						</SettingsSection>
 
 						<!-- Utilities Section -->
-						<div>
-							<h3
-								class="text-sm font-semibold text-contrast-600 mb-2 flex items-center gap-2"
-							>
-								<Icon
-									icon="material-symbols:build"
-									class="text-accent-400 text-lg"
-								/>
-								Utilities
-							</h3>
-							<div class="grid grid-cols-1 gap-1.5">
-								<button
-									@click="removeDuplicates"
-									class="cursor-pointer flex items-center gap-2 px-3 py-2 text-sm text-left rounded-lg bg-primary-600 hover:bg-red-600/20 text-contrast-600 hover:text-red-400 transition-colors"
-								>
-									<Icon
-										icon="material-symbols:file-copy-off-rounded"
-										class="text-base opacity-70 text-red-400"
-									/>
-									Remove Duplicates
-								</button>
-							</div>
-						</div>
+						<SettingsSection title="Utilities" icon="material-symbols:build">
+							<SettingsItem
+								icon="material-symbols:file-copy-off-rounded"
+								title="Remove Duplicates"
+								class="cursor-pointer hover:bg-red-900"
+								description="Remove duplicate cards from the set"
+								icon-color-class="text-red-400"
+								@click="() => removeDuplicates()"
+							/>
+						</SettingsSection>
 
-						<!-- Import/Export Section (placeholder) -->
-						<!-- <div>
-							<h3
-								class="text-sm font-semibold text-contrast-600 mb-2 flex items-center gap-2"
-							>
-								<Icon
-									icon="tabler:package-export"
-									class="text-accent-400 text-lg"
-								/>
-								Import / Export
-							</h3>
-						</div> -->
+						<!-- Import/Export Section -->
+						<SettingsSection title="Export" icon="tabler:package-export">
+							<SettingsItem
+								icon="tabler:file-text-filled"
+								title="Export as Text"
+								class="cursor-pointer"
+								description="Export set as readable .txt file"
+								@click="() => exportAsText()"
+							/>
+							<SettingsItem
+								icon="tabler:heart-broken-filled"
+								title="Export Unowned List"
+								class="cursor-pointer"
+								description="Export unowned cards as readable .txt file"
+								@click="() => exportUnowned()"
+							/>
+							<SettingsItem
+								icon="tabler:clipboard-list-filled"
+								title="Clipboard Unowned List"
+								class="cursor-pointer"
+								description="Copy unowned cards list to clipboard"
+								@click="() => clipboardUnowned()"
+							/>
+						</SettingsSection>
 					</div>
 				</div>
 			</div>

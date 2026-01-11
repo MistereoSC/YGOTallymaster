@@ -77,18 +77,24 @@ export async function exportIdsToMarketString(cardIds: number[]): Promise<string
 }
 
 export function exportPopulatedToMarketString(cards: TCardData[]): string {
-	const countMap: Record<number, number> = {}
-	const cardMap: Record<number, TCardData> = {}
+	const countMap = new Map<number, number>()
+	const cardMap = new Map<number, TCardData>()
+	const orderList: number[] = []
+
 	for (const card of cards) {
-		if (!countMap[card.id]) countMap[card.id] = 0
-		countMap[card.id]++
-		cardMap[card.id] = card
+		if (!countMap.has(card.id)) {
+			countMap.set(card.id, 0)
+			orderList.push(card.id) // Track first occurrence order
+		}
+		countMap.set(card.id, countMap.get(card.id)! + 1)
+		cardMap.set(card.id, card)
 	}
+
 	let output = ''
-	for (const cardId in countMap) {
-		const card = cardMap[Number(cardId)]
+	for (const cardId of orderList) {
+		const card = cardMap.get(cardId)
 		if (!card) continue
-		output += `${countMap[cardId]}x ${card.name}\n`
+		output += `${countMap.get(cardId)}x ${card.name}\n`
 	}
 	return output
 }

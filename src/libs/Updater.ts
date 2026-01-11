@@ -140,7 +140,7 @@ function versionIsLessThan(v1: string, v2: string): boolean {
 	return false
 }
 
-async function runVersionMigrations() {
+export async function runVersionMigrations() {
 	const cfg = await getConfig()
 	const oldVer = cfg?.oldVer || '0'
 
@@ -167,4 +167,6 @@ async function runVersionMigrations() {
 			await setConfig({dbVer: newDbVer})
 		}
 	}
+
+	await setConfig({}) // Just to update the appVer and remove oldVer
 }

@@ -127,11 +127,13 @@ onBeforeUnmount(() => {
 						class="w-full px-2 py-1 rounded-md bg-primary-800 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-500"
 					/>
 					<Button
+						v-if="searchInput.length > 0"
 						rounded
 						icon="material-symbols:filter-alt-off-rounded"
 						@click="onReset"
 						size="small"
 					/>
+					<span v-else class="w-7"></span>
 				</div>
 
 				<div class="items-center">

@@ -1,7 +1,7 @@
 {
   "name": "ygotallymaster",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
   "author": "Mistereo",
   "description": "Electron App for organizing YuGiOh Cards",

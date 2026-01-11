@@ -1,7 +1,12 @@
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue'
 import {getConfig} from '@/libs/Config'
-import {dbNeedsUpdating, performDBUpdate} from '@/libs/Updater'
+import {
+	appNeedsUpdating,
+	dbNeedsUpdating,
+	performDBUpdate,
+	runVersionMigrations,
+} from '@/libs/Updater'
 import {useRouter} from 'vue-router'
 import ExternalLink from '@/components/common/ExternalLink.vue'
 import {Icon} from '@iconify/vue'
@@ -38,6 +43,11 @@ async function checkSetupState() {
 	} else if (cfg?.autoUpdate && (await dbNeedsUpdating(language))) {
 		console.debug('INIT::Check Setup::Update Available')
 		state.value = 'update-available'
+	} else if (await appNeedsUpdating()) {
+		console.debug('INIT::Check Setup::App Update Available')
+		state.value = 'updating'
+		await runVersionMigrations()
+		await router.push({name: 'Database'})
 	} else {
 		console.debug('INIT::Check Setup::Ready')
 		// state.value = 'ready'

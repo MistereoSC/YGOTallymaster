@@ -160,7 +160,7 @@ function onDeckAreaWheel(e: WheelEvent) {
 					v-else
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
-					item-size="medium"
+					:item-size="settings?.gridSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					@card-Hovered="onCardHover"
 					@card-shift-clicked="(card) => onCardShiftLClick(card)"

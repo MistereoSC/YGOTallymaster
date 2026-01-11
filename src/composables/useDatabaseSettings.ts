@@ -83,6 +83,11 @@ export const useDatabaseSettings = () => {
 		settings.value.showBanlistFor = to
 		save()
 	}
+	function gridSize(to: TSizes) {
+		if (!settings.value) return
+		settings.value.gridSize = to
+		save()
+	}
 	function listSizeSmallList(to: TSizes) {
 		if (!settings.value) return
 		settings.value.listSizeSmallList = to
@@ -109,6 +114,7 @@ export const useDatabaseSettings = () => {
 		showBanlistFor,
 		listSizeSmallList,
 		cardLanguage,
+		gridSize,
 	}
 
 	return {
@@ -150,6 +156,7 @@ export type TDatabaseSettings = {
 	showOwnedNumbers: boolean
 	grayUnowned: boolean
 	listSize: TSizes
+	gridSize: TSizes
 
 	decklistGrayUnownedGrid: boolean
 	decklistGridCardSize: TSizes
@@ -168,6 +175,7 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	showOwnedNumbers: false,
 	grayUnowned: false,
 	listSize: 'small',
+	gridSize: 'small',
 
 	decklistGrayUnownedGrid: false,
 	decklistGridCardSize: 'tiny',

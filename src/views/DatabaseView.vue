@@ -72,7 +72,7 @@ function toggleFilter() {
 // ----------------------------------------------
 // #region Settings
 // ----------------------------------------------
-const settingsStore = useDatabaseSettings()
+const {settings} = useDatabaseSettings()
 
 // #endregion
 // ----------------------------------------------
@@ -113,15 +113,15 @@ const settingsStore = useDatabaseSettings()
 			v-if="fullCardList.length > 0"
 		>
 			<CardListVirtualList
-				v-if="settingsStore.settings.value?.displayAsList"
+				v-if="settings?.displayAsList"
 				ref="cardGrid"
 				:cardList="searchResults == null ? fullCardList : searchResults"
 				@card-clicked="(card) => onCardClick(card)"
 				:active-card-id="activeCard ? activeCard.id : null"
-				:item-size="settingsStore.settings.value?.listSize || 'medium'"
+				:item-size="settings?.listSize || 'medium'"
 				:show-owned-heart="true"
-				:gray-unowned="settingsStore.settings.value?.grayUnowned"
-				:show-banlist-for="settingsStore.settings.value?.showBanlistFor || 'none'"
+				:gray-unowned="settings?.grayUnowned"
+				:show-banlist-for="settings?.showBanlistFor || 'none'"
 			/>
 			<CardListVirtualGrid
 				v-else
@@ -129,11 +129,11 @@ const settingsStore = useDatabaseSettings()
 				:cardList="searchResults == null ? fullCardList : searchResults"
 				@card-clicked="(card) => onCardClick(card)"
 				:active-card-id="activeCard ? activeCard.id : null"
-				item-size="medium"
+				:item-size="settings?.gridSize || 'medium'"
 				:show-owned-heart="true"
-				:show-owned-number="settingsStore.settings.value?.showOwnedNumbers"
-				:gray-unowned="settingsStore.settings.value?.grayUnowned"
-				:show-banlist-for="settingsStore.settings.value?.showBanlistFor || 'none'"
+				:show-owned-number="settings?.showOwnedNumbers"
+				:gray-unowned="settings?.grayUnowned"
+				:show-banlist-for="settings?.showBanlistFor || 'none'"
 			/>
 
 			<div

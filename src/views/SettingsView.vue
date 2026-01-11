@@ -27,7 +27,7 @@ onMounted(async () => {
 // ------------------------------------------------------
 // #region Display Settings
 // -----------------------------------------------------
-const displayStore = useDatabaseSettings()
+const {settings, set, toggle} = useDatabaseSettings()
 
 enum EListSize {
 	'tiny' = 'Tiny',
@@ -39,6 +39,11 @@ enum EListSizeNoLarge {
 	'tiny' = 'Small',
 	'small' = 'Large',
 }
+enum EListSizeNoTiny {
+	'small' = 'Small',
+	'medium' = 'Large',
+}
+
 enum EBanlistFormat {
 	'none' = 'None',
 	'ban_tcg' = 'TCG',
@@ -86,7 +91,7 @@ function onForceReset() {
 }
 
 function onLanguageChange(language: keyof typeof ELanguageCodes) {
-	displayStore.set.cardLanguage(language)
+	set.cardLanguage(language)
 	forceReset.value = 'reInit'
 	nextTick(() => {
 		checkForUpdatesModalOpen.value = true
@@ -131,7 +136,7 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Language only affects card names and descriptions. Card images are only available in English. Changing language may require downloading additional data."
 					>
 						<select
-							:value="displayStore.settings.value?.cardLanguage"
+							:value="settings?.cardLanguage"
 							@change="(e) => onLanguageChange((e.target as HTMLSelectElement).value as keyof typeof ELanguageCodes)"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
@@ -148,8 +153,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Show ban status indicators for selected format"
 					>
 						<select
-							:value="displayStore.settings.value?.showBanlistFor"
-							@change="(e) => displayStore.set.showBanlistFor((e.target as HTMLSelectElement).value as keyof typeof EBanlistFormat)"
+							:value="settings?.showBanlistFor"
+							@change="(e) => set.showBanlistFor((e.target as HTMLSelectElement).value as keyof typeof EBanlistFormat)"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option v-for="(label, key) in EBanlistFormat" :key="key" :value="key">
@@ -167,8 +172,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Dim cards you don't own. Only affects the Database tab"
 					>
 						<Checkbox
-							:model-value="displayStore.settings.value?.grayUnowned"
-							@change="displayStore.toggle.grayUnowned"
+							:model-value="settings?.grayUnowned"
+							@change="toggle.grayUnowned"
 							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
@@ -180,8 +185,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Dim unowned cards in small lists for Deck-Creation and Set-Creation"
 					>
 						<Checkbox
-							:model-value="displayStore.settings.value?.grayUnownedSmallList"
-							@change="displayStore.toggle.grayUnownedSmallList"
+							:model-value="settings?.grayUnownedSmallList"
+							@change="toggle.grayUnownedSmallList"
 							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
@@ -193,8 +198,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Dim cards you don't own. Only affects the Decks tab"
 					>
 						<Checkbox
-							:model-value="displayStore.settings.value?.decklistGrayUnownedGrid"
-							@change="displayStore.toggle.decklistGrayUnownedGrid"
+							:model-value="settings?.decklistGrayUnownedGrid"
+							@change="toggle.decklistGrayUnownedGrid"
 							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
@@ -206,8 +211,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Dim cards you don't own. Only affects the Lists tab"
 					>
 						<Checkbox
-							:model-value="displayStore.settings.value?.setsGrayUnownedGrid"
-							@change="displayStore.toggle.setsGrayUnownedGrid"
+							:model-value="settings?.setsGrayUnownedGrid"
+							@change="toggle.setsGrayUnownedGrid"
 							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
@@ -221,8 +226,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Display ownership count on all cards in Database tab"
 					>
 						<Checkbox
-							:model-value="displayStore.settings.value?.showOwnedNumbers"
-							@change="displayStore.toggle.showOwnedNumbers"
+							:model-value="settings?.showOwnedNumbers"
+							@change="toggle.showOwnedNumbers"
 							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
@@ -234,10 +239,27 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Show cards in a list view instead of a grid for the Database tab"
 					>
 						<Checkbox
-							:model-value="displayStore.settings.value?.displayAsList"
-							@change="displayStore.toggle.displayAsList"
+							:model-value="settings?.displayAsList"
+							@change="toggle.displayAsList"
 							:allow-only-check-to-toggle="true"
 						/>
+					</SettingsItem>
+					<!-- Database Grid Size -->
+					<SettingsItem
+						icon="material-symbols:photo-size-select-large-rounded"
+						iconColorClass="text-tertiary-400"
+						title="Card Size"
+						description="Size of cards displayed in Lists and Database tabs"
+					>
+						<select
+							:value="settings?.gridSize"
+							@change="(e) => set.gridSize((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoTiny)"
+							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+						>
+							<option v-for="(label, key) in EListSizeNoTiny" :key="key" :value="key">
+								{{ label }}
+							</option>
+						</select>
 					</SettingsItem>
 					<!-- Database List Size -->
 					<SettingsItem
@@ -247,8 +269,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Size of items when displayed as a list. Affects Database and Lists tab"
 					>
 						<select
-							:value="displayStore.settings.value?.listSize"
-							@change="(e) => displayStore.set.listSize((e.target as HTMLSelectElement).value as keyof typeof EListSize)"
+							:value="settings?.listSize"
+							@change="(e) => set.listSize((e.target as HTMLSelectElement).value as keyof typeof EListSize)"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option v-for="(label, key) in EListSize" :key="key" :value="key">
@@ -269,8 +291,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Size of the small list on the right side of the Decks and Lists tab"
 					>
 						<select
-							:value="displayStore.settings.value?.listSizeSmallList"
-							@change="(e) => displayStore.set.listSizeSmallList((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoLarge)"
+							:value="settings?.listSizeSmallList"
+							@change="(e) => set.listSizeSmallList((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoLarge)"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option
@@ -291,8 +313,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Size of cards for the Decks tab"
 					>
 						<select
-							:value="displayStore.settings.value?.decklistGridCardSize"
-							@change="(e) => displayStore.set.decklistGridSize((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoLarge)"
+							:value="settings?.decklistGridCardSize"
+							@change="(e) => set.decklistGridSize((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoLarge)"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option
@@ -312,8 +334,8 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						description="Show cards in a list view instead of a grid. Only affects Lists tab"
 					>
 						<Checkbox
-							:model-value="displayStore.settings.value?.setsDisplayAsList"
-							@change="displayStore.toggle.setsDisplayAsList"
+							:model-value="settings?.setsDisplayAsList"
+							@change="toggle.setsDisplayAsList"
 							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>

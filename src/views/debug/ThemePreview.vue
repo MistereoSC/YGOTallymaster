@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Button from '@/components/common/Button.vue'
-import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
+import ThemeSwitcher from '@/components/common/ThemeSwitcher.vue'
 </script>
 
 <template>
@@ -424,48 +424,16 @@ import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 		<div class="mt-8">
 			<h3 class="mb-4 text-xl font-bold">Components</h3>
 			<div class="flex items-center gap-2">
-				<Button
-					size="tiny"
-					icon="material-symbols:add-box-rounded"
-					label="SM"
-				/>
-				<Button
-					size="small"
-					icon="material-symbols:add-box-rounded"
-					label="SM"
-				/>
-				<Button
-					size="medium"
-					icon="material-symbols:add-box-rounded"
-					label="MD"
-				/>
-				<Button
-					size="large"
-					icon="material-symbols:add-box-rounded"
-					label="LG"
-				/>
+				<Button size="tiny" icon="material-symbols:add-box-rounded" label="SM" />
+				<Button size="small" icon="material-symbols:add-box-rounded" label="SM" />
+				<Button size="medium" icon="material-symbols:add-box-rounded" label="MD" />
+				<Button size="large" icon="material-symbols:add-box-rounded" label="LG" />
 
-				<Button
-					size="tiny"
-					icon="material-symbols:add-box-rounded"
-					rounded
-				/>
+				<Button size="tiny" icon="material-symbols:add-box-rounded" rounded />
 
-				<Button
-					size="small"
-					icon="material-symbols:add-box-rounded"
-					rounded
-				/>
-				<Button
-					size="medium"
-					icon="material-symbols:add-box-rounded"
-					rounded
-				/>
-				<Button
-					size="large"
-					icon="material-symbols:add-box-rounded"
-					rounded
-				/>
+				<Button size="small" icon="material-symbols:add-box-rounded" rounded />
+				<Button size="medium" icon="material-symbols:add-box-rounded" rounded />
+				<Button size="large" icon="material-symbols:add-box-rounded" rounded />
 				<Button variant="primary" label="Primary" />
 				<Button variant="secondary" label="Secondary" />
 				<Button variant="tertiary" label="Tertiary" />

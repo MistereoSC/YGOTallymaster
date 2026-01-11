@@ -3,14 +3,17 @@ import {TFullSet, useCardCollections} from '@/composables/useCardCollections'
 import {onBeforeUnmount, onMounted, ref} from 'vue'
 import Button from '@/components/common/Button.vue'
 import {Icon} from '@iconify/vue'
-import CardListVirtualGrid from '@/components/database/CardListVirtualGrid.vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {ESortBy, _sort} from '@/composables/useCardSearch'
 import CardFullView from '@/components/database/CardFullView.vue'
 import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import CardFilter from '@/components/database/CardFilter.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {useCardSearch} from '@/composables/useCardSearch'
 import Spinner from '@/components/common/Spinner.vue'
+import DraggableCardListVirtualGrid from '@/components/collections/DraggableCardListVirtualGrid.vue'
+import DraggableCardListVirtualList from '@/components/collections/DraggableCardListVirtualList.vue'
+import {sortByDeckOrder} from '@/composables/useDeckList'
 
 const {settings} = useDatabaseSettings()
 const {resetSearch, fullCardList, searchResults, search, initialized} = useCardSearch()
@@ -37,6 +40,10 @@ onBeforeUnmount(async () => {
 	window.removeEventListener('keyup', onKeyUp)
 })
 
+// ----------------------------------------------
+// #region Card Actions
+// ----------------------------------------------
+
 const hoveredCard = ref<null | TCardData>(null)
 function onCardHover(card?: TCardData) {
 	hoveredCard.value = card || null
@@ -44,9 +51,21 @@ function onCardHover(card?: TCardData) {
 
 function onCardAdd(card: TCardData) {
 	if (props.set.cards.length >= 256) return
-	const index = props.set.cards.findIndex((c) => c.id === card.id)
-	if (index === -1) {
+	const existingCopies = props.set.cards.filter((c) => c.id === card.id).length
+	if (existingCopies >= 3) return
+
+	if (existingCopies === 0) {
 		props.set.cards.push(card)
+	} else {
+		// Find the first index of this card and insert after it
+		let firstIndex = -1
+		for (let i = 0; i < props.set.cards.length; i++) {
+			if (props.set.cards[i].id === card.id) {
+				firstIndex = i
+				break
+			}
+		}
+		props.set.cards.splice(firstIndex + 1, 0, card)
 	}
 }
 function onCardRemove(card: TCardData) {
@@ -56,6 +75,12 @@ function onCardRemove(card: TCardData) {
 	}
 }
 
+function onCardReorder(fromIndex: number, toIndex: number) {
+	if (fromIndex === toIndex) return
+	const [movedCard] = props.set.cards.splice(fromIndex, 1)
+	props.set.cards.splice(toIndex, 0, movedCard)
+}
+
 function onCardShiftLClick(card: TCardData) {
 	activePanel.value = 'filter'
 	resetSearch()
@@ -63,17 +88,25 @@ function onCardShiftLClick(card: TCardData) {
 	search({term: searchTerm})
 }
 
-const activePanel = ref('filter' as 'filter' | 'none')
+// #endregion
+// ----------------------------------------------
+// #region Controls
+// ----------------------------------------------
+
+const activePanel = ref('filter' as 'filter' | 'controls' | 'none')
 function toggleFilter() {
 	if (activePanel.value === 'filter') activePanel.value = 'none'
 	else activePanel.value = 'filter'
+}
+function toggleControls() {
+	if (activePanel.value === 'controls') activePanel.value = 'none'
+	else activePanel.value = 'controls'
 }
 
 function onReturnClick() {
 	emit('close')
 }
 
-// Scroll Side Menu for Card Preview when SHIFT key is held
 const cardFullViewContainer = ref<HTMLElement | null>(null)
 const isShiftHeld = ref(false)
 function onKeyDown(e: KeyboardEvent) {
@@ -92,6 +125,57 @@ function onDeckAreaWheel(e: WheelEvent) {
 		cardFullViewContainer.value.scrollTop += e.deltaY
 	}
 }
+// #endregion
+// ----------------------------------------------
+// #region Sorting and Utilities
+// ----------------------------------------------
+const sortOptions = [
+	{value: ESortBy.Name_Asc, label: 'Name (A-Z)', icon: 'material-symbols:sort-by-alpha'},
+	{value: ESortBy.Name_Desc, label: 'Name (Z-A)', icon: 'material-symbols:sort-by-alpha'},
+	{value: ESortBy.TCG_Date_Asc, label: 'Date (Old-New)', icon: 'material-symbols:calendar-month'},
+	{
+		value: ESortBy.TCG_Date_Desc,
+		label: 'Date (New-Old)',
+		icon: 'material-symbols:calendar-month',
+	},
+	{value: ESortBy.ATK_Asc, label: 'ATK (Low-High)', icon: 'material-symbols:swords'},
+	{value: ESortBy.ATK_Desc, label: 'ATK (High-Low)', icon: 'material-symbols:swords'},
+	{value: ESortBy.DEF_Asc, label: 'DEF (Low-High)', icon: 'material-symbols:shield'},
+	{value: ESortBy.DEF_Desc, label: 'DEF (High-Low)', icon: 'material-symbols:shield'},
+	{value: ESortBy.Type, label: 'Card Type', icon: 'material-symbols:category'},
+	{value: 'Deck Order' as ESortBy, label: 'Deck Order', icon: 'material-symbols:view-list'},
+]
+
+function sortCards(sortBy: ESortBy) {
+	//@ts-ignore
+	if (sortBy === 'Deck Order') {
+		const sorted = sortByDeckOrder([...props.set.cards])
+		props.set.cards.splice(0, props.set.cards.length, ...sorted)
+		return
+	}
+	const sorted = _sort(sortBy, [...props.set.cards])
+	props.set.cards.splice(0, props.set.cards.length, ...sorted)
+}
+
+function removeDuplicates() {
+	const seen = new Set<number>()
+	const uniqueCards: TCardData[] = []
+	for (const card of props.set.cards) {
+		if (!seen.has(card.id)) {
+			seen.add(card.id)
+			uniqueCards.push(card)
+		}
+	}
+	props.set.cards.splice(0, props.set.cards.length, ...uniqueCards)
+}
+
+// #endregion
+// ----------------------------------------------
+// #region Import / Export
+// ----------------------------------------------
+
+// #endregion
+// ----------------------------------------------
 </script>
 
 <template>
@@ -124,6 +208,13 @@ function onDeckAreaWheel(e: WheelEvent) {
 				<Button
 					rounded
 					size="small"
+					icon="material-symbols:tune"
+					@click="toggleControls"
+					:class="activePanel === 'controls' ? 'ring-2 ring-accent-500/50' : ''"
+				/>
+				<Button
+					rounded
+					size="small"
 					icon="material-symbols:filter-alt"
 					@click="toggleFilter"
 					:class="activePanel === 'filter' ? 'ring-2 ring-accent-500/50' : ''"
@@ -146,25 +237,29 @@ function onDeckAreaWheel(e: WheelEvent) {
 					<Icon icon="material-symbols:credit-card-off-rounded" class="text-4xl" />
 					<p class="text-lg font-medium">No cards in this Set</p>
 				</div>
-				<CardListVirtualList
+				<DraggableCardListVirtualList
 					v-else-if="settings?.setsDisplayAsList"
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
 					:item-size="settings?.listSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
+					:draggable="true"
 					@card-Hovered="onCardHover"
 					@card-shift-clicked="(card) => onCardShiftLClick(card)"
 					@card-right-clicked="(card) => onCardRemove(card)"
+					@reorder="onCardReorder"
 				/>
-				<CardListVirtualGrid
+				<DraggableCardListVirtualGrid
 					v-else
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
 					:item-size="settings?.gridSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
+					:draggable="true"
 					@card-Hovered="onCardHover"
 					@card-shift-clicked="(card) => onCardShiftLClick(card)"
 					@card-right-clicked="(card) => onCardRemove(card)"
+					@reorder="onCardReorder"
 				/>
 			</div>
 			<div
@@ -173,7 +268,7 @@ function onDeckAreaWheel(e: WheelEvent) {
 			>
 				<div
 					v-if="activePanel === 'filter'"
-					class="h-full grid grid-rows-[auto_auto] overflow-hidden"
+					class="h-full grid grid-rows-[auto_1fr] overflow-hidden"
 				>
 					<div
 						class="max-h-[50vh] overflow-y-scroll scrollable border-b border-primary-500 p-2 pr-1"
@@ -191,6 +286,74 @@ function onDeckAreaWheel(e: WheelEvent) {
 							@card-clicked="(card) => onCardAdd(card)"
 							:item-size="settings?.listSizeSmallList || 'tiny'"
 						/>
+					</div>
+				</div>
+				<div
+					v-if="activePanel === 'controls'"
+					class="h-full overflow-y-auto scrollable p-3"
+				>
+					<div class="space-y-4">
+						<!-- Sort Section -->
+						<div>
+							<h3
+								class="text-sm font-semibold text-contrast-600 mb-2 flex items-center gap-2"
+							>
+								<Icon
+									icon="material-symbols:sort"
+									class="text-accent-400 text-lg"
+								/>
+								Sort Cards
+							</h3>
+							<div class="grid grid-cols-1 gap-1.5">
+								<button
+									v-for="option in sortOptions"
+									:key="option.value"
+									@click="sortCards(option.value)"
+									class="cursor-pointer flex items-center gap-2 px-3 py-2 text-sm text-left rounded-lg bg-primary-600 hover:bg-accent-500 text-contrast-600 hover:text-contrast-700 transition-colors"
+								>
+									<Icon :icon="option.icon" class="text-base opacity-70" />
+									{{ option.label }}
+								</button>
+							</div>
+						</div>
+
+						<!-- Utilities Section -->
+						<div>
+							<h3
+								class="text-sm font-semibold text-contrast-600 mb-2 flex items-center gap-2"
+							>
+								<Icon
+									icon="material-symbols:build"
+									class="text-accent-400 text-lg"
+								/>
+								Utilities
+							</h3>
+							<div class="grid grid-cols-1 gap-1.5">
+								<button
+									@click="removeDuplicates"
+									class="cursor-pointer flex items-center gap-2 px-3 py-2 text-sm text-left rounded-lg bg-primary-600 hover:bg-red-600/20 text-contrast-600 hover:text-red-400 transition-colors"
+								>
+									<Icon
+										icon="material-symbols:file-copy-off-rounded"
+										class="text-base opacity-70 text-red-400"
+									/>
+									Remove Duplicates
+								</button>
+							</div>
+						</div>
+
+						<!-- Import/Export Section (placeholder) -->
+						<!-- <div>
+							<h3
+								class="text-sm font-semibold text-contrast-600 mb-2 flex items-center gap-2"
+							>
+								<Icon
+									icon="tabler:package-export"
+									class="text-accent-400 text-lg"
+								/>
+								Import / Export
+							</h3>
+						</div> -->
 					</div>
 				</div>
 			</div>

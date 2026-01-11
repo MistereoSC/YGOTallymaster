@@ -6,6 +6,7 @@ import {
 	TDeckData,
 	deleteDeckFile,
 } from '@/libs/Decks'
+import { TCardData, TFrameType } from '@/libs/interfaces/YGOProInterfaces'
 import {ref} from 'vue'
 
 const initialized = ref<'uninitialized' | 'loading' | 'ready'>('uninitialized')
@@ -68,3 +69,46 @@ const useDeckList = () => {
 }
 
 export {useDeckList}
+
+const frameTypeSortOrder: Record<string, number> = {
+	link: 0,
+	xyz: 1,
+	xyz_pendulum: 2,
+	synchro: 3,
+	synchro_pendulum: 4,
+	fusion: 5,
+	fusion_pendulum: 6,
+	ritual: 7,
+	// Other monster types will get 8
+	spell: 9,
+	trap: 10,
+}
+
+export function sortByDeckOrder(cards: TCardData[]) {
+	return [...cards].sort((a, b) => {
+		const frameOrderA = _getFrameTypeOrder(a.frameType)
+		const frameOrderB = _getFrameTypeOrder(b.frameType)
+		if (frameOrderA !== frameOrderB) {
+			return frameOrderA - frameOrderB
+		}
+
+		const atkA = a.atk ?? -1
+		const atkB = b.atk ?? -1
+		if (atkA !== atkB) {
+			return atkB - atkA
+		}
+
+		return a.name.localeCompare(b.name)
+	})
+
+	function _getFrameTypeOrder(frameType: TFrameType): number {
+		if (frameType in frameTypeSortOrder) {
+			return frameTypeSortOrder[frameType]
+		}
+		// All other monster frame types
+		if (frameType !== 'spell' && frameType !== 'trap') {
+			return 8
+		}
+		return frameTypeSortOrder[frameType]
+	}
+}

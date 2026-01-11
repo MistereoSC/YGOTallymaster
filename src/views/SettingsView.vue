@@ -11,7 +11,7 @@ import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import SettingsSection from '@/components/settings/SettingsSection.vue'
 import SettingsItem from '@/components/settings/SettingsItem.vue'
 import SettingsSeparator from '@/components/settings/SettingsSeparator.vue'
-import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
+import ThemeSwitcher from '@/components/common/ThemeSwitcher.vue'
 import {useRouter} from 'vue-router'
 
 const router = useRouter()

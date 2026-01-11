@@ -7,10 +7,10 @@ import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import DeckCardGrid from '@/components/decks/DeckCardGrid.vue'
 import {useCardSearch} from '@/composables/useCardSearch'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
-import {useDeckList} from '@/composables/useDeckList'
+import {useDeckList, sortByDeckOrder} from '@/composables/useDeckList'
 import {deckIdsToPopulated, ydkToJsonIds} from '@/libs/DeckParsers'
 import {TDeckCardsPopulated, TDeckData} from '@/libs/Decks'
-import {TCardData, TFrameType} from '@/libs/interfaces/YGOProInterfaces'
+import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {Icon} from '@iconify/vue'
 import {onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
 import DeckImportExportPanel from './DeckImportExportPanel.vue'
@@ -111,53 +111,14 @@ function checkDeckLimit(cardId: number) {
 }
 
 function onSortClick() {
-	cards.value.main = sortForDeck(cards.value.main)
-	cards.value.extra = sortForDeck(cards.value.extra)
-	cards.value.side = sortForDeck(cards.value.side)
+	cards.value.main = sortByDeckOrder(cards.value.main)
+	cards.value.extra = sortByDeckOrder(cards.value.extra)
+	cards.value.side = sortByDeckOrder(cards.value.side)
 }
 
-const frameTypeSortOrder: Record<string, number> = {
-	link: 0,
-	xyz: 1,
-	xyz_pendulum: 2,
-	synchro: 3,
-	synchro_pendulum: 4,
-	fusion: 5,
-	fusion_pendulum: 6,
-	ritual: 7,
-	// Other monster types will get 8
-	spell: 9,
-	trap: 10,
-}
 
-function getFrameTypeOrder(frameType: TFrameType): number {
-	if (frameType in frameTypeSortOrder) {
-		return frameTypeSortOrder[frameType]
-	}
-	// All other monster frame types
-	if (frameType !== 'spell' && frameType !== 'trap') {
-		return 8
-	}
-	return frameTypeSortOrder[frameType]
-}
 
-function sortForDeck(cards: TCardData[]) {
-	return [...cards].sort((a, b) => {
-		const frameOrderA = getFrameTypeOrder(a.frameType)
-		const frameOrderB = getFrameTypeOrder(b.frameType)
-		if (frameOrderA !== frameOrderB) {
-			return frameOrderA - frameOrderB
-		}
 
-		const atkA = a.atk ?? -1
-		const atkB = b.atk ?? -1
-		if (atkA !== atkB) {
-			return atkB - atkA
-		}
-
-		return a.name.localeCompare(b.name)
-	})
-}
 
 onBeforeUnmount(async () => {
 	const newDeckData = {...props.deckData}
@@ -357,11 +318,15 @@ async function onYdkImported(ydkContent: string) {
 				class="border-l border-primary-600 max-w-180 w-[30vw] bg-primary-700 h-full overflow-hidden"
 			>
 				<div class="h-full overflow-y-auto scrollable" v-if="activePanel === 'export'">
-					<DeckImportExportPanel :deck-cards="cards" :deck-name="props.deckData.name" @ydk-imported="(ydk) => onYdkImported(ydk)"/>
+					<DeckImportExportPanel
+						:deck-cards="cards"
+						:deck-name="props.deckData.name"
+						@ydk-imported="(ydk) => onYdkImported(ydk)"
+					/>
 				</div>
 				<div
 					v-else-if="activePanel === 'filter'"
-					class="h-full grid grid-rows-[auto_1fr] overflow-hidden gap"
+					class="h-full grid grid-rows-[auto_1fr] overflow-hidden"
 				>
 					<div
 						class="max-h-[50vh] overflow-y-scroll scrollable border-b border-primary-500 p-2 pr-1"

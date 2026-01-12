@@ -275,6 +275,7 @@ async function _getUnownedMarketString() {
 					rounded
 					icon="material-symbols:keyboard-return-rounded"
 					@click="onReturnClick"
+					v-tooltip.bottom="'Return'"
 				/>
 
 				<div class="flex gap-3 items-center">
@@ -297,6 +298,7 @@ async function _getUnownedMarketString() {
 					icon="material-symbols:tune"
 					@click="toggleControls"
 					:class="activePanel === 'controls' ? 'ring-2 ring-accent-500/50' : ''"
+					v-tooltip.bottom="'Utilities'"
 				/>
 				<Button
 					rounded
@@ -304,6 +306,7 @@ async function _getUnownedMarketString() {
 					icon="material-symbols:filter-alt"
 					@click="toggleFilter"
 					:class="activePanel === 'filter' ? 'ring-2 ring-accent-500/50' : ''"
+					v-tooltip.bottom="'Card Search'"
 				/>
 			</span>
 		</div>

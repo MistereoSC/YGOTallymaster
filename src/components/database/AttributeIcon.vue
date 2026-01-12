@@ -45,7 +45,7 @@ function getAttributeIconPath(attribute: TMonsterAttribute | TSpellTrapAttribute
 </script>
 
 <template>
-	<div>
+	<div v-tooltip.bottom="props.attribute">
 		<img
 			v-if="getAttributeIconPath(props.attribute)"
 			:src="getAttributeIconPath(props.attribute)"

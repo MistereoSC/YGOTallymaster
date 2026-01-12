@@ -41,6 +41,7 @@ const emit = defineEmits<{
 					rounded
 					size="small"
 					@click="emit('reset')"
+					v-tooltip.bottom="'Reset section'"
 				/>
 			</span>
 		</div>

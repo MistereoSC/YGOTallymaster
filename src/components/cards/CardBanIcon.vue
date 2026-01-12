@@ -6,10 +6,12 @@ interface IProps {
 	banlistInfo?: TBanlistInfo | TBanlistType
 	showBanlistFor?: TBanlistFormat | 'none'
 	size?: 'tiny' | 'small' | 'medium' | 'large'
+	showTooltip?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	showBanlistFor: 'ban_tcg',
 	size: 'medium',
+	showTooltip: false,
 })
 
 const banlistStatus = computed(() => {
@@ -32,18 +34,29 @@ const banlistStatus = computed(() => {
 		}
 	}
 })
+const tooltipString = computed(() => {
+	if (!props.showTooltip) return null
+	if (!props.banlistInfo) return null
+	if (props.showBanlistFor === 'none') return null
+	if (typeof props.banlistInfo === 'string') return props.banlistInfo
+	if (props.banlistInfo[props.showBanlistFor] == undefined) return null
+	const format = props.showBanlistFor.slice(4).toUpperCase()
+	return `${props.banlistInfo[props.showBanlistFor]} in ${format} Format`
+})
 </script>
 
 <template>
 	<div
 		v-if="banlistStatus !== null && banlistStatus !== -1"
-		class="rounded-full bg-black border-red-500 flex items-center justify-center text-yellow-200 relative"
+		class="select-none rounded-full bg-black border-red-500 flex items-center justify-center text-yellow-200 relative"
 		:class="{
 			'w-5 h-5 border-3 text-sm': props.size === 'tiny',
 			'w-7 h-7 border-4 text-md': props.size === 'small',
 			'w-9 h-9 border-5 text-xl': props.size === 'medium',
 			'w-11 h-11 border-6 text-2xl': props.size === 'large',
+			'pointer-events-none': !props.showTooltip,
 		}"
+		v-tooltip.bottom="tooltipString"
 	>
 		<div
 			class="font-bold leading-none"

@@ -111,7 +111,12 @@ function onCancelRenameCollection() {
 			</div>
 			<DropdownMenu :items="menuItems">
 				<template #trigger>
-					<Button rounded size="small" icon="material-symbols:more-vert" />
+					<Button
+						rounded
+						size="small"
+						icon="material-symbols:more-vert"
+						v-tooltip.left="'Actions'"
+					/>
 				</template>
 			</DropdownMenu>
 		</div>

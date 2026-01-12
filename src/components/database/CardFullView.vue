@@ -36,6 +36,7 @@ const emit = defineEmits([])
 							:show-banlist-for="props.showBanlistFor"
 							:banlist-info="card.banlist_info"
 							size="small"
+							:show-tooltip="true"
 						/>
 					</span>
 					<span class="text-xl font-bold text-contrast-700 flex-1">{{ card.name }}</span>

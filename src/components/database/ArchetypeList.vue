@@ -30,6 +30,7 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 					rounded
 					icon="material-symbols:keyboard-return-rounded"
 					@click="emit('close')"
+					v-tooltip.bottom="'Return'"
 				/>
 				<div class="flex gap-3 items-center">
 					<div class="flex flex-col">

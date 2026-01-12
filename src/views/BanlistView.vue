@@ -73,7 +73,7 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 					<select
 						:value="activeBanlist"
 						@change="(e) => switchBanlist((e.target as HTMLSelectElement).value as keyof typeof EBanlistFormat)"
-						class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-full"
+						class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-full"
 					>
 						<option v-for="(label, key) in EBanlistFormat" :key="key" :value="key">
 							{{ label }}

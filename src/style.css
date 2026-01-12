@@ -68,7 +68,7 @@
 	--color-contrast-800: #ffffff;
 	--color-contrast-900: #ffffff;
 	--color-contrast-950: #000000;
-	
+
 	--color-card-spell: #46b5ac;
 	--color-card-spelltext: #b4d9d3;
 	--color-card-trap: #a01870;
@@ -204,4 +204,69 @@ body::-webkit-scrollbar-thumb {
 	transition: background-color 0.3s ease-out;
 	background-color: var(--color-accent-500);
 	border-radius: 4px;
+}
+
+/* Tooltip Directive Styles */
+.v-tooltip {
+	position: fixed;
+	z-index: 9999;
+	max-width: 280px;
+	padding: 8px 12px;
+	font-size: 0.8125rem;
+	line-height: 1.4;
+	color: var(--color-contrast-800);
+	background-color: var(--color-primary-800);
+	border: 1px solid var(--color-primary-600);
+	border-radius: 6px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 150ms ease-out;
+	word-wrap: break-word;
+	font-weight: 600;
+}
+
+.v-tooltip--visible {
+	opacity: 1;
+}
+
+/* Tooltip Arrow */
+.v-tooltip::before {
+	content: '';
+	position: absolute;
+	width: 0;
+	height: 0;
+	border: 6px solid transparent;
+}
+
+.v-tooltip[data-position='top']::before {
+	bottom: -12px;
+	left: var(--arrow-offset, 50%);
+	transform: translateX(-50%);
+	border-top-color: var(--color-primary-600);
+	border-bottom: none;
+}
+
+.v-tooltip[data-position='bottom']::before {
+	top: -6px;
+	left: var(--arrow-offset, 50%);
+	transform: translateX(-50%);
+	border-bottom-color: var(--color-primary-600);
+	border-top: none;
+}
+
+.v-tooltip[data-position='left']::before {
+	right: -6px;
+	top: var(--arrow-offset, 50%);
+	transform: translateY(-50%);
+	border-left-color: var(--color-primary-600);
+	border-right: none;
+}
+
+.v-tooltip[data-position='right']::before {
+	left: -6px;
+	top: var(--arrow-offset, 50%);
+	transform: translateY(-50%);
+	border-right-color: var(--color-primary-600);
+	border-left: none;
 }

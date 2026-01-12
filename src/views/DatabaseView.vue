@@ -105,6 +105,7 @@ const {settings} = useDatabaseSettings()
 				icon="material-symbols:filter-alt"
 				@click="toggleFilter"
 				:class="activePanel === 'filter' ? 'ring-2 ring-accent-500/50' : ''"
+				v-tooltip.bottom="'Card Search'"
 			/>
 		</div>
 

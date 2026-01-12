@@ -312,7 +312,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				v-model="searchInput"
 				@keyup="(e) => onSearchInput(e)"
 				type="text"
-				placeholder="Search cards by name..."
+				placeholder="Search card name/description..."
 				class="flex-1 px-2 py-1 rounded-md bg-primary-700 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-400 text-sm"
 			/>
 			<Button
@@ -320,6 +320,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				class="aspect-square"
 				size="small"
 				@click="onReset"
+				v-tooltip.bottom="'Reset all filters'"
 			/>
 		</div>
 

@@ -116,10 +116,6 @@ function onSortClick() {
 	cards.value.side = sortByDeckOrder(cards.value.side)
 }
 
-
-
-
-
 onBeforeUnmount(async () => {
 	const newDeckData = {...props.deckData}
 	newDeckData.main = cards.value.main.map((c) => c.id)
@@ -165,7 +161,7 @@ async function onYdkImported(ydkContent: string) {
 					rounded
 					icon="material-symbols:keyboard-return-rounded"
 					@click="onReturnClick"
-					title="Return to Deck List"
+					v-tooltip.bottom="'Return'"
 				/>
 				<h2 class="font-bold text-lg">
 					{{ props.deckData.name }}
@@ -175,9 +171,17 @@ async function onYdkImported(ydkContent: string) {
 				<Button
 					size="small"
 					rounded
+					icon="material-symbols:sort-rounded"
+					@click="onSortClick"
+					v-tooltip.bottom="'Sort Deck'"
+				/>
+				<span class="w-px full bg-primary-600 mx-1"></span>
+				<Button
+					size="small"
+					rounded
 					icon="material-symbols:export-notes-rounded"
 					@click="() => toggleTab('export')"
-					title="Import/Export Deck"
+					v-tooltip.bottom="'Import/Export Deck'"
 					:class="activePanel === 'export' ? 'ring-2 ring-accent-500/50' : ''"
 				/>
 				<Button
@@ -185,15 +189,8 @@ async function onYdkImported(ydkContent: string) {
 					rounded
 					icon="material-symbols:filter-alt"
 					@click="() => toggleTab('filter')"
-					title="Card Search"
+					v-tooltip.bottom="'Card Search'"
 					:class="activePanel === 'filter' ? 'ring-2 ring-accent-500/50' : ''"
-				/>
-				<Button
-					size="small"
-					rounded
-					icon="material-symbols:sort-rounded"
-					@click="onSortClick"
-					title="Sort Deck"
 				/>
 			</span>
 		</div>

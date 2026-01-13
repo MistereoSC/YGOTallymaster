@@ -82,7 +82,7 @@ const emit = defineEmits([])
 				<!-- Left Pendulum Scale -->
 				<div class="min-h-12">
 					<div
-						v-if="card.scale"
+						v-if="card.scale != undefined"
 						class="flex flex-col h-full items-center gap-1 px-4 py-3 bg-linear-to-b from-blue-500/20 to-transparent border-r border-primary-600"
 					>
 						<div
@@ -119,7 +119,7 @@ const emit = defineEmits([])
 				<!-- Right Pendulum Scale -->
 				<div>
 					<div
-						v-if="card.scale"
+						v-if="card.scale != undefined"
 						class="flex flex-col h-full items-center gap-1 px-4 py-3 bg-linear-to-b from-red-500/20 to-transparent border-l border-primary-600"
 					>
 						<div class="rotate-45 w-3 h-3 bg-red-500 shadow-sm shadow-red-500/50"></div>

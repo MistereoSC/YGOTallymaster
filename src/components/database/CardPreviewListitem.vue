@@ -182,7 +182,7 @@ const styles = getCardStyles(props.card)
 							</div>
 						</div>
 						<div class="flex gap-4" v-if="!props.showLimitedInfo">
-							<span class="flex items-center gap-1" v-if="card.scale">
+							<span class="flex items-center gap-1" v-if="card.scale != undefined">
 								<div class="rotate-45 w-2 h-2 bg-blue-500"></div>
 								<span class="font-bold">{{ card.scale }}</span>
 								<div class="rotate-45 w-2 h-2 bg-red-500"></div>

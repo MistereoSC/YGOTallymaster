@@ -70,7 +70,10 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 				class="border-l border-primary-600 min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
 				<div class="h-full overflow-y-auto scrollable p-3">
-					<CardFullView :card="activeCard" />
+					<CardFullView
+						:card="activeCard"
+						:description-highlighting="settings?.descriptionHighlighting"
+					/>
 				</div>
 			</div>
 		</div>

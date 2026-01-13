@@ -315,7 +315,11 @@ async function _getUnownedMarketString() {
 				class="border-r border-primary-600 min-w-86 w-[25vw] max-w-132 bg-primary-700 grid h-full overflow-hidden"
 			>
 				<div class="p-2 h-full overflow-y-auto scrollable" ref="cardFullViewContainer">
-					<CardFullView v-if="hoveredCard" :card="hoveredCard" />
+					<CardFullView
+						v-if="hoveredCard"
+						:card="hoveredCard"
+						:description-highlighting="settings?.descriptionHighlighting"
+					/>
 				</div>
 			</div>
 			<div class="overflow-hidden h-full" @wheel="onDeckAreaWheel">

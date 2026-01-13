@@ -162,6 +162,16 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 							</option>
 						</select>
 					</SettingsItem>
+					<SettingsItem
+						icon="material-symbols:credit-card"
+						title="Description Highlighting"
+						description="Highlight keywords in card descriptions for better readability (Works mostly only in English)"
+					>
+						<Checkbox
+							:model-value="settings?.descriptionHighlighting"
+							@change="toggle.descriptionHighlighting"
+						/>
+					</SettingsItem>
 
 					<SettingsSeparator label="Owned Cards" icon="tabler:heart-filled" />
 					<!-- Dim Unowned Cards (Database) -->
@@ -174,7 +184,6 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						<Checkbox
 							:model-value="settings?.grayUnowned"
 							@change="toggle.grayUnowned"
-							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
 					<!-- Dim Unowned Cards (Small Lists) -->
@@ -187,7 +196,6 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						<Checkbox
 							:model-value="settings?.grayUnownedSmallList"
 							@change="toggle.grayUnownedSmallList"
-							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
 					<!-- Dim Unowned Cards (Decks) -->
@@ -200,7 +208,6 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						<Checkbox
 							:model-value="settings?.decklistGrayUnownedGrid"
 							@change="toggle.decklistGrayUnownedGrid"
-							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
 					<!-- Dim Unowned Cards (Sets) -->
@@ -213,7 +220,6 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						<Checkbox
 							:model-value="settings?.setsGrayUnownedGrid"
 							@change="toggle.setsGrayUnownedGrid"
-							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
 
@@ -228,7 +234,6 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						<Checkbox
 							:model-value="settings?.showOwnedNumbers"
 							@change="toggle.showOwnedNumbers"
-							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
 					<!-- Database As List -->
@@ -241,7 +246,6 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						<Checkbox
 							:model-value="settings?.displayAsList"
 							@change="toggle.displayAsList"
-							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
 					<!-- Database Grid Size -->
@@ -336,7 +340,6 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						<Checkbox
 							:model-value="settings?.setsDisplayAsList"
 							@change="toggle.setsDisplayAsList"
-							:allow-only-check-to-toggle="true"
 						/>
 					</SettingsItem>
 				</SettingsSection>
@@ -384,11 +387,7 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						title="Automatic Update Check"
 						description="Check for database updates when the application starts"
 					>
-						<Checkbox
-							@change="onAutoUpdateChange"
-							:model-value="autoUpdateChecked"
-							:allow-only-check-to-toggle="true"
-						/>
+						<Checkbox @change="onAutoUpdateChange" :model-value="autoUpdateChecked" />
 					</SettingsItem>
 
 					<!-- Manual Update Check -->

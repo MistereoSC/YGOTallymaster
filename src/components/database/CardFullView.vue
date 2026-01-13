@@ -3,13 +3,19 @@ import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardReImage from './CardReImage.vue'
 import {Icon} from '@iconify/vue'
 import AttributeIcon from './AttributeIcon.vue'
-import CardBanIcon from '../cards/CardBanIcon.vue'
+import CardBanIcon from '@/components/cards/CardBanIcon.vue'
+import CardHighlightedDescription from './CardHighlightedDescription.vue'
 
 const props = defineProps<{
 	card: TCardData
 	showBanlistFor?: TBanlistFormat | 'none'
+	descriptionHighlighting?: boolean
+	linkHighlighting?: boolean
 }>()
-const emit = defineEmits([])
+
+const emit = defineEmits<{
+	(e: 'linkClick', text: string): void
+}>()
 </script>
 
 <template>
@@ -137,7 +143,15 @@ const emit = defineEmits([])
 				>
 			</div>
 			<div class="p-4">
+				<CardHighlightedDescription
+					v-if="props.descriptionHighlighting"
+					:description="card.desc"
+					:frame-type="card.frameType"
+					:display-links="props.linkHighlighting"
+					@link-click="(v) => emit('linkClick', v)"
+				/>
 				<span
+					v-else
 					class="leading-relaxed whitespace-pre-line font-semibold text-contrast-600 text-sm"
 				>
 					{{ card.desc }}

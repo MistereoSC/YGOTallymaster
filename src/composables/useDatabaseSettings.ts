@@ -67,6 +67,11 @@ export const useDatabaseSettings = () => {
 		settings.value.grayUnownedSmallList = to ?? !settings.value.grayUnownedSmallList
 		save()
 	}
+	function descriptionHighlighting(to?: boolean) {
+		if (!settings.value) return
+		settings.value.descriptionHighlighting = to ?? !settings.value.descriptionHighlighting
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -107,6 +112,7 @@ export const useDatabaseSettings = () => {
 		setsGrayUnownedGrid,
 		grayUnownedSmallList,
 		setsDisplayAsList,
+		descriptionHighlighting,
 	}
 	const setFns = {
 		listSize,
@@ -163,7 +169,8 @@ export type TDatabaseSettings = {
 	setsGrayUnownedGrid: boolean
 	setsDisplayAsList: boolean
 
-	cardLanguage?: TLanguageCodes
+	cardLanguage: TLanguageCodes
+	descriptionHighlighting: boolean
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
@@ -183,4 +190,5 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	setsDisplayAsList: false,
 
 	cardLanguage: 'en',
+	descriptionHighlighting: true,
 }

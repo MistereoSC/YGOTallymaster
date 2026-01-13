@@ -199,7 +199,11 @@ async function onYdkImported(ydkContent: string) {
 				class="border-r border-primary-600 min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
 				<div class="p-2 h-full overflow-y-scroll scrollable" ref="cardFullViewContainer">
-					<CardFullView v-if="hoveredCard" :card="hoveredCard" />
+					<CardFullView
+						v-if="hoveredCard"
+						:card="hoveredCard"
+						:description-highlighting="settings?.descriptionHighlighting"
+					/>
 				</div>
 			</div>
 			<div

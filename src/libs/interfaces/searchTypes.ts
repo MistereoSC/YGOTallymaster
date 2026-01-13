@@ -2,14 +2,14 @@
 // Extracted to avoid circular dependencies between useCardSearch and useOwnedCards
 
 export enum ESortBy {
-	Name_Asc = 'Name (Ascending)',
-	Name_Desc = 'Name (Descending)',
-	TCG_Date_Asc = 'TCG Date (Ascending)',
-	TCG_Date_Desc = 'TCG Date (Descending)',
-	Search_Score = 'Text Search Score',
-	ATK_Asc = 'ATK (Ascending)',
-	ATK_Desc = 'ATK (Descending)',
-	DEF_Asc = 'DEF (Ascending)',
-	DEF_Desc = 'DEF (Descending)',
+	Name_Asc = 'Name (A-Z)',
+	Name_Desc = 'Name (Z-A)',
+	TCG_Date_Asc = 'TCG Date (Old-New)',
+	TCG_Date_Desc = 'TCG Date (New-Old)',
+	ATK_Asc = 'ATK (Low-High)',
+	ATK_Desc = 'ATK (High-Low)',
+	DEF_Asc = 'DEF (Low-High)',
+	DEF_Desc = 'DEF (High-Low)',
 	Type = 'Card Type',
+	Search_Score = 'Text Search Score',
 }

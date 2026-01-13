@@ -37,6 +37,7 @@ import SetFilterSelector from './SetFilterSelector.vue'
 const props = defineProps<{
 	searchWhileTyping?: boolean
 	showSetFilter?: boolean
+	showInfoPanel?: boolean
 }>()
 // #endregion
 // -----------------------------------------
@@ -284,7 +285,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 			<select
 				v-model="selectedSort"
 				@change="sort(selectedSort)"
-				class="bg-primary-700 border border-primary-600 rounded-md px-2 py-1 text-sm focus:outline-none focus:border-accent-500 flex-1 max-w-48"
+				class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 text-sm focus:outline-none focus:border-accent-500 flex-1 max-w-48"
 			>
 				<option v-for="(label, key) in ESortBy" :key="key" :value="label">
 					{{ label }}
@@ -480,7 +481,12 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				:options="ETrapTypes"
 				:model-value="trapTypes.items.value"
 				@toggle="trapTypes.toggle"
-			/>
+			>
+				<template #default="{option}">
+					<AttributeIcon size="tiny" :attribute="option" />
+					<span class="font-bold text-sm">{{ option }}</span>
+				</template>
+			</ToggleButtonGroup>
 		</FilterSection>
 
 		<!-- Spell Type -->
@@ -494,12 +500,17 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				:options="ESpellTypes"
 				:model-value="spellTypes.items.value"
 				@toggle="spellTypes.toggle"
-			/>
+			>
+				<template #default="{option}">
+					<AttributeIcon size="tiny" :attribute="option" />
+					<span class="font-bold text-sm">{{ option }}</span>
+				</template>
+			</ToggleButtonGroup>
 		</FilterSection>
 
 		<!-- Info -->
-		<!-- <div
-			v-if="!toggledCoreType"
+		<div
+			v-if="props.showInfoPanel && !toggledCoreType"
 			class="px-2 py-2 rounded-lg bg-primary-800/50 border border-primary-600 flex items-center gap-3"
 		>
 			<p class="text-xs text-contrast-500">
@@ -507,6 +518,6 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				<span class="font-medium text-contrast-600">(Monster / Spell / Trap)</span>
 				to see more filters.
 			</p>
-		</div> -->
+		</div>
 	</div>
 </template>

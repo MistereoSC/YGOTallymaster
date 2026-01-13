@@ -141,7 +141,7 @@ onBeforeUnmount(() => {
 					<select
 						v-model="sortedBy"
 						@change="sort(sortedBy)"
-						class="bg-primary-800 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-46"
+						class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-58"
 					>
 						<option v-for="(label, key) in ESortArchetypeBy" :key="key" :value="label">
 							{{ label }}

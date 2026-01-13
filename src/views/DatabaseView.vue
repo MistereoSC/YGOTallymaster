@@ -143,7 +143,11 @@ const {settings} = useDatabaseSettings()
 			>
 				<div class="h-full overflow-y-scroll scrollable p-3 pr-2">
 					<CardFullView v-if="activeCard && activePanel === 'card'" :card="activeCard" />
-					<CardFilter :search-while-typing="true" v-else-if="activePanel === 'filter'" />
+					<CardFilter
+						:search-while-typing="true"
+						v-else-if="activePanel === 'filter'"
+						:show-info-panel="true"
+					/>
 				</div>
 			</div>
 		</div>

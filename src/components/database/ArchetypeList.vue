@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import {TArchetype} from '@/composables/useArchetypes'
 import Button from '@/components/common/Button.vue'
-import VirtualGridCustom from './VirtualGridCustom.vue'
-import CardPreview from './CardPreview.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {ref} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardFullView from './CardFullView.vue'
+import CardListVirtualGrid from './CardListVirtualGrid.vue'
+import CardListVirtualList from './CardListVirtualList.vue'
 
 interface IProps {
 	archetype: TArchetype
@@ -49,21 +49,28 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 
 		<div class="h-full overflow-hidden grid grid-cols-[1fr_auto]">
 			<div class="h-full overflow-hidden">
-				<VirtualGridCustom
-					:items="props.archetype.cards"
-					:item-dimensions="{width: 173, height: 258}"
-				>
-					<template #item="{item: card}">
-						<CardPreview
-							:card="card"
-							size="medium"
-							:show-owned-heart="true"
-							:show-banlist-for="settings?.showBanlistFor || 'none'"
-							@click="activeCard = card"
-							:active="activeCard?.id === card.id"
-						/>
-					</template>
-				</VirtualGridCustom>
+				<CardListVirtualList
+					v-if="settings?.displayAsList"
+					:cardList="props.archetype.cards"
+					@card-clicked="(card) => (activeCard = card)"
+					:active-card-id="activeCard ? activeCard.id : null"
+					:item-size="settings?.listSize || 'medium'"
+					:show-owned-heart="true"
+					:show-owned-number="settings?.showOwnedNumbers"
+					:show-banlist-for="settings?.showBanlistFor || 'none'"
+					:show-card-context-menu="true"
+				/>
+				<CardListVirtualGrid
+					v-else
+					:cardList="props.archetype.cards"
+					@card-clicked="(card) => (activeCard = card)"
+					:active-card-id="activeCard ? activeCard.id : null"
+					:item-size="settings?.gridSize || 'medium'"
+					:show-owned-heart="true"
+					:show-owned-number="settings?.showOwnedNumbers"
+					:show-banlist-for="settings?.showBanlistFor || 'none'"
+					:show-card-context-menu="true"
+				/>
 			</div>
 			<div
 				v-if="activeCard"

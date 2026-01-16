@@ -229,7 +229,7 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						icon="material-symbols:tag-rounded"
 						iconColorClass="text-secondary-400"
 						title="Always Show Owned Numbers"
-						description="Display ownership count on all cards in Database tab"
+						description="Display ownership count on all cards in Database and Archetypes tabs"
 					>
 						<Checkbox
 							:model-value="settings?.showOwnedNumbers"
@@ -241,7 +241,7 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						icon="material-symbols:view-list-rounded"
 						title="Display as List"
 						iconColorClass="text-tertiary-400"
-						description="Show cards in a list view instead of a grid for the Database tab"
+						description="Show cards in a list view instead of a grid for the Database and Archetypes tabs"
 					>
 						<Checkbox
 							:model-value="settings?.displayAsList"
@@ -253,7 +253,7 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						icon="material-symbols:photo-size-select-large-rounded"
 						iconColorClass="text-tertiary-400"
 						title="Card Size"
-						description="Size of cards displayed in Lists and Database tabs"
+						description="Size of cards displayed in Lists, Database and Archetypes tabs"
 					>
 						<select
 							:value="settings?.gridSize"
@@ -270,7 +270,7 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 						icon="material-symbols:format-size-rounded"
 						iconColorClass="text-tertiary-400"
 						title="List Size"
-						description="Size of items when displayed as a list. Affects Database and Lists tab"
+						description="Size of items when displayed as a list within Lists, Database and Archetypes tabs"
 					>
 						<select
 							:value="settings?.listSize"

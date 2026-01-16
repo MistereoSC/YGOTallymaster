@@ -345,6 +345,7 @@ async function onYdkImported(ydkContent: string) {
 							@card-shift-clicked="(card) => onCardAdd(card, true)"
 							:item-size="settings?.listSizeSmallList || 'tiny'"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
+							:show-card-context-menu="true"
 						/>
 					</div>
 				</div>

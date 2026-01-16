@@ -378,6 +378,7 @@ async function _getUnownedMarketString() {
 							@card-hovered="(card) => onCardHover(card)"
 							@card-clicked="(card) => onCardAdd(card)"
 							:item-size="settings?.listSizeSmallList || 'tiny'"
+							:show-card-context-menu="true"
 						/>
 					</div>
 				</div>

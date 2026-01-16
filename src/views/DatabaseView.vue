@@ -123,6 +123,7 @@ const {settings} = useDatabaseSettings()
 				:show-owned-heart="true"
 				:gray-unowned="settings?.grayUnowned"
 				:show-banlist-for="settings?.showBanlistFor || 'none'"
+				:show-card-context-menu="true"
 			/>
 			<CardListVirtualGrid
 				v-else
@@ -135,6 +136,7 @@ const {settings} = useDatabaseSettings()
 				:show-owned-number="settings?.showOwnedNumbers"
 				:gray-unowned="settings?.grayUnowned"
 				:show-banlist-for="settings?.showBanlistFor || 'none'"
+				:show-card-context-menu="true"
 			/>
 
 			<div

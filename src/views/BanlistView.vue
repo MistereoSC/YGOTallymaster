@@ -88,6 +88,7 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 					@card-clicked="(card) => (activeCard = card)"
 					:active-card-id="activeCard?.id"
 					:show-banlist-for="activeBanlist ?? 'ban_tcg'"
+					:show-card-context-menu="true"
 				/>
 				<div
 					class="border-l border-primary-600 min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full overflow-hidden"

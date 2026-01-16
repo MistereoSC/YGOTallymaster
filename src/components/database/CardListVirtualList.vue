@@ -3,6 +3,7 @@ import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
 import CardPreviewListitem from './CardPreviewListitem.vue'
 import {Icon} from '@iconify/vue'
+import CardContextMenu from '@/components/cards/CardContextMenu.vue'
 
 const emit = defineEmits<{
 	(e: 'cardHovered', card: TCardData): void
@@ -21,6 +22,7 @@ interface IProps {
 	showOwnedNumber?: boolean
 	grayUnowned?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
+	showCardContextMenu?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
@@ -192,22 +194,25 @@ defineExpose({
 				class="absolute w-full flex flex-col gap-1.5"
 				:style="{transform: `translateY(${offsetY}px)`}"
 			>
-				<CardPreviewListitem
-					v-for="{card} in visibleCards"
-					:key="card.id"
-					:card="card"
-					:active="card.id === props.activeCardId"
-					:size="props.itemSize"
-					@click="() => onCardClick(card)"
-					@mouseenter="() => onHoverEnter(card)"
-					@shift-click="() => emit('cardShiftClicked', card)"
-					@click.right="() => emit('cardRightClicked', card)"
-					:show-limited-info="props.showLimitedInfo"
-					:show-owned-heart="props.showOwnedHeart"
-					:show-owned-number="props.showOwnedNumber"
-					:gray-unowned="props.grayUnowned"
-					:show-banlist-for="props.showBanlistFor"
-				/>
+				<div v-for="{card} in visibleCards" :key="card.id">
+					<CardContextMenu :card="card" :disabled="!props.showCardContextMenu">
+						<CardPreviewListitem
+							:card="card"
+							:active="card.id === props.activeCardId"
+							:size="props.itemSize"
+							@click="() => onCardClick(card)"
+							@mouseenter="() => onHoverEnter(card)"
+							@shift-click="() => emit('cardShiftClicked', card)"
+							@click.right="() => emit('cardRightClicked', card)"
+							:show-limited-info="props.showLimitedInfo"
+							:show-owned-heart="props.showOwnedHeart"
+							:show-owned-number="props.showOwnedNumber"
+							:gray-unowned="props.grayUnowned"
+							:show-banlist-for="props.showBanlistFor"
+							:show-context-menu="props.showCardContextMenu"
+						/>
+					</CardContextMenu>
+				</div>
 			</div>
 		</div>
 	</div>

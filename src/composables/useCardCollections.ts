@@ -121,6 +121,56 @@ const useCardCollections = () => {
 		}
 	}
 
+	/**
+	 * Adds a card to an existing set within a collection.
+	 * Cards are added at the end of the set.
+	 * Maximum 3 copies of a card per set.
+	 * @returns The number of copies added (0 if already at max)
+	 */
+	async function _addCardToSet(
+		collectionName: string,
+		setName: string,
+		card: TCardData,
+		copies: number = 1
+	): Promise<number> {
+		const collection = collections.value.find((c) => c.name === collectionName)
+		if (!collection) return 0
+
+		const set = collection.sets.find((s) => s.name === setName)
+		if (!set) return 0
+
+		// Count existing copies of this card in the set
+		const existingCopies = set.cards.filter((c) => c.id === card.id).length
+		const maxCopies = 3
+		const availableSlots = maxCopies - existingCopies
+
+		if (availableSlots <= 0) return 0
+
+		// Add up to the available slots
+		const copiesToAdd = Math.min(copies, availableSlots)
+		for (let i = 0; i < copiesToAdd; i++) {
+			set.cards.push(card)
+		}
+
+		// Save the updated set
+		await _saveSet(collectionName, set)
+
+		return copiesToAdd
+	}
+
+	/**
+	 * Gets the count of a specific card in a set
+	 */
+	function _getCardCountInSet(collectionName: string, setName: string, cardId: number): number {
+		const collection = collections.value.find((c) => c.name === collectionName)
+		if (!collection) return 0
+
+		const set = collection.sets.find((s) => s.name === setName)
+		if (!set) return 0
+
+		return set.cards.filter((c) => c.id === cardId).length
+	}
+
 	return {
 		collections,
 		createCollection: _createCollection,
@@ -130,6 +180,8 @@ const useCardCollections = () => {
 		renameSet: _renameSet,
 		deleteCollection: _deleteCollection,
 		renameCollection: _renameCollection,
+		addCardToSet: _addCardToSet,
+		getCardCountInSet: _getCardCountInSet,
 		initialized,
 	}
 }

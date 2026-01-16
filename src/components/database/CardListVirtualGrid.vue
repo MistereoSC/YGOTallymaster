@@ -3,6 +3,7 @@ import {onMounted, ref, computed, onUnmounted, nextTick, watch} from 'vue'
 import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardPreview from '@/components/database/CardPreview.vue'
 import {Icon} from '@iconify/vue'
+import CardContextMenu from '../cards/CardContextMenu.vue'
 
 interface IProps {
 	cardList: TCardData[]
@@ -15,6 +16,7 @@ interface IProps {
 	showOwnedNumber?: boolean
 	grayUnowned?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
+	showCardContextMenu?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
@@ -235,21 +237,24 @@ defineExpose({
 					gridTemplateColumns: `repeat(auto-fill, ${CARD_WIDTH}px)`,
 				}"
 			>
-				<CardPreview
-					v-for="{card} in visibleCards"
-					:key="card.id"
-					:card="card"
-					:active="card.id === props.activeCardId"
-					:size="props.itemSize"
-					@click.right.stop.prevent="() => emit('cardRightClicked', card)"
-					@click="onCardClick(card)"
-					@shift-click="() => emit('cardShiftClicked', card)"
-					@mouseenter="() => onHoverEnter(card)"
-					:show-owned-heart="props.showOwnedHeart"
-					:show-owned-number="props.showOwnedNumber"
-					:gray-unowned="props.grayUnowned"
-					:show-banlist-for="props.showBanlistFor"
-				/>
+				<div v-for="{card} in visibleCards" :key="card.id">
+					<CardContextMenu :card="card" :disabled="!props.showCardContextMenu">
+						<CardPreview
+							:card="card"
+							:active="card.id === props.activeCardId"
+							:size="props.itemSize"
+							@click.right="() => emit('cardRightClicked', card)"
+							@click="onCardClick(card)"
+							@shift-click="() => emit('cardShiftClicked', card)"
+							@mouseenter="() => onHoverEnter(card)"
+							:show-owned-heart="props.showOwnedHeart"
+							:show-owned-number="props.showOwnedNumber"
+							:gray-unowned="props.grayUnowned"
+							:show-banlist-for="props.showBanlistFor"
+							:show-context-menu="props.showCardContextMenu"
+						/>
+					</CardContextMenu>
+				</div>
 			</div>
 		</div>
 	</div>

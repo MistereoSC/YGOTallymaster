@@ -20,13 +20,13 @@ onMounted(async () => {
 const router = useRouter()
 type TState = 'checking' | 'needs-setup' | 'update-available' | 'ready' | 'updating' | 'error'
 const state = ref<TState>('checking')
+let neededSetup = false
 
 async function checkSetupState() {
-	// state.value = 'updating'
-
 	const cfg = await getConfig()
 	if (!cfg) {
 		console.error('INIT::Check Setup::Error loading config')
+		neededSetup = true
 		state.value = 'error'
 		return
 	}
@@ -39,6 +39,7 @@ async function checkSetupState() {
 			`INIT::Check Setup::Needs Setup::cfg.dbVer[${language}] `,
 			cfg.dbVer[language]
 		)
+		neededSetup = true
 		state.value = 'needs-setup'
 	} else if (cfg?.autoUpdate && (await dbNeedsUpdating(language))) {
 		console.debug('INIT::Check Setup::Update Available')
@@ -199,7 +200,18 @@ function skipUpdate() {
 					<p class="font-semibold text-contrast-700">
 						An error occurred while checking for updates.
 					</p>
-					<p class="text-contrast-500">Please try restarting the application.</p>
+					<p v-if="neededSetup" class="text-contrast-500">
+						Please try restarting the application.
+					</p>
+					<div class="mt-2" v-else>
+						<p class="text-contrast-500">
+							It is recommended to restart the application.
+						</p>
+						<p class="text-contrast-500">You can also skip the update.</p>
+						<div class="flex items-center justify-center gap-4 mt-6">
+							<Button label="Skip Update" @click="skipUpdate" />
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

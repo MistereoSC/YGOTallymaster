@@ -194,7 +194,11 @@ async function onYdkImported(ydkContent: string) {
 				/>
 			</span>
 		</div>
-		<div class="grid h-full grid-cols-[auto_1fr_auto] overflow-hidden" v-if="!loading">
+		<div
+			class="grid h-full grid-cols-[auto_1fr_auto] overflow-hidden"
+			v-if="!loading"
+			@wheel="onDeckAreaWheel"
+		>
 			<div
 				class="border-r border-primary-600 min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
@@ -206,10 +210,7 @@ async function onYdkImported(ydkContent: string) {
 					/>
 				</div>
 			</div>
-			<div
-				class="h-full grid grid-rows-[1fr_auto_auto] overflow-hidden"
-				@wheel="onDeckAreaWheel"
-			>
+			<div class="h-full grid grid-rows-[1fr_auto_auto] overflow-hidden">
 				<div class="overflow-hidden grid grid-rows-[auto_auto_1fr] relative">
 					<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-12">
 						<DeckCardGrid

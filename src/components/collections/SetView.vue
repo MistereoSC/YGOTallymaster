@@ -310,7 +310,7 @@ async function _getUnownedMarketString() {
 				/>
 			</span>
 		</div>
-		<div class="grid h-full grid-cols-[auto_1fr_auto] overflow-hidden">
+		<div class="grid h-full grid-cols-[auto_1fr_auto] overflow-hidden" @wheel="onDeckAreaWheel">
 			<div
 				class="border-r border-primary-600 min-w-86 w-[25vw] max-w-132 bg-primary-700 grid h-full overflow-hidden"
 			>
@@ -322,7 +322,7 @@ async function _getUnownedMarketString() {
 					/>
 				</div>
 			</div>
-			<div class="overflow-hidden h-full" @wheel="onDeckAreaWheel">
+			<div class="overflow-hidden h-full">
 				<div
 					v-if="props.set.cards.length === 0"
 					class="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400"

@@ -100,11 +100,18 @@ function clearSelection() {
 	<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600">
 		<!-- Header -->
 		<div
-			class="px-3 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between cursor-pointer"
+			class="group px-3 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between cursor-pointer"
 			@click="toggleExpand"
 		>
 			<div class="flex items-center gap-2">
-				<Icon icon="material-symbols:folder-open-rounded" class="text-contrast-500" />
+				<Icon
+					:icon="
+						isExpanded
+							? 'material-symbols:folder-open-rounded'
+							: 'material-symbols:folder-rounded'
+					"
+					class="text-contrast-500 group-hover:text-accent-400 transition-colors"
+				/>
 				<span class="font-semibold text-contrast-600">Filter by Set</span>
 			</div>
 			<div class="flex items-center gap-2">
@@ -114,7 +121,7 @@ function clearSelection() {
 							? 'material-symbols:expand-less-rounded'
 							: 'material-symbols:expand-more-rounded'
 					"
-					class="text-contrast-500 text-xl"
+					class="text-contrast-500 text-xl group-hover:text-accent-400 transition-colors"
 				/>
 			</div>
 		</div>

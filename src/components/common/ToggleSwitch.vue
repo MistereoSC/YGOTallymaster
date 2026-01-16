@@ -2,6 +2,7 @@
 const props = defineProps<{
 	modelValue: boolean
 	duoLabels?: [string, string]
+	label?: string
 }>()
 const emit = defineEmits<{
 	(e: 'update:modelValue', value: boolean): void
@@ -17,6 +18,7 @@ function onClick() {
 <template>
 	<div class="flex gap-2">
 		<span
+			class="transition-colors"
 			:class="{'text-contrast-400': props.modelValue}"
 			v-if="duoLabels"
 			>{{ duoLabels[1] }}</span
@@ -24,6 +26,7 @@ function onClick() {
 		<div class="cursor-pointer relative" @click="onClick">
 			<div
 				class="w-10 h-6 rounded-full bg-accent-500 relative transition-colors"
+				:class="{'bg-primary-500!': !props.duoLabels && !props.modelValue}"
 			>
 				<div
 					class="w-4 h-4 rounded-full bg-accent-200 absolute top-1 left-1 transition-transform"
@@ -32,11 +35,17 @@ function onClick() {
 			</div>
 		</div>
 		<span
+			class="transition-colors"
 			:class="{'text-contrast-400': !props.modelValue}"
 			v-if="duoLabels"
 			>{{ duoLabels[0] }}</span
 		>
-		<span v-else>Toggle</span>
+		<span
+			v-else-if="label"
+			class="transition-colors"
+			:class="{'text-contrast-500': !props.modelValue}"
+			>{{ label }}</span
+		>
 	</div>
 </template>
 

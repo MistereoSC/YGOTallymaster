@@ -29,7 +29,6 @@ import {Icon} from '@iconify/vue'
 import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
 import NumberInputMinMax from '@/components/common/NumberInputMinMax.vue'
 import CardLinkSelection from './CardLinkSelection.vue'
-import Checkbox from '@/components/common/Checkbox.vue'
 import FilterSection from './FilterSection.vue'
 import ToggleButtonGroup from '@/components/common/ToggleButtonGroup.vue'
 import SetFilterSelector from './SetFilterSelector.vue'
@@ -327,10 +326,10 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 
 		<!-- Staple Filter -->
 		<div class="px-3 py-2 rounded-lg bg-primary-800 border border-primary-600">
-			<Checkbox
-				label="Show only 'Staple' Cards"
+			<ToggleSwitch
+				label="Show only Cards marked as 'Staple'"
 				:model-value="toggledStaple"
-				@change="toggleStaple"
+				@toggle="toggleStaple"
 			/>
 		</div>
 

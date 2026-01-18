@@ -72,6 +72,11 @@ export const useDatabaseSettings = () => {
 		settings.value.descriptionHighlighting = to ?? !settings.value.descriptionHighlighting
 		save()
 	}
+	function englishNameSearch(to?: boolean) {
+		if (!settings.value) return
+		settings.value.englishNameSearch = to ?? !settings.value.englishNameSearch
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -113,6 +118,7 @@ export const useDatabaseSettings = () => {
 		grayUnownedSmallList,
 		setsDisplayAsList,
 		descriptionHighlighting,
+		englishNameSearch,
 	}
 	const setFns = {
 		listSize,
@@ -171,6 +177,7 @@ export type TDatabaseSettings = {
 
 	cardLanguage: TLanguageCodes
 	descriptionHighlighting: boolean
+	englishNameSearch: boolean
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
@@ -191,4 +198,5 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 
 	cardLanguage: 'en',
 	descriptionHighlighting: true,
+	englishNameSearch: false,
 }

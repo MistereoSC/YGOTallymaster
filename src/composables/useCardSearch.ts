@@ -121,10 +121,11 @@ const useCardSearch = () => {
 		let cardData = [] as TCardData[]
 		const settings = await getSettings()
 		const language = settings.cardLanguage || 'en'
-		cardData = _initialFilterCardData(await getCardList(language))
+		const includeEnglishName = settings.englishNameSearch && language !== 'en'
 
+		cardData = _initialFilterCardData(await getCardList(language))
 		fullCardList.value = cardData
-		miniSearchIndex = _createMinisearchIndex(cardData)
+		miniSearchIndex = _createMinisearchIndex(cardData, includeEnglishName)
 
 		activeQuery.value = {}
 		searchResults.value = null
@@ -272,9 +273,11 @@ function _initialFilterCardData(cardData: TCardData[]) {
 	})
 }
 
-function _createMinisearchIndex(cardData: TCardData[]) {
+function _createMinisearchIndex(cardData: TCardData[], includeEnglishName = false) {
+	const searchableFields = ['name', 'desc', 'archetype']
+	if (includeEnglishName) searchableFields.push('name_en')
 	const miniSearch = new MiniSearch({
-		fields: ['name', 'desc', 'archetype'],
+		fields: searchableFields,
 		storeFields: STORE_FIELDS,
 		searchOptions: {
 			fuzzy: 0.1,

@@ -13,6 +13,7 @@ import SettingsItem from '@/components/settings/SettingsItem.vue'
 import SettingsSeparator from '@/components/settings/SettingsSeparator.vue'
 import ThemeSwitcher from '@/components/common/ThemeSwitcher.vue'
 import {useRouter} from 'vue-router'
+import {invalidateUseCardSearch} from '@/composables/useCardSearch'
 
 const router = useRouter()
 const SHOW_DEBUG_SETTINGS = false
@@ -98,6 +99,11 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 	})
 }
 
+function onEnglishNameSearchChange() {
+	toggle.englishNameSearch()
+	invalidateUseCardSearch()
+}
+
 // #endregion
 // ------------------------------------------------------
 </script>
@@ -128,23 +134,6 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 					title="Display Settings"
 					description="Configure how cards are displayed"
 				>
-					<!-- Card Language -->
-					<SettingsItem
-						icon="material-symbols:language"
-						iconColorClass="text-secondary-400"
-						title="Card Language"
-						description="Language only affects card names and descriptions. Card images are only available in English. Changing language may require downloading additional data."
-					>
-						<select
-							:value="settings?.cardLanguage"
-							@change="(e) => onLanguageChange((e.target as HTMLSelectElement).value as keyof typeof ELanguageCodes)"
-							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
-						>
-							<option v-for="(label, key) in ELanguageCodes" :key="key" :value="key">
-								{{ label }}
-							</option>
-						</select>
-					</SettingsItem>
 					<!-- Banlist Format -->
 					<SettingsItem
 						icon="material-symbols:block-outline"
@@ -154,7 +143,13 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 					>
 						<select
 							:value="settings?.showBanlistFor"
-							@change="(e) => set.showBanlistFor((e.target as HTMLSelectElement).value as keyof typeof EBanlistFormat)"
+							@change="
+								(e) =>
+									set.showBanlistFor(
+										(e.target as HTMLSelectElement)
+											.value as keyof typeof EBanlistFormat
+									)
+							"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option v-for="(label, key) in EBanlistFormat" :key="key" :value="key">
@@ -162,6 +157,42 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 							</option>
 						</select>
 					</SettingsItem>
+
+					<!-- Card Language -->
+					<SettingsItem
+						icon="material-symbols:language"
+						iconColorClass="text-secondary-400"
+						title="Card Language"
+						description="Language only affects card names and descriptions. Card images are only available in English. Changing language may require downloading additional data."
+					>
+						<select
+							:value="settings?.cardLanguage"
+							@change="
+								(e) =>
+									onLanguageChange(
+										(e.target as HTMLSelectElement)
+											.value as keyof typeof ELanguageCodes
+									)
+							"
+							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+						>
+							<option v-for="(label, key) in ELanguageCodes" :key="key" :value="key">
+								{{ label }}
+							</option>
+						</select>
+					</SettingsItem>
+					<!-- English Name Search -->
+					<SettingsItem
+						icon="material-symbols:language"
+						title="English Name Search"
+						description="Include english card names when searching in other languages"
+					>
+						<Checkbox
+							:model-value="settings?.englishNameSearch"
+							@change="onEnglishNameSearchChange"
+						/>
+					</SettingsItem>
+					<!-- Description Highlighting -->
 					<SettingsItem
 						icon="material-symbols:credit-card"
 						title="Description Highlighting"
@@ -257,7 +288,13 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 					>
 						<select
 							:value="settings?.gridSize"
-							@change="(e) => set.gridSize((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoTiny)"
+							@change="
+								(e) =>
+									set.gridSize(
+										(e.target as HTMLSelectElement)
+											.value as keyof typeof EListSizeNoTiny
+									)
+							"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option v-for="(label, key) in EListSizeNoTiny" :key="key" :value="key">
@@ -274,7 +311,13 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 					>
 						<select
 							:value="settings?.listSize"
-							@change="(e) => set.listSize((e.target as HTMLSelectElement).value as keyof typeof EListSize)"
+							@change="
+								(e) =>
+									set.listSize(
+										(e.target as HTMLSelectElement)
+											.value as keyof typeof EListSize
+									)
+							"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option v-for="(label, key) in EListSize" :key="key" :value="key">
@@ -296,7 +339,13 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 					>
 						<select
 							:value="settings?.listSizeSmallList"
-							@change="(e) => set.listSizeSmallList((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoLarge)"
+							@change="
+								(e) =>
+									set.listSizeSmallList(
+										(e.target as HTMLSelectElement)
+											.value as keyof typeof EListSizeNoLarge
+									)
+							"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option
@@ -318,7 +367,13 @@ function onLanguageChange(language: keyof typeof ELanguageCodes) {
 					>
 						<select
 							:value="settings?.decklistGridCardSize"
-							@change="(e) => set.decklistGridSize((e.target as HTMLSelectElement).value as keyof typeof EListSizeNoLarge)"
+							@change="
+								(e) =>
+									set.decklistGridSize(
+										(e.target as HTMLSelectElement)
+											.value as keyof typeof EListSizeNoLarge
+									)
+							"
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option

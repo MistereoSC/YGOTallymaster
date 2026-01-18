@@ -1,4 +1,4 @@
-import {fetchCardData, fetchDatabaseVersion} from './api/YGOProAPI'
+import {fetchCardData, fetchCardSets, fetchDatabaseVersion} from './api/YGOProAPI'
 import {getConfig, setConfig, _appIsUpToDate} from './Config'
 import Files from './Files'
 import {TLanguageCodes} from './interfaces/Localization'
@@ -19,7 +19,7 @@ export async function performDBUpdate(
 	onProgress?: (step: number, total: number, message: string) => void,
 	lang: TLanguageCodes = 'en'
 ) {
-	const TOTAL_STEPS: Readonly<number> = 4
+	const TOTAL_STEPS: Readonly<number> = 5
 	let hasError = false
 	let errorMsgs: string[] = []
 	let currentStep = 0
@@ -59,20 +59,20 @@ export async function performDBUpdate(
 		errorMsgs.push('Failed to update core card data.')
 	}
 
-	// Step 5: Update Staple Data
+	// Step 5: Update Card Sets
+	updateProgress('Updating Card Sets...')
+	const cardSets = await updateCardSets()
+	if (!cardSets) {
+		hasError = true
+		errorMsgs.push('Failed to update card sets.')
+	}
+
+	// Step 6: Update Staple Data
 	// updateProgress('Updating Staple Data...')
 	// const stapleData = await updateStapleData()
 	// if (!stapleData) {
 	// 	hasError = true
 	// 	errorMsgs.push('Failed to update staple data.')
-	// }
-
-	// Step 6: Update Card Sets
-	// updateProgress('Updating Card Sets...')
-	// const cardSets = await updateCardSets()
-	// if (!cardSets) {
-	// 	hasError = true
-	// 	errorMsgs.push('Failed to update card sets.')
 	// }
 
 	await setConfig({dbVer: dbConfigVer})
@@ -92,18 +92,18 @@ async function updateCoreCardData(language: TLanguageCodes = 'en') {
 	return cardData.data.length
 }
 
+async function updateCardSets() {
+	const cardSets = await fetchCardSets()
+	if (!cardSets) return null
+	await Files.write('data/sets_en.json', cardSets)
+	return cardSets.length
+}
+
 // async function updateStapleData() {
 // 	const cardData = await fetchCardData('en', ['&staple=yes'])
 // 	if (!cardData) return null
 // 	await Files.write('data/staples_en.json', cardData)
 // 	return cardData.data.length
-// }
-
-// async function updateCardSets() {
-// 	const cardSets = await fetchCardSets()
-// 	if (!cardSets) return null
-// 	await Files.write('data/sets_en.json', cardSets)
-// 	return cardSets.length
 // }
 
 async function createFolderStructure() {
@@ -113,6 +113,7 @@ async function createFolderStructure() {
 		'userdata/decks',
 		'userdata/collections',
 		'images',
+		'images/sets',
 		'images/cards',
 		'images/cards/cropped',
 		'images/cards/small',
@@ -165,6 +166,13 @@ export async function runVersionMigrations() {
 				pt: '0',
 			}
 			await setConfig({dbVer: newDbVer})
+		}
+	}
+	if (versionIsLessThan(oldVer, '1.4.0')) {
+		await updateCardSets()
+		const e = await Files.exists('images/sets')
+		if (!e.exists) {
+			await Files.makeDir('images/sets')
 		}
 	}
 

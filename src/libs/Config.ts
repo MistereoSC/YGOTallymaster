@@ -1,4 +1,4 @@
-export const APP_VERSION: Readonly<string> = '1.3.5'
+export const APP_VERSION: Readonly<string> = '1.4.0'
 const DEFAULT_CONFIG: Readonly<TConfig> = {
 	appVer: APP_VERSION,
 	dbVer: {

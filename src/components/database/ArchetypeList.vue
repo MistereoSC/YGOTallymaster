@@ -9,14 +9,15 @@ import CardListVirtualGrid from './CardListVirtualGrid.vue'
 import CardListVirtualList from './CardListVirtualList.vue'
 
 interface IProps {
-	archetype: TArchetype
+	cardList: TCardData[]
+	title: string
 }
 const props = withDefaults(defineProps<IProps>(), {})
 const emit = defineEmits<{
 	(e: 'close'): void
 }>()
 const {settings} = useDatabaseSettings()
-const activeCard = ref(props.archetype.cards[0] as TCardData | null)
+const activeCard = ref(props.cardList[0] as TCardData | null)
 </script>
 
 <template>
@@ -35,10 +36,10 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 				<div class="flex gap-3 items-center">
 					<div class="flex flex-col">
 						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
-							{{ props.archetype.name }}
+							{{ props.title }}
 						</h2>
 						<p class="text-xs text-contrast-500">
-							<span class="font-medium">{{ props.archetype.count }}</span>
+							<span class="font-medium">{{ props.cardList.length }}</span>
 							cards
 						</p>
 					</div>
@@ -51,7 +52,7 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 			<div class="h-full overflow-hidden">
 				<CardListVirtualList
 					v-if="settings?.displayAsList"
-					:cardList="props.archetype.cards"
+					:cardList="props.cardList"
 					@card-clicked="(card) => (activeCard = card)"
 					:active-card-id="activeCard ? activeCard.id : null"
 					:item-size="settings?.listSize || 'medium'"
@@ -62,7 +63,7 @@ const activeCard = ref(props.archetype.cards[0] as TCardData | null)
 				/>
 				<CardListVirtualGrid
 					v-else
-					:cardList="props.archetype.cards"
+					:cardList="props.cardList"
 					@card-clicked="(card) => (activeCard = card)"
 					:active-card-id="activeCard ? activeCard.id : null"
 					:item-size="settings?.gridSize || 'medium'"

@@ -31,6 +31,12 @@ const activeRoute = computed(() => route.name as string)
 					:active="activeRoute === 'Archetypes'"
 				/>
 				<AppMainMenuLink
+					label="Releases"
+					icon="material-symbols:calendar-month-rounded"
+					route-name="Releases"
+					:active="activeRoute === 'Releases'"
+				/>
+				<AppMainMenuLink
 					label="Banlist"
 					icon="material-symbols:block-outline"
 					route-name="Banlist"

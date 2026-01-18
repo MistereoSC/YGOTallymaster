@@ -97,7 +97,11 @@ onBeforeUnmount(() => {
 <template>
 	<div class="flex flex-col gap-4 overflow-hidden h-full">
 		<div v-if="selectedArchetype" class="overflow-hidden h-full">
-			<ArchetypeList :archetype="selectedArchetype" @close="onArchetypeListClose" />
+			<ArchetypeList
+				:card-list="selectedArchetype.cards"
+				:title="selectedArchetype.name"
+				@close="onArchetypeListClose"
+			/>
 		</div>
 		<div
 			v-else-if="initialized === 'ready' && archetypes.length > 0"

@@ -24,27 +24,17 @@ const unwatch = watch(
 )
 
 const num = ref(0)
-function onMouse(e: MouseEvent) {
+function onClickLeft(e: MouseEvent) {
 	if (initialized.value !== 'ready') return
-	if (e.button === 0) {
-		if (e.shiftKey) {
-			// Shift + Left click
-			num.value = 3
-			return
-		}
-		// Left click
-		num.value += 1
-	} else if (e.button === 2) {
-		if (e.shiftKey) {
-			// Shift + Right click
-			num.value = 0
-			return
-		}
-		// Right click
-		if (num.value > 0) {
-			num.value -= 1
-		}
-	}
+	if (e.shiftKey) {
+		if (num.value >= 3) num.value++
+		else num.value = 3
+	} else num.value += 1
+}
+function onClickRight(e: MouseEvent) {
+	if (initialized.value !== 'ready') return
+	if (e.shiftKey) num.value = 0
+	else if (num.value > 0) num.value -= 1
 }
 
 watch(num, (newVal) => {
@@ -55,9 +45,9 @@ watch(num, (newVal) => {
 
 <template>
 	<div
-		class="cardOwnHeart relative select-none cursor-pointer rounded-full p-0.5 text-tertiary-300 hover:text-tertiary-500 transition-colors border-none outline-none h-9 w-9 flex items-center justify-center"
-		@mouseup.stop.prevent="(e) => onMouse(e)"
-		@click.stop
+		class="cardOwnHeart relative select-none cursor-pointer rounded-full text-tertiary-400 hover:text-tertiary-600 transition-colors border-none outline-none h-9 w-9 flex items-center justify-center"
+		@click.right.stop.prevent="onClickRight"
+		@click.left.stop.prevent="onClickLeft"
 	>
 		<Icon icon="tabler:heart-filled" class="text-4xl text-inherit" />
 		<span

@@ -30,6 +30,51 @@ const MARKERS = {
 	LINK_START: '\x00LINK_S\x00',
 	LINK_MID: '\x00LINK_M\x00',
 	LINK_END: '\x00LINK_E\x00',
+	BOLD_START: '\x00BOLD_S\x00',
+	BOLD_END: '\x00BOLD_E\x00',
+}
+
+function replaceQuotedCardNames(text: string, markers: typeof MARKERS): string {
+	const result: string[] = []
+	let i = 0
+
+	while (i < text.length) {
+		if (text[i] === '"') {
+			const startIdx = i
+			i++ // skip opening quote
+
+			let endIdx = -1
+			while (i < text.length) {
+				if (text[i] === '"') {
+					const nextChar = text[i + 1]
+					if (nextChar === undefined || /[\s.,;:!?)}\]\n]/.test(nextChar)) {
+						endIdx = i
+						break
+					}
+				}
+				i++
+			}
+
+			if (endIdx !== -1) {
+				const cardName = text.substring(startIdx + 1, endIdx)
+				if (cardName.trim()) {
+					result.push(
+						`"${markers.LINK_START}${cardName}${markers.LINK_MID}${cardName}${markers.LINK_END}"`
+					)
+				} else {
+					result.push(text.substring(startIdx, endIdx + 1))
+				}
+				i = endIdx + 1
+			} else {
+				result.push('"')
+			}
+		} else {
+			result.push(text[i])
+			i++
+		}
+	}
+
+	return result.join('')
 }
 
 function getDescriptionWithHighlights(): string {
@@ -74,11 +119,16 @@ function getDescriptionWithHighlights(): string {
 		/\(Quick Effect\)/g,
 		`${MARKERS.QUICK_START}(Quick Effect)${MARKERS.QUICK_END}`
 	)
+	// 5. Highlight Keywords (If, When, Then) ignoring case
+	description = description.replace(
+		/(^|[.!?\n])(\s*)(if|when|then)(\s+)/gi,
+		(_, p1, p2, p3, p4) => {
+			return `${p1}${p2}${MARKERS.BOLD_START}${p3}${MARKERS.BOLD_END}${p4}`
+		}
+	)
 
-	// 5. Replace quoted text with clickable links (before escaping)
-	description = description.replace(/"([^"]+)"/g, (_, quotedText) => {
-		return `"${MARKERS.LINK_START}${quotedText}${MARKERS.LINK_MID}${quotedText}${MARKERS.LINK_END}"`
-	})
+	// 6. Replace quoted text with clickable links (before escaping)
+	description = replaceQuotedCardNames(description, MARKERS)
 
 	description = escapeHtml(description)
 	description = description
@@ -90,6 +140,8 @@ function getDescriptionWithHighlights(): string {
 		.replace(new RegExp(MARKERS.QUICK_END, 'g'), '</span>')
 		.replace(new RegExp(MARKERS.COST_START, 'g'), '<span class="desc-cost">')
 		.replace(new RegExp(MARKERS.COST_END, 'g'), '</span>')
+		.replace(new RegExp(MARKERS.BOLD_START, 'g'), '<strong>')
+		.replace(new RegExp(MARKERS.BOLD_END, 'g'), '</strong>')
 
 	if (props.displayLinks)
 		description = description

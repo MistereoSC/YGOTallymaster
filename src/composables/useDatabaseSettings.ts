@@ -2,6 +2,7 @@ import {ref, toRaw} from 'vue'
 import Files from '@/libs/Files'
 import {TBanlistFormat} from '@/libs/interfaces/YGOProInterfaces'
 import {TLanguageCodes} from '@/libs/interfaces/Localization'
+import {TVendor} from '@/libs/interfaces/CardSets'
 
 const SAVE_DEBOUNCE_MS = 1000
 const PATH = 'userdata/db_settings.json'
@@ -108,6 +109,11 @@ export const useDatabaseSettings = () => {
 		settings.value.cardLanguage = to
 		save()
 	}
+	function cardPricesVendor(to: TVendor) {
+		if (!settings.value) return
+		settings.value.cardPricesVendor = to
+		save()
+	}
 
 	const toggleFns = {
 		displayAsList,
@@ -127,6 +133,7 @@ export const useDatabaseSettings = () => {
 		listSizeSmallList,
 		cardLanguage,
 		gridSize,
+		cardPricesVendor,
 	}
 
 	return {
@@ -178,6 +185,7 @@ export type TDatabaseSettings = {
 	cardLanguage: TLanguageCodes
 	descriptionHighlighting: boolean
 	englishNameSearch: boolean
+	cardPricesVendor: TVendor
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
@@ -199,4 +207,5 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	cardLanguage: 'en',
 	descriptionHighlighting: true,
 	englishNameSearch: false,
+	cardPricesVendor: 'none',
 }

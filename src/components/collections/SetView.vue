@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {TFullSet, useCardCollections} from '@/composables/useCardCollections'
-import {onBeforeUnmount, onMounted, ref} from 'vue'
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
 import Button from '@/components/common/Button.vue'
 import {Icon} from '@iconify/vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
@@ -260,6 +260,18 @@ async function _getUnownedMarketString() {
 	return exportPopulatedToMarketString(unownedCards)
 }
 
+const cardPrices = computed(() => {
+	if (!settings.value?.cardPricesVendor || settings.value.cardPricesVendor === 'none') return 0
+	return props.set.cards
+		.reduce((sum, card) => {
+			const prices = card.card_prices[0]
+			if (!prices) return sum
+			//@ts-ignore
+			const val = prices[settings.value.cardPricesVendor]
+			return sum + (val ? parseFloat(val) : 0)
+		}, 0)
+		.toFixed(2)
+})
 // #endregion
 // ----------------------------------------------
 </script>
@@ -285,7 +297,15 @@ async function _getUnownedMarketString() {
 						</h2>
 						<p class="text-xs text-contrast-500">
 							<span class="font-medium">
-								{{ collectionName }}
+								{{ collectionName }} - {{ props.set.cards.length }} cards
+								<span
+									v-if="
+										settings?.cardPricesVendor &&
+										settings?.cardPricesVendor !== 'none'
+									"
+								>
+									- ${{ cardPrices }}
+								</span>
 							</span>
 						</p>
 					</div>
@@ -319,6 +339,8 @@ async function _getUnownedMarketString() {
 						v-if="hoveredCard"
 						:card="hoveredCard"
 						:description-highlighting="settings?.descriptionHighlighting"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
+						:show-card-prices="settings?.cardPricesVendor !== 'none'"
 					/>
 				</div>
 			</div>

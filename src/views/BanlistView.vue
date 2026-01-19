@@ -38,10 +38,10 @@ async function initializeList() {
 		banlist.value.forbidden.length > 0
 			? banlist.value.forbidden[0]
 			: banlist.value.limited.length > 0
-			? banlist.value.limited[0]
-			: banlist.value.semi_limited.length > 0
-			? banlist.value.semi_limited[0]
-			: null
+				? banlist.value.limited[0]
+				: banlist.value.semi_limited.length > 0
+					? banlist.value.semi_limited[0]
+					: null
 }
 async function switchBanlist(to: keyof typeof EBanlistFormat) {
 	activeBanlist.value = to ?? 'ban_tcg'
@@ -72,7 +72,13 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 				<div class="grid items-center gap-2">
 					<select
 						:value="activeBanlist"
-						@change="(e) => switchBanlist((e.target as HTMLSelectElement).value as keyof typeof EBanlistFormat)"
+						@change="
+							(e) =>
+								switchBanlist(
+									(e.target as HTMLSelectElement)
+										.value as keyof typeof EBanlistFormat
+								)
+						"
 						class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-full"
 					>
 						<option v-for="(label, key) in EBanlistFormat" :key="key" :value="key">
@@ -97,7 +103,9 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 						<CardFullView
 							v-if="activeCard"
 							:card="activeCard"
+							:description-highlighting="settings?.descriptionHighlighting"
 							:show-banlist-for="activeBanlist && 'ban_tcg'"
+							:show-card-prices="settings?.cardPricesVendor !== 'none'"
 						/>
 					</div>
 				</div>

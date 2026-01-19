@@ -31,3 +31,5 @@ export interface TCardCollection {
 	name: string
 	sets: TCardSet[]
 }
+
+export type TVendor = 'cardmarket_price' | 'tcgplayer_price' | 'none'

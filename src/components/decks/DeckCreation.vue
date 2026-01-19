@@ -12,7 +12,7 @@ import {deckIdsToPopulated, ydkToJsonIds} from '@/libs/DeckParsers'
 import {TDeckCardsPopulated, TDeckData} from '@/libs/Decks'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {Icon} from '@iconify/vue'
-import {onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
+import {computed, onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
 import DeckImportExportPanel from './DeckImportExportPanel.vue'
 
 const props = defineProps<{
@@ -148,6 +148,21 @@ async function onYdkImported(ydkContent: string) {
 	const imported = ydkToJsonIds(ydkContent)
 	cards.value = await deckIdsToPopulated(imported)
 }
+
+const cardPrices = computed(() => {
+	if (!settings.value?.cardPricesVendor || settings.value.cardPricesVendor === 'none') return 0
+	return cards.value.main
+		.concat(cards.value.extra)
+		.concat(cards.value.side)
+		.reduce((sum, card) => {
+			const prices = card.card_prices[0]
+			if (!prices) return sum
+			//@ts-ignore
+			const val = prices[settings.value.cardPricesVendor]
+			return sum + (val ? parseFloat(val) : 0)
+		}, 0)
+		.toFixed(2)
+})
 </script>
 
 <template>
@@ -155,7 +170,7 @@ async function onYdkImported(ydkContent: string) {
 		<div
 			class="h-12 w-full grid grid-cols-[1fr_auto] gap-1 pl-4 pr-2 py-1 items-center bg-linear-to-r from-primary-800 via-primary-700 to-primary-800 border-b border-primary-600"
 		>
-			<div class="flex gap-2">
+			<div class="flex gap-3 items-center">
 				<Button
 					size="small"
 					rounded
@@ -166,6 +181,12 @@ async function onYdkImported(ydkContent: string) {
 				<h2 class="font-bold text-lg">
 					{{ props.deckData.name }}
 				</h2>
+				<p
+					class="font-semibold text-lg text-accent-100"
+					v-if="settings?.cardPricesVendor !== 'none'"
+				>
+					${{ cardPrices }}
+				</p>
 			</div>
 			<span class="flex gap-1">
 				<Button
@@ -207,6 +228,8 @@ async function onYdkImported(ydkContent: string) {
 						v-if="hoveredCard"
 						:card="hoveredCard"
 						:description-highlighting="settings?.descriptionHighlighting"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
+						:show-card-prices="settings?.cardPricesVendor !== 'none'"
 					/>
 				</div>
 			</div>

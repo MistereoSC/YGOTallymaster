@@ -58,7 +58,11 @@ enum ELanguageCodes {
 	'it' = 'Italian (it)',
 	'pt' = 'Portuguese (pt)',
 }
-
+enum ECardPriceVendors {
+	'none' = 'None',
+	'cardmarket_price' = 'Cardmarket',
+	'tcgplayer_price' = 'TCGPlayer',
+}
 // #endregion
 // ------------------------------------------------------
 // #region Update Settings
@@ -196,7 +200,7 @@ function onEnglishNameSearchChange() {
 					<SettingsItem
 						icon="material-symbols:credit-card"
 						title="Description Highlighting"
-						description="Highlight keywords in card descriptions for better readability (Works mostly only in English)"
+						description="Highlight keywords in card descriptions for better readability (Works best for English)"
 					>
 						<Checkbox
 							:model-value="settings?.descriptionHighlighting"
@@ -205,12 +209,24 @@ function onEnglishNameSearchChange() {
 					</SettingsItem>
 
 					<SettingsSeparator label="Owned Cards" icon="tabler:heart-filled" />
+					<!-- Database Owned Numbers -->
+					<SettingsItem
+						icon="material-symbols:tag-rounded"
+						iconColorClass="text-secondary-400"
+						title="Always Show Owned Numbers"
+						description="Display ownership count on all cards in Database, Archetypes and Releases tabs"
+					>
+						<Checkbox
+							:model-value="settings?.showOwnedNumbers"
+							@change="toggle.showOwnedNumbers"
+						/>
+					</SettingsItem>
 					<!-- Dim Unowned Cards (Database) -->
 					<SettingsItem
 						icon="material-symbols:opacity"
 						iconColorClass="text-primary-300"
 						title="Dim Unowned Cards (Database)"
-						description="Dim cards you don't own. Only affects the Database tab"
+						description="Dim cards you don't own. Affects the Database, Archetypes and Releases tabs"
 					>
 						<Checkbox
 							:model-value="settings?.grayUnowned"
@@ -255,18 +271,7 @@ function onEnglishNameSearchChange() {
 					</SettingsItem>
 
 					<SettingsSeparator label="Database " icon="material-symbols:database" />
-					<!-- Database Owned Numbers -->
-					<SettingsItem
-						icon="material-symbols:tag-rounded"
-						iconColorClass="text-secondary-400"
-						title="Always Show Owned Numbers"
-						description="Display ownership count on all cards in Database and Archetypes tabs"
-					>
-						<Checkbox
-							:model-value="settings?.showOwnedNumbers"
-							@change="toggle.showOwnedNumbers"
-						/>
-					</SettingsItem>
+
 					<!-- Database As List -->
 					<SettingsItem
 						icon="material-symbols:view-list-rounded"
@@ -321,6 +326,35 @@ function onEnglishNameSearchChange() {
 							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
 						>
 							<option v-for="(label, key) in EListSize" :key="key" :value="key">
+								{{ label }}
+							</option>
+						</select>
+					</SettingsItem>
+					<!-- Card Prices -->
+					<SettingsItem
+						icon="material-symbols:photo-size-select-large-rounded"
+						iconColorClass="text-tertiary-400"
+						title="Show Card Prices From"
+						description="Select the vendor to show card prices from. 
+									Shows estimated price (in USD) in the Card Details. 
+									Sums up prices in Decks and Sets views."
+					>
+						<select
+							:value="settings?.cardPricesVendor"
+							@change="
+								(e) =>
+									set.cardPricesVendor(
+										(e.target as HTMLSelectElement)
+											.value as keyof typeof ECardPriceVendors
+									)
+							"
+							class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500"
+						>
+							<option
+								v-for="(label, key) in ECardPriceVendors"
+								:key="key"
+								:value="key"
+							>
 								{{ label }}
 							</option>
 						</select>

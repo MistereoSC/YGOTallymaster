@@ -45,7 +45,7 @@ watch(num, (newVal) => {
 
 <template>
 	<div
-		class="cardOwnHeart relative select-none cursor-pointer rounded-full text-tertiary-400 hover:text-tertiary-600 transition-colors border-none outline-none h-9 w-9 flex items-center justify-center"
+		class="cardOwnHeart relative select-none cursor-pointer rounded-full text-tertiary-300 hover:text-tertiary-400 transition-colors border-none outline-none h-9 w-9 flex items-center justify-center"
 		@click.right.stop.prevent="onClickRight"
 		@click.left.stop.prevent="onClickLeft"
 	>

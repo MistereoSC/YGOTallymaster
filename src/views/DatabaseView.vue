@@ -148,6 +148,8 @@ const {settings} = useDatabaseSettings()
 						v-if="activeCard && activePanel === 'card'"
 						:card="activeCard"
 						:description-highlighting="settings?.descriptionHighlighting"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
+						:show-card-prices="settings?.cardPricesVendor !== 'none'"
 					/>
 					<CardFilter
 						:search-while-typing="true"

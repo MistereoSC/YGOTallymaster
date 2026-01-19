@@ -57,6 +57,7 @@ const activeCard = ref(props.cardList[0] as TCardData | null)
 					:active-card-id="activeCard ? activeCard.id : null"
 					:item-size="settings?.listSize || 'medium'"
 					:show-owned-heart="true"
+					:gray-unowned="settings?.grayUnowned"
 					:show-owned-number="settings?.showOwnedNumbers"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:show-card-context-menu="true"
@@ -68,6 +69,7 @@ const activeCard = ref(props.cardList[0] as TCardData | null)
 					:active-card-id="activeCard ? activeCard.id : null"
 					:item-size="settings?.gridSize || 'medium'"
 					:show-owned-heart="true"
+					:gray-unowned="settings?.grayUnowned"
 					:show-owned-number="settings?.showOwnedNumbers"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:show-card-context-menu="true"
@@ -81,6 +83,8 @@ const activeCard = ref(props.cardList[0] as TCardData | null)
 					<CardFullView
 						:card="activeCard"
 						:description-highlighting="settings?.descriptionHighlighting"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
+						:show-card-prices="settings?.cardPricesVendor !== 'none'"
 					/>
 				</div>
 			</div>

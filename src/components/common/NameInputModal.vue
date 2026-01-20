@@ -197,10 +197,12 @@ watch(
 					<div>
 						<input
 							v-model="nameInput"
+							v-autofocus
 							type="text"
 							:placeholder="inputPlaceholder"
 							class="w-full mt-4 p-2.5 rounded-lg bg-primary-700 border border-primary-600 outline-none placeholder:text-contrast-400 focus:border-accent-500 transition-colors"
 							@input="onNameInput"
+							@keyup.enter="handleConfirm"
 						/>
 					</div>
 					<div class="mt-5 flex justify-end">

@@ -43,7 +43,8 @@ const filteredDeckList = computed(() => {
 })
 
 async function onCreateDeck(name: string) {
-	await createDeck(name)
+	const uniqueName = _getUniqueName(name)
+	await createDeck(uniqueName)
 }
 
 const activeDeck = ref<null | TDeckData>(null)
@@ -79,7 +80,12 @@ async function onDeckDeleteConfirm() {
 
 async function onDeckRenameConfirm(newName: string) {
 	if (activeDeckForAction.value) {
-		await renameDeck(activeDeckForAction.value.name, newName)
+		if( activeDeckForAction.value.name === newName) {
+			onDeckRenameCancel()
+			return
+		}
+		const uniqueName = _getUniqueName(newName)
+		await renameDeck(activeDeckForAction.value.name, uniqueName)
 	}
 	onDeckRenameCancel()
 }
@@ -106,6 +112,21 @@ onBeforeUnmount(() => {
 
 function onDeckImport(deck: TDeckData) {
 	createDeck(deck.name, deck)
+}
+
+function onDeckClone(deck: TDeckData) {
+	const uniqueName = _getUniqueName(`${deck.name} (Copy)`)
+	createDeck(uniqueName, {...deck, name: uniqueName})
+}
+
+function _getUniqueName(name: string): string {
+	let uniqueName = name
+	let counter = 1
+	while (deckList.value.map((deck) => deck.name).includes(uniqueName)) {
+		uniqueName = `${name} (${counter})`
+		counter++
+	}
+	return uniqueName
 }
 </script>
 
@@ -188,13 +209,13 @@ function onDeckImport(deck: TDeckData) {
 					@click="activeDeck = deck"
 					@delete="() => onDeckDelete(deck)"
 					@rename="() => onDeckRename(deck)"
+					@clone="() => onDeckClone(deck)"
 				/>
 				<div
 					class="w-56 h-77 grid grid-rows-2 gap-2 place-items-center"
 					v-if="!searchQuery && deckList.length < 200"
 				>
 					<NameInputModal
-						:existing-items="deckList"
 						item-type="Deck"
 						@confirm="(name) => onCreateDeck(name)"
 					>
@@ -256,7 +277,6 @@ function onDeckImport(deck: TDeckData) {
 
 	<NameInputModal
 		:open="deckRenameModalOpen"
-		:existing-items="deckList"
 		:existing-name="activeDeckForAction?.name"
 		item-type="Deck"
 		@confirm="(newName) => onDeckRenameConfirm(newName)"

@@ -40,6 +40,30 @@ onMounted(() => {
 onBeforeUnmount(() => {
 	window.removeEventListener('popstate', handlePopState)
 })
+
+function onCreateCollection(collectionName: string) {
+	const uniqueName = _getUniqueCollectionName(collectionName)
+	createCollection(uniqueName)
+}
+function onRenameCollection(oldName: string, newName: string) {
+	if (oldName === newName) return
+	const uniqueName = _getUniqueCollectionName(newName)
+	renameCollection(oldName, uniqueName)
+}
+function onCloneSet(collectionName: string, set: TFullSet) {
+	createSet(collectionName, set.name, set)
+}
+
+function _getUniqueCollectionName(baseName: string): string {
+	let uniqueName = baseName
+	let counter = 1
+	const existingNames = collections.value.map((col) => col.name)
+	while (existingNames.includes(uniqueName)) {
+		uniqueName = `${baseName} (${counter})`
+		counter++
+	}
+	return uniqueName
+}
 </script>
 
 <template>
@@ -66,8 +90,7 @@ onBeforeUnmount(() => {
 				</div>
 				<div v-if="collections.length < 64">
 					<NameInputModal
-						@confirm="(newName) => createCollection(newName)"
-						:existing-items="collections"
+						@confirm="(newName) => onCreateCollection(newName)"
 						item-type="Collection"
 					>
 						<template #trigger>
@@ -91,8 +114,9 @@ onBeforeUnmount(() => {
 						@rename-set="(set, newName) => renameSet(collection.name, set, newName)"
 						@delete-collection="() => deleteCollection(collection.name)"
 						@rename-collection="
-							(_, newName) => renameCollection(collection.name, newName)
+							(_, newName) => onRenameCollection(collection.name, newName)
 						"
+						@clone-set="(newSet) => onCloneSet(collection.name, newSet)"
 					/>
 				</div>
 			</div>
@@ -110,8 +134,7 @@ onBeforeUnmount(() => {
 			<p class="text-sm text-contrast-500">Let's start by creating your first collection</p>
 			<div class="mt-2">
 				<NameInputModal
-					@confirm="(newName) => createCollection(newName)"
-					:existing-items="collections"
+					@confirm="(newName) => onCreateCollection(newName)"
 					item-type="Collection"
 				>
 					<template #trigger>

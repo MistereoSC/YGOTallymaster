@@ -193,8 +193,6 @@ export function validateYdkContent(ydkData: string): boolean {
 		} else if (currentSection) {
 			const cardId = parseInt(line, 10)
 			if (isNaN(cardId)) {
-				console.log('line is NaN::', line)
-
 				return false
 			}
 		}

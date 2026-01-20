@@ -65,11 +65,20 @@ const useCardCollections = () => {
 		collections.value.unshift(newCollection)
 	}
 
-	async function _createSet(collectionName: string, setName: string) {
+	async function _createSet(collectionName: string, setName: string, setData?: TFullSet) {
 		const collection = collections.value.find((c) => c.name === collectionName)
 		if (collection) {
-			const set = (await createSet(setName, collectionName)) as unknown as TFullSet
-			collection.sets.unshift(set)
+			if (!setData) {
+				const set = (await createSet(setName, collectionName)) as unknown as TFullSet
+				collection.sets.unshift(set)
+			} else {
+				await createSet(setData.name, collectionName, {
+					created_at: setData.created_at,
+					updated_at: setData.updated_at,
+					cards: setData.cards.map((card) => card.id),
+				})
+				collection.sets.unshift(JSON.parse(JSON.stringify(setData)))
+			}
 		}
 	}
 

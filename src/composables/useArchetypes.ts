@@ -35,7 +35,7 @@ const useArchetypes = () => {
 				tmpArchetypes[card.archetype].push(card)
 			}
 		}
-		const out: TArchetype[] = []
+		let out: TArchetype[] = []
 		let index = 0
 		for (const [key, val] of Object.entries(tmpArchetypes)) {
 			archetypeList.value.push(key)
@@ -74,7 +74,7 @@ const useArchetypes = () => {
 			out.push(newArchetype)
 			index++
 		}
-		out.sort((a, b) => (a.count === b.count ? 0 : a.count < b.count ? 1 : -1))
+		out = sort(ESortArchetypeBy.Release_Desc, out)
 		archetypes.value = out
 		initialized.value = 'ready'
 	}

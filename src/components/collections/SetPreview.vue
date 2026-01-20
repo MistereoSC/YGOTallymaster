@@ -8,21 +8,27 @@ const props = defineProps<{
 	set: TFullSet
 }>()
 const emit = defineEmits<{
-	(e: 'clickSet', set: TFullSet): void
-	(e: 'renameSet', set: TFullSet): void
-	(e: 'deleteSet', set: TFullSet): void
+	(e: 'clickSet'): void
+	(e: 'renameSet'): void
+	(e: 'deleteSet'): void
+	(e: 'cloneSet'): void
 }>()
 
 const menuItems = [
 	{
 		label: 'Rename Set',
 		icon: 'material-symbols:edit-outline-rounded',
-		action: () => emit('renameSet', props.set),
+		action: () => emit('renameSet'),
 	},
 	{
 		label: 'Delete Set',
 		icon: 'material-symbols:delete-rounded',
-		action: () => emit('deleteSet', props.set),
+		action: () => emit('deleteSet'),
+	},
+	{
+		label: 'Clone Set',
+		icon: 'material-symbols:content-copy-rounded',
+		action: () => emit('cloneSet'),
 	},
 ]
 </script>
@@ -32,11 +38,11 @@ const menuItems = [
 		<template #trigger>
 			<div
 				class="w-43.25 h-64.5 grid place-items-center rounded-lg bg-primary-700 cursor-pointer"
-				@click="() => emit('clickSet', props.set)"
+				@click="() => emit('clickSet')"
 			>
-				<div v-if="set.cards.length > 0" class="relative">
+				<div v-if="props.set.cards.length > 0" class="relative">
 					<CardPreview
-						:card="set.cards[0]"
+						:card="props.set.cards[0]"
 						size="medium"
 						:gray-unowned="false"
 						:gray-override="false"
@@ -50,7 +56,7 @@ const menuItems = [
 						class="absolute bottom-0 left-0 right-0 p-3 text-white pointer-events-none"
 					>
 						<p class="font-bold text-sm drop-shadow-lg">
-							{{ set.name }}
+							{{ props.set.name }}
 						</p>
 						<div class="flex items-center gap-3 mt-1 text-xs text-contrast-400">
 							<span class="flex font-semibold items-center gap-1">
@@ -58,8 +64,8 @@ const menuItems = [
 									icon="material-symbols:credit-card"
 									class="text-sm text-accent-400"
 								/>
-								{{ set.cards.length }}
-								{{ set.cards.length === 1 ? 'Card' : 'Cards' }}
+								{{ props.set.cards.length }}
+								{{ props.set.cards.length === 1 ? 'Card' : 'Cards' }}
 							</span>
 						</div>
 					</div>
@@ -74,7 +80,7 @@ const menuItems = [
 					/>
 					<span
 						class="font-bold transition-colors duration-200 group-hover:text-contrast-700 text-center px-2"
-						>{{ set.name }}</span
+						>{{ props.set.name }}</span
 					>
 					<span class="text-contrast-500">(No Cards)</span>
 				</div>

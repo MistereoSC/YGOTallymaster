@@ -14,6 +14,7 @@ const emit = defineEmits<{
 	(e: 'click'): void
 	(e: 'rename'): void
 	(e: 'delete'): void
+	(e: 'clone'): void
 }>()
 
 const previewCard = computed<TCardData | null>(() => {
@@ -30,6 +31,11 @@ const menuItems = [
 		label: 'Delete Deck',
 		icon: 'material-symbols:delete-rounded',
 		action: () => emit('delete'),
+	},
+	{
+		label: 'Clone Deck',
+		icon: 'material-symbols:content-copy-rounded',
+		action: () => emit('clone'),
 	},
 ]
 </script>

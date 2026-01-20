@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {TFullCollection, TFullSet, useCardCollections} from '@/composables/useCardCollections'
+import {TFullCollection, TFullSet} from '@/composables/useCardCollections'
 import SetPreview from './SetPreview.vue'
 import ConfirmCancelModal from '@/components/common/ConfirmCancelModal.vue'
 import {ref} from 'vue'
@@ -8,13 +8,12 @@ import DropdownMenu from './DropdownMenu.vue'
 import {Icon} from '@iconify/vue'
 import NameInputModal from '@/components/common/NameInputModal.vue'
 
-const {collections} = useCardCollections()
-
 const props = defineProps<{
 	collection: TFullCollection
 }>()
 const emit = defineEmits<{
 	(e: 'createSet', name: string): void
+	(e: 'cloneSet', set: TFullSet): void
 	(e: 'deleteSet', set: TFullSet): void
 	(e: 'renameSet', set: TFullSet, newName: string): void
 	(e: 'clickSet', set: TFullSet): void
@@ -51,9 +50,22 @@ function onCancelDeleteSet() {
 
 function onConfirmRenameSet(newName: string) {
 	if (activeActionForSet.value) {
-		emit('renameSet', activeActionForSet.value, newName)
+		if (activeActionForSet.value.name === newName) {
+			onCancelRenameSet()
+			return
+		}
+		const uniqueName = _getUniqueSetName(newName)
+		emit('renameSet', activeActionForSet.value, uniqueName)
 	}
 	onCancelRenameSet()
+}
+function onCreateSet(setName: string) {
+	const uniqueName = _getUniqueSetName(setName)
+	emit('createSet', uniqueName)
+}
+function onCloneSet(set: TFullSet) {
+	const uniqueName = _getUniqueSetName(`${set.name} (Copy)`)
+	emit('cloneSet', {...set, name: uniqueName})
 }
 
 function onConfirmDeleteSet() {
@@ -75,6 +87,7 @@ const menuItems = [
 		action: () => (confirmDeleteCollectionOpen.value = true),
 	},
 ]
+
 function onConfirmDeleteCollection() {
 	emit('deleteCollection', props.collection)
 	confirmDeleteCollectionOpen.value = false
@@ -88,6 +101,17 @@ function onConfirmRenameCollection(newName: string) {
 }
 function onCancelRenameCollection() {
 	confirmRenameCollectionOpen.value = false
+}
+
+function _getUniqueSetName(baseName: string): string {
+	let uniqueName = baseName
+	let counter = 1
+	const existingNames = props.collection.sets.map((set) => set.name)
+	while (existingNames.includes(uniqueName)) {
+		uniqueName = `${baseName} (${counter})`
+		counter++
+	}
+	return uniqueName
 }
 
 // #endregion Set Actions
@@ -126,19 +150,16 @@ function onCancelRenameCollection() {
 				<SetPreview
 					:set="set"
 					@clickSet="() => emit('clickSet', set)"
-					@delete-set="(set) => onDeleteSet(set)"
-					@rename-set="(set) => onRenameSet(set)"
+					@delete-set="() => onDeleteSet(set)"
+					@rename-set="() => onRenameSet(set)"
+					@clone-set="() => onCloneSet(set)"
 				/>
 			</div>
 			<div
 				class="w-43.25 h-64.5 grid place-items-center"
 				v-if="props.collection.sets.length < 64"
 			>
-				<NameInputModal
-					:existing-items="props.collection.sets"
-					item-type="Set"
-					@confirm="(name) => emit('createSet', name)"
-				>
+				<NameInputModal item-type="Set" @confirm="(name) => onCreateSet(name)">
 					<template #trigger>
 						<div
 							class="h-full w-full rounded-lg bg-primary-700/50 cursor-pointer shadow-lg transition-all duration-200 hover:bg-primary-600/70 border-2 border-dashed border-primary-500 hover:border-accent-500/50 group"
@@ -181,7 +202,6 @@ function onCancelRenameCollection() {
 		<NameInputModal
 			:open="confirmRenameOpen"
 			:existing-name="activeActionForSet?.name"
-			:existing-items="props.collection.sets"
 			item-type="Set"
 			@confirm="(newName) => onConfirmRenameSet(newName)"
 			@close="onCancelRenameSet"
@@ -205,7 +225,6 @@ function onCancelRenameCollection() {
 		<NameInputModal
 			:open="confirmRenameCollectionOpen"
 			:existing-name="props.collection.name"
-			:existing-items="collections"
 			item-type="Collection"
 			@confirm="(newName) => onConfirmRenameCollection(newName)"
 			@close="onCancelRenameCollection"

@@ -50,7 +50,7 @@ export async function deleteCollection(name: string) {
 	return true
 }
 
-export async function createSet(name: string, parentCollection: string) {
+export async function createSet(name: string, parentCollection: string, setData?: TCardSet) {
 	const safeName = name.replace(RUnsafePathCharactersRegex, '')
 
 	const colE = await Files.exists(`${COLLECTIONS_PATH}${parentCollection}`)
@@ -58,7 +58,7 @@ export async function createSet(name: string, parentCollection: string) {
 	const setE = await Files.exists(`${COLLECTIONS_PATH}${parentCollection}/${safeName}.json`)
 	if (setE.exists) throw new Error('Set already exists: ' + name)
 
-	const newSet: TCardSet = {
+	const newSet: TCardSet = setData ?? {
 		created_at: new Date().toISOString(),
 		updated_at: new Date().toISOString(),
 		cards: [],

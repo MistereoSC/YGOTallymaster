@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import {TArchetype} from '@/composables/useArchetypes'
 import Button from '@/components/common/Button.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import {ref} from 'vue'

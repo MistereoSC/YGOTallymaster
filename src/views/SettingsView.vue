@@ -188,6 +188,7 @@ function onEnglishNameSearchChange() {
 					<!-- English Name Search -->
 					<SettingsItem
 						icon="material-symbols:language"
+						iconColorClass="text-secondary-400"
 						title="English Name Search"
 						description="Include english card names when searching in other languages"
 					>
@@ -212,7 +213,6 @@ function onEnglishNameSearchChange() {
 					<!-- Database Owned Numbers -->
 					<SettingsItem
 						icon="material-symbols:tag-rounded"
-						iconColorClass="text-secondary-400"
 						title="Always Show Owned Numbers"
 						description="Display ownership count on all cards in Database, Archetypes and Releases tabs"
 					>
@@ -330,11 +330,21 @@ function onEnglishNameSearchChange() {
 							</option>
 						</select>
 					</SettingsItem>
+					<SettingsItem
+						icon="material-symbols:splitscreen-left"
+						title="Split Database View"
+						iconColorClass="text-tertiary-400"
+						description="Splits Search/Cardinfo panels in Database tab (as in Deck/List creation)"
+					>
+						<Checkbox
+							:model-value="settings?.splitDatabaseView"
+							@change="toggle.splitDatabaseView"
+						/>
+					</SettingsItem>
 					<!-- Card Prices -->
 					<SettingsItem
-						icon="material-symbols:photo-size-select-large-rounded"
-						iconColorClass="text-tertiary-400"
-						title="Show Card Prices From"
+						icon="material-symbols:attach-money-rounded"
+						title="Show Card Prices"
 						description="Select the vendor to show card prices from. 
 									Shows estimated price (in USD) in the Card Details. 
 									Sums up prices in Decks and Sets views."

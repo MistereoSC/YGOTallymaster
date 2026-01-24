@@ -44,7 +44,7 @@ function onCardClick(card: TCardData) {
 	if (activePanel.value !== 'card') {
 		previousPanel.value = activePanel.value === 'none' ? 'filter' : activePanel.value
 		activeCard.value = card
-		activePanel.value = 'card'
+		if(!settings.value?.splitDatabaseView) activePanel.value = 'card'
 		return
 	}
 	if (activeCard.value && activeCard.value.id === card.id) {
@@ -57,7 +57,9 @@ function onCardClick(card: TCardData) {
 }
 function toggleFilter() {
 	if (activePanel.value === 'filter') {
-		if (activeCard.value) {
+		if (settings.value?.splitDatabaseView) {
+			activePanel.value = 'none'
+		} else if (activeCard.value) {
 			activePanel.value = 'card'
 		} else {
 			activePanel.value = 'none'
@@ -111,8 +113,23 @@ const {settings} = useDatabaseSettings()
 
 		<div
 			class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden"
+			:class="{'grid-cols-[auto_1fr_auto]!': settings?.splitDatabaseView}"
 			v-if="fullCardList.length > 0"
 		>
+			<div
+				v-if="settings?.splitDatabaseView"
+				class="border-l border-primary-600 min-w-96 w-[25vw] max-w-116 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+			>
+				<div class="h-full overflow-y-scroll scrollable p-3 pr-2">
+					<CardFullView
+						v-if="activeCard"
+						:card="activeCard"
+						:description-highlighting="settings?.descriptionHighlighting"
+						:show-banlist-for="settings?.showBanlistFor || 'none'"
+						:show-card-prices="settings?.cardPricesVendor !== 'none'"
+					/>
+				</div>
+			</div>
 			<CardListVirtualList
 				v-if="settings?.displayAsList"
 				ref="cardGrid"
@@ -145,7 +162,7 @@ const {settings} = useDatabaseSettings()
 			>
 				<div class="h-full overflow-y-scroll scrollable p-3 pr-2">
 					<CardFullView
-						v-if="activeCard && activePanel === 'card'"
+						v-if="activeCard && activePanel === 'card' && !settings?.splitDatabaseView"
 						:card="activeCard"
 						:description-highlighting="settings?.descriptionHighlighting"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
@@ -153,7 +170,7 @@ const {settings} = useDatabaseSettings()
 					/>
 					<CardFilter
 						:search-while-typing="true"
-						v-else-if="activePanel === 'filter'"
+						v-else-if="activePanel === 'filter' || settings?.splitDatabaseView"
 						:show-info-panel="true"
 					/>
 				</div>

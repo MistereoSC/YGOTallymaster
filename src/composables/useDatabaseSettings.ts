@@ -78,6 +78,11 @@ export const useDatabaseSettings = () => {
 		settings.value.englishNameSearch = to ?? !settings.value.englishNameSearch
 		save()
 	}
+	function splitDatabaseView(to?: boolean) {
+		if (!settings.value) return
+		settings.value.splitDatabaseView = to ?? !settings.value.splitDatabaseView
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -125,6 +130,7 @@ export const useDatabaseSettings = () => {
 		setsDisplayAsList,
 		descriptionHighlighting,
 		englishNameSearch,
+		splitDatabaseView,
 	}
 	const setFns = {
 		listSize,
@@ -186,6 +192,7 @@ export type TDatabaseSettings = {
 	descriptionHighlighting: boolean
 	englishNameSearch: boolean
 	cardPricesVendor: TVendor
+	splitDatabaseView: boolean
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
@@ -208,4 +215,5 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	descriptionHighlighting: true,
 	englishNameSearch: false,
 	cardPricesVendor: 'none',
+	splitDatabaseView: false,
 }

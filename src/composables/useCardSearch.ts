@@ -38,8 +38,6 @@ const STOP_WORDS = new Set([
 	'be',
 	'by',
 	'on',
-	'with',
-	'from',
 ])
 const STORE_FIELDS = [
 	// TGeneralCardData fields
@@ -71,8 +69,9 @@ const TOKENIZE_FN = (text: string) => {
 	const baseTokens = text
 		.toLowerCase()
 		// Normalize special characters and symbols to common equivalents
-		.replace(/☆/g, '-') // Star symbol to "star"
-		.replace(/★/g, '-') // Filled star to "star"
+		.replace(/☆/g, '-')
+		.replace(/★/g, '-')
+		.replace(/"/g, ' " ')
 
 		// First, protect D/D/D/D patterns by replacing slashes with a placeholder
 		.replace(/\bd(\/d)+\b/g, (match) => match.replace(/\//g, '___SLASH___'))

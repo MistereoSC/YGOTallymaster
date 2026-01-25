@@ -10,7 +10,7 @@ import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
-const {searchResults, fullCardList, resetSearch} = useCardSearch()
+const {searchResults, fullCardList, resetSearch, search} = useCardSearch()
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
 onBeforeMount(() => {
@@ -44,7 +44,7 @@ function onCardClick(card: TCardData) {
 	if (activePanel.value !== 'card') {
 		previousPanel.value = activePanel.value === 'none' ? 'filter' : activePanel.value
 		activeCard.value = card
-		if(!settings.value?.splitDatabaseView) activePanel.value = 'card'
+		if (!settings.value?.splitDatabaseView) activePanel.value = 'card'
 		return
 	}
 	if (activeCard.value && activeCard.value.id === card.id) {
@@ -70,6 +70,11 @@ function toggleFilter() {
 	activePanel.value = 'filter'
 }
 
+function onCardShiftLClick(card: TCardData) {
+	resetSearch()
+	const searchTerm = card.archetype || card.name
+	search({term: searchTerm})
+}
 // #endregion
 // ----------------------------------------------
 // #region Settings
@@ -135,6 +140,7 @@ const {settings} = useDatabaseSettings()
 				ref="cardGrid"
 				:cardList="searchResults == null ? fullCardList : searchResults"
 				@card-clicked="(card) => onCardClick(card)"
+				@card-shift-clicked="(card) => onCardShiftLClick(card)"
 				:active-card-id="activeCard ? activeCard.id : null"
 				:item-size="settings?.listSize || 'medium'"
 				:show-owned-heart="true"
@@ -147,6 +153,7 @@ const {settings} = useDatabaseSettings()
 				ref="cardGrid"
 				:cardList="searchResults == null ? fullCardList : searchResults"
 				@card-clicked="(card) => onCardClick(card)"
+				@card-shift-clicked="(card) => onCardShiftLClick(card)"
 				:active-card-id="activeCard ? activeCard.id : null"
 				:item-size="settings?.gridSize || 'medium'"
 				:show-owned-heart="true"

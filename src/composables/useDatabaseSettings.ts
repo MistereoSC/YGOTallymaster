@@ -93,6 +93,11 @@ export const useDatabaseSettings = () => {
 		settings.value.setsGrayUnownedGridReverse = to ?? !settings.value.setsGrayUnownedGridReverse
 		save()
 	}
+	function setsShowOwnedHeart(to?: boolean) {
+		if (!settings.value) return
+		settings.value.setsShowOwnedHeart = to ?? !settings.value.setsShowOwnedHeart
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -143,6 +148,7 @@ export const useDatabaseSettings = () => {
 		splitDatabaseView,
 		setsShowOwnedNumbers,
 		setsGrayUnownedGridReverse,
+		setsShowOwnedHeart,
 	}
 	const setFns = {
 		listSize,
@@ -201,6 +207,7 @@ export type TDatabaseSettings = {
 	setsGrayUnownedGridReverse: boolean
 	setsDisplayAsList: boolean
 	setsShowOwnedNumbers: boolean
+	setsShowOwnedHeart: boolean
 
 	cardLanguage: TLanguageCodes
 	descriptionHighlighting: boolean
@@ -226,6 +233,7 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	setsGrayUnownedGridReverse: false,
 	setsDisplayAsList: false,
 	setsShowOwnedNumbers: false,
+	setsShowOwnedHeart: false,
 
 	cardLanguage: 'en',
 	descriptionHighlighting: true,

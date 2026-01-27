@@ -10,6 +10,7 @@ interface IProps {
 	allowReorder?: boolean
 	grayUnowned?: boolean
 	showOwnedNumber?: boolean
+	showOwnedHeart?: boolean
 	cardSize?: 'tiny' | 'small' | 'medium' | 'large'
 	showBanlistFor?: TBanlistFormat | 'none'
 	horizontal?: boolean
@@ -18,6 +19,8 @@ const props = withDefaults(defineProps<IProps>(), {
 	allowCardRemoval: true,
 	allowReorder: true,
 	grayUnowned: false,
+	showOwnedNumber: false,
+	showOwnedHeart: false,
 	cardSize: 'tiny',
 	horizontal: false,
 })
@@ -179,6 +182,7 @@ function onHorizontalWheel(event: WheelEvent) {
 				:class="{
 					'hover:z-10 -ml-8': props.horizontal,
 				}"
+				:show-owned-heart="props.showOwnedHeart"
 			/>
 		</div>
 	</div>
@@ -187,7 +191,9 @@ function onHorizontalWheel(event: WheelEvent) {
 <style lang="scss" scoped>
 .card-drag-wrapper {
 	cursor: grab;
-	transition: transform 0.15s ease, opacity 0.15s ease;
+	transition:
+		transform 0.15s ease,
+		opacity 0.15s ease;
 	border-radius: 4px;
 
 	&:active {

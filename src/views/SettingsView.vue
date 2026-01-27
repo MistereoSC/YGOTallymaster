@@ -394,7 +394,7 @@ function onEnglishNameSearchChange() {
 					</SettingsItem>
 
 					<SettingsSeparator
-						label="Decks & Lists"
+						label="Decks & Sets"
 						icon="material-symbols:stacks-rounded"
 					/>
 					<!-- List Size (Small List) -->
@@ -402,7 +402,7 @@ function onEnglishNameSearchChange() {
 						icon="material-symbols:format-size-rounded"
 						iconColorClass="text-tertiary-400"
 						title="Small List Size"
-						description="Size of the small list on the right side of the Decks and Lists tab"
+						description="Size of the small list on the right side of the Decks and Lists tabs"
 					>
 						<select
 							:value="settings?.listSizeSmallList"
@@ -462,6 +462,19 @@ function onEnglishNameSearchChange() {
 						<Checkbox
 							:model-value="settings?.setsDisplayAsList"
 							@change="toggle.setsDisplayAsList"
+						/>
+					</SettingsItem>
+
+					<!-- Lists Owned Heart -->
+					<SettingsItem
+						icon="tabler:heart-filled"
+						iconColorClass="text-tertiary-400"
+						title="Sets Owned Heart"
+						description="Display Owned Heart Icon in Lists and Decks tabs"
+					>
+						<Checkbox
+							:model-value="settings?.setsShowOwnedHeart"
+							@change="toggle.setsShowOwnedHeart"
 						/>
 					</SettingsItem>
 				</SettingsSection>

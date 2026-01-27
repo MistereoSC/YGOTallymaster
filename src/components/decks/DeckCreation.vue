@@ -244,6 +244,7 @@ const cardPrices = computed(() => {
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@card-shift-click="(card) => onCardShiftLClick(card)"
 							:show-owned-number="settings?.setsShowOwnedNumbers"
+							:show-owned-heart="settings?.setsShowOwnedHeart"
 						/>
 					</div>
 					<div>
@@ -302,6 +303,7 @@ const cardPrices = computed(() => {
 							@card-shift-click="(card) => onCardShiftLClick(card)"
 							:horizontal="true"
 							:show-owned-number="settings?.setsShowOwnedNumbers"
+							:show-owned-heart="settings?.setsShowOwnedHeart"
 						/>
 					</div>
 				</div>
@@ -336,6 +338,8 @@ const cardPrices = computed(() => {
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@card-shift-click="(card) => onCardShiftLClick(card)"
 							:horizontal="true"
+							:show-owned-number="settings?.setsShowOwnedNumbers"
+							:show-owned-heart="settings?.setsShowOwnedHeart"
 						/>
 					</div>
 				</div>

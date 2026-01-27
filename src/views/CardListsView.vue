@@ -102,8 +102,19 @@ function _getUniqueCollectionName(baseName: string): string {
 				class="h-12 w-full px-4 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between shrink-0"
 			>
 				<div class="flex items-center gap-3 flex-1">
-					<div class="flex flex-col">
-						<h1 class="font-semibold text-contrast-700">Collections</h1>
+					<div class="flex flex-col w-24">
+						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+							Collections
+						</h2>
+						<p class="text-xs text-contrast-500">
+							<span class="font-medium">{{
+								collections.reduce(
+									(acc, collection) => acc + collection.sets.length,
+									0
+								)
+							}}</span>
+							sets
+						</p>
 					</div>
 
 					<!-- Search Field -->
@@ -116,7 +127,7 @@ function _getUniqueCollectionName(baseName: string): string {
 							v-model="searchQuery"
 							type="text"
 							placeholder="Search sets..."
-							class="w-full bg-primary-600 text-contrast-700 placeholder-contrast-500 rounded-md pl-9 pr-3 py-1.5 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors"
+							class="w-full bg-primary-800 text-contrast-700 placeholder-contrast-500 rounded-md pl-9 pr-3 py-1.5 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors"
 						/>
 						<button
 							v-if="searchQuery"
@@ -131,7 +142,7 @@ function _getUniqueCollectionName(baseName: string): string {
 					<div class="relative">
 						<select
 							v-model="sortBy"
-							class="bg-primary-600 text-contrast-700 rounded-md px-3 py-1.5 pr-8 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+							class="bg-primary-800 text-contrast-700 rounded-md px-3 py-1.5 pr-8 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors appearance-none cursor-pointer"
 						>
 							<option v-for="(label, key) in ESortBy" :key="key" :value="key">
 								{{ label }}

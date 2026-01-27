@@ -5,7 +5,7 @@ import VirtualListCustom from '@/components/database/VirtualListCustom.vue'
 import ArchetypeListItem from '@/components/database/ArchetypeListItem.vue'
 import Spinner from '@/components/common/Spinner.vue'
 import ArchetypeList from '@/components/database/ArchetypeList.vue'
-import Button from '@/components/common/Button.vue'
+import {Icon} from '@iconify/vue'
 
 const {archetypes, initialized, sortedBy, sort} = useArchetypes()
 const archetypesFiltered = ref(null as TArchetype[] | null)
@@ -107,50 +107,66 @@ onBeforeUnmount(() => {
 			v-else-if="initialized === 'ready' && archetypes.length > 0"
 			class="h-full overflow-hidden grid grid-rows-[auto_1fr]"
 		>
+			<!-- Page Header -->
 			<div
-				class="h-12 w-full flex justify-between px-4 py-1 items-center bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
+				class="h-12 w-full px-4 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between shrink-0"
 			>
-				<div class="flex gap-3 items-center">
-					<div class="flex flex-col">
-						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
-							Archetypes
-						</h2>
-						<p class="text-xs text-contrast-500">
-							<span class="font-medium">{{ archetypes.length }}</span>
-							archetypes
-						</p>
+				<div class="flex items-center gap-3 flex-1">
+					<div class="flex gap-3 items-center w-24">
+						<div class="flex flex-col">
+							<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+								Archetypes
+							</h2>
+							<p class="text-xs text-contrast-500">
+								<span class="font-medium">{{ archetypes.length }}</span>
+								archetypes
+							</p>
+						</div>
 					</div>
-				</div>
 
-				<div class="grid grid-cols-[1fr_auto] gap-2 items-center">
-					<input
-						v-model="searchInput"
-						@keyup="(e) => onSearchInput(e)"
-						type="text"
-						placeholder="Search Archetypes..."
-						class="w-full px-2 py-1 rounded-md bg-primary-800 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-500"
-					/>
-					<Button
-						v-if="searchInput.length > 0"
-						rounded
-						icon="material-symbols:filter-alt-off-rounded"
-						@click="onReset"
-						size="small"
-					/>
-					<span v-else class="w-7"></span>
-				</div>
+					<!-- Search Field -->
+					<div class="relative ml-4 flex-1 max-w-xs">
+						<Icon
+							icon="material-symbols:search-rounded"
+							class="absolute left-2.5 top-1/2 -translate-y-1/2 text-contrast-500 text-lg"
+						/>
+						<input
+							v-model="searchInput"
+							@keyup="(e) => onSearchInput(e)"
+							type="text"
+							placeholder="Search archetypes..."
+							class="w-full bg-primary-800 text-contrast-700 placeholder-contrast-500 rounded-md pl-9 pr-3 py-1.5 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors"
+						/>
+						<button
+							v-if="searchInput"
+							@click="onReset"
+							class="absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 hover:text-contrast-700 transition-colors"
+						>
+							<Icon icon="material-symbols:close-rounded" class="text-lg" />
+						</button>
+					</div>
 
-				<div class="items-center">
-					<span class="font-bold pr-2">Sort</span>
-					<select
-						v-model="sortedBy"
-						@change="sort(sortedBy)"
-						class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-58"
-					>
-						<option v-for="(label, key) in ESortArchetypeBy" :key="key" :value="label">
-							{{ label }}
-						</option>
-					</select>
+					<!-- Sort Dropdown -->
+					<div class="relative">
+						<select
+							v-model="sortedBy"
+							@change="sort(sortedBy)"
+							class="bg-primary-800 text-contrast-700 rounded-md px-3 py-1.5 pr-8 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+						>
+							<option
+								v-for="(label, key) in ESortArchetypeBy"
+								:key="key"
+								:value="label"
+								class="cursor-pointer"
+							>
+								{{ label }}
+							</option>
+						</select>
+						<Icon
+							icon="material-symbols:arrow-drop-down-rounded"
+							class="absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 pointer-events-none text-xl"
+						/>
+					</div>
 				</div>
 			</div>
 

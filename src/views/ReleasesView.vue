@@ -6,6 +6,7 @@ import VirtualListCustom from '@/components/database/VirtualListCustom.vue'
 import ReleaseItem from '@/components/releases/ReleaseItem.vue'
 import {TCardData, TSetListData} from '@/libs/interfaces/YGOProInterfaces'
 import {getCardsForRelease, getReleases} from '@/libs/Releases'
+import {Icon} from '@iconify/vue'
 import {nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 
 const virtualListRef = ref<{
@@ -98,7 +99,8 @@ function onSearch() {
 	sets.value.forEach((set) => {
 		if (set.set_name.toLowerCase().includes(query)) {
 			setsFiltered.value!.push(set)
-			return
+		} else if (set.set_code.toLowerCase().includes(query)) {
+			setsFiltered.value!.push(set)
 		}
 	})
 }
@@ -119,38 +121,45 @@ function onSearch() {
 				class="h-full overflow-hidden grid grid-rows-[auto_1fr]"
 			>
 				<div
-					class="h-12 w-full flex justify-between px-4 py-1 items-center bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
+					class="h-12 w-full px-4 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between shrink-0"
 				>
-					<div class="flex gap-3 items-center">
-						<div class="flex flex-col">
-							<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
-								Releases
-							</h2>
-							<p class="text-xs text-contrast-500">
-								<span class="font-medium">{{ sets.length }}</span>
-								sets
-							</p>
+					<div class="flex items-center gap-3 flex-1">
+						<div class="flex gap-3 items-center w-24">
+							<div class="flex flex-col">
+								<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+									Releases
+								</h2>
+								<p class="text-xs text-contrast-500">
+									<span class="font-medium">{{ sets.length }}</span>
+									sets
+								</p>
+							</div>
+						</div>
+
+						<!-- Search Field -->
+						<div class="relative ml-4 flex-1 max-w-xs">
+							<Icon
+								icon="material-symbols:search-rounded"
+								class="absolute left-2.5 top-1/2 -translate-y-1/2 text-contrast-500 text-lg"
+							/>
+							<input
+								v-model="searchInput"
+								type="text"
+								@keyup="(e) => onSearchInput(e)"
+								placeholder="Search releases..."
+								class="w-full bg-primary-800 text-contrast-700 placeholder-contrast-500 rounded-md pl-9 pr-3 py-1.5 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors"
+							/>
+							<button
+								v-if="searchInput"
+								@click="onReset"
+								class="absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 hover:text-contrast-700 transition-colors"
+							>
+								<Icon icon="material-symbols:close-rounded" class="text-lg" />
+							</button>
 						</div>
 					</div>
-
-					<div class="grid grid-cols-[1fr_auto] gap-2 items-center">
-						<input
-							v-model="searchInput"
-							@keyup="(e) => onSearchInput(e)"
-							type="text"
-							placeholder="Search Releases..."
-							class="w-full px-2 py-1 rounded-md bg-primary-800 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-500"
-						/>
-						<Button
-							v-if="searchInput.length > 0"
-							rounded
-							icon="material-symbols:filter-alt-off-rounded"
-							@click="onReset"
-							size="small"
-						/>
-						<span v-else class="w-7"></span>
-					</div>
 				</div>
+
 				<VirtualListCustom
 					ref="virtualListRef"
 					:items="setsFiltered ?? sets"

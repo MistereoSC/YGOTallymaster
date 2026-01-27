@@ -6,13 +6,14 @@ import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardFullView from '@/components/database/CardFullView.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
+import {Icon} from '@iconify/vue'
 
 const activeCard = ref<TCardData | null>(null)
 const activeBanlist = ref<TBanlistFormat>('ban_tcg')
 enum EBanlistFormat {
-	'ban_tcg' = 'TCG',
-	'ban_ocg' = 'OCG',
-	'ban_goat' = 'GOAT',
+	'ban_tcg' = 'TCG Banlist',
+	'ban_ocg' = 'OCG Banlist',
+	'ban_goat' = 'GOAT Banlist',
 }
 
 const banlist = ref<null | Awaited<ReturnType<typeof getBanlist>>>(null)
@@ -69,7 +70,7 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 						</p>
 					</div>
 				</div>
-				<div class="grid items-center gap-2">
+				<div class="relative">
 					<select
 						:value="activeBanlist"
 						@change="
@@ -79,12 +80,16 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 										.value as keyof typeof EBanlistFormat
 								)
 						"
-						class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 focus:outline-none focus:border-accent-500 w-full"
+						class="bg-primary-700 text-contrast-700 rounded-md px-3 py-1.5 pr-8 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors appearance-none cursor-pointer"
 					>
 						<option v-for="(label, key) in EBanlistFormat" :key="key" :value="key">
 							{{ label }}
 						</option>
 					</select>
+					<Icon
+						icon="material-symbols:arrow-drop-down-rounded"
+						class="absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 pointer-events-none text-xl"
+					/>
 				</div>
 			</div>
 			<div class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden">

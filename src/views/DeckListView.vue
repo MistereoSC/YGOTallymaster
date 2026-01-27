@@ -80,7 +80,7 @@ async function onDeckDeleteConfirm() {
 
 async function onDeckRenameConfirm(newName: string) {
 	if (activeDeckForAction.value) {
-		if( activeDeckForAction.value.name === newName) {
+		if (activeDeckForAction.value.name === newName) {
 			onDeckRenameCancel()
 			return
 		}
@@ -157,29 +157,39 @@ function _getUniqueName(name: string): string {
 	<div v-else-if="initialized" class="h-full flex flex-col overflow-hidden">
 		<!-- Page Header -->
 		<div
-			class="w-full px-4 py-1 h-12 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between shrink-0"
+			class="h-12 w-full px-4 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between shrink-0"
 		>
-			<div class="flex items-center gap-3">
-				<div class="flex flex-col">
-					<h1 class="font-semibold text-contrast-700">Decks</h1>
+			<div class="flex items-center gap-3 flex-1">
+				<div class="flex gap-3 items-center w-24">
+					<div class="flex flex-col">
+						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">Decks</h2>
+						<p class="text-xs text-contrast-500">
+							<span class="font-medium">{{ deckList.length }}</span>
+							decks
+						</p>
+					</div>
 				</div>
-			</div>
 
-			<div class="flex gap-2 items-center">
-				<Button
-					v-if="searchInput"
-					rounded
-					icon="material-symbols:filter-alt-off-rounded"
-					@click="onResetSearch"
-					size="small"
-				/>
-				<input
-					v-model="searchInput"
-					@input="onSearchInput"
-					type="text"
-					placeholder="Search Decks..."
-					class="w-56 px-2 py-1 rounded-md bg-primary-800 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-500"
-				/>
+				<!-- Search Field -->
+				<div class="relative ml-4 flex-1 max-w-xs">
+					<Icon
+						icon="material-symbols:search-rounded"
+						class="absolute left-2.5 top-1/2 -translate-y-1/2 text-contrast-500 text-lg"
+					/>
+					<input
+						v-model="searchQuery"
+						type="text"
+						placeholder="Search decks..."
+						class="w-full bg-primary-800 text-contrast-700 placeholder-contrast-500 rounded-md pl-9 pr-3 py-1.5 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors"
+					/>
+					<button
+						v-if="searchQuery"
+						@click="searchQuery = ''"
+						class="absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 hover:text-contrast-700 transition-colors"
+					>
+						<Icon icon="material-symbols:close-rounded" class="text-lg" />
+					</button>
+				</div>
 			</div>
 		</div>
 		<!-- Deck Grid -->
@@ -215,10 +225,7 @@ function _getUniqueName(name: string): string {
 					class="w-56 h-77 grid grid-rows-2 gap-2 place-items-center"
 					v-if="!searchQuery && deckList.length < 200"
 				>
-					<NameInputModal
-						item-type="Deck"
-						@confirm="(name) => onCreateDeck(name)"
-					>
+					<NameInputModal item-type="Deck" @confirm="(name) => onCreateDeck(name)">
 						<template #trigger>
 							<div
 								class="h-full w-full rounded-lg bg-primary-700/50 cursor-pointer shadow-lg transition-all duration-200 hover:bg-primary-600/70 border-2 border-dashed border-primary-500 hover:border-accent-500/50 group"

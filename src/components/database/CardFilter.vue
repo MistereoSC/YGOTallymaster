@@ -281,15 +281,21 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				<Icon icon="material-symbols:sort-rounded" class="text-base" />
 				Sort By
 			</span>
-			<select
-				v-model="selectedSort"
-				@change="sort(selectedSort)"
-				class="cursor-pointer bg-primary-700 border border-primary-600 rounded-md px-2 py-1 text-sm focus:outline-none focus:border-accent-500 flex-1 max-w-48"
-			>
-				<option v-for="(label, key) in ESortBy" :key="key" :value="label">
-					{{ label }}
-				</option>
-			</select>
+			<div class="relative">
+				<select
+					v-model="selectedSort"
+					@change="sort(selectedSort)"
+					class="bg-primary-700 text-contrast-700 rounded-md px-3 py-1.5 pr-8 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+				>
+					<option v-for="(label, key) in ESortBy" :key="key" :value="label">
+						{{ label }}
+					</option>
+				</select>
+				<Icon
+					icon="material-symbols:arrow-drop-down-rounded"
+					class="absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 pointer-events-none text-xl"
+				/>
+			</div>
 		</div>
 
 		<!-- Owned Filter -->
@@ -343,7 +349,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		<!-- Core Card Types -->
 		<FilterSection title="Monster/Spell/Trap" @reset="resetCoreType">
 			<ToggleButton
-				v-for="type in (['Monster', 'Spell', 'Trap'] as TCoreCardType[])"
+				v-for="type in ['Monster', 'Spell', 'Trap'] as TCoreCardType[]"
 				:key="type"
 				:model-value="toggledCoreType === type"
 				@toggle="toggleCoreType(type)"

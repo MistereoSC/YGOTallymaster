@@ -88,6 +88,11 @@ export const useDatabaseSettings = () => {
 		settings.value.setsShowOwnedNumbers = to ?? !settings.value.setsShowOwnedNumbers
 		save()
 	}
+	function setsGrayUnownedGridReverse(to?: boolean) {
+		if (!settings.value) return
+		settings.value.setsGrayUnownedGridReverse = to ?? !settings.value.setsGrayUnownedGridReverse
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -137,6 +142,7 @@ export const useDatabaseSettings = () => {
 		englishNameSearch,
 		splitDatabaseView,
 		setsShowOwnedNumbers,
+		setsGrayUnownedGridReverse,
 	}
 	const setFns = {
 		listSize,
@@ -192,6 +198,7 @@ export type TDatabaseSettings = {
 	decklistGrayUnownedGrid: boolean
 	decklistGridCardSize: TSizes
 	setsGrayUnownedGrid: boolean
+	setsGrayUnownedGridReverse: boolean
 	setsDisplayAsList: boolean
 	setsShowOwnedNumbers: boolean
 
@@ -216,6 +223,7 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	decklistGrayUnownedGrid: false,
 	decklistGridCardSize: 'tiny',
 	setsGrayUnownedGrid: false,
+	setsGrayUnownedGridReverse: false,
 	setsDisplayAsList: false,
 	setsShowOwnedNumbers: false,
 

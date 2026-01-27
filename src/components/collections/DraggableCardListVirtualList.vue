@@ -22,6 +22,7 @@ interface IProps {
 	showOwnedHeart?: boolean
 	showOwnedNumber?: boolean
 	grayUnowned?: boolean
+	grayUnownedReverse?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 	draggable?: boolean
 }
@@ -35,7 +36,6 @@ const {getOwned} = useOwnedCards()
 // Compute which cards should be grayed out based on occurrence vs owned count
 const grayedOutIndices = computed(() => {
 	if (!props.grayUnowned) return new Set<number>()
-
 	const grayed = new Set<number>()
 	const occurrenceCount: Record<number, number> = {}
 
@@ -43,11 +43,16 @@ const grayedOutIndices = computed(() => {
 		const cardId = card.id
 		occurrenceCount[cardId] = (occurrenceCount[cardId] || 0) + 1
 		const currentOccurrence = occurrenceCount[cardId]
-		const ownedCount = getOwned(cardId)
+		const ownedCount = Math.min(getOwned(cardId), 3)
 
-		// Gray out if this occurrence exceeds the owned count
-		if (currentOccurrence > ownedCount) {
-			grayed.add(index)
+		if (props.grayUnownedReverse) {
+			if (3 - currentOccurrence >= ownedCount) {
+				grayed.add(index)
+			}
+		} else {
+			if (currentOccurrence > ownedCount) {
+				grayed.add(index)
+			}
 		}
 	})
 
@@ -67,10 +72,10 @@ const CARD_HEIGHT = computed(() => {
 	return props.itemSize === 'small'
 		? 48
 		: props.itemSize === 'large'
-		? 80
-		: props.itemSize === 'tiny'
-		? 32
-		: 64
+			? 80
+			: props.itemSize === 'tiny'
+				? 32
+				: 64
 })
 
 const visibleRange = computed(() => {

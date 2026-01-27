@@ -280,6 +280,18 @@ function onEnglishNameSearchChange() {
 							@change="toggle.setsGrayUnownedGrid"
 						/>
 					</SettingsItem>
+					<!-- Reverse Unowned Order (Sets) -->
+					<SettingsItem
+						icon="material-symbols:opacity"
+						iconColorClass="text-primary-300"
+						title="Reverse Unowned Order (Sets)"
+						description="Dim Missing Cards instead of Owned Cards. Intended for 'Wants' Lists. Only affects the Lists tab"
+					>
+						<Checkbox
+							:model-value="settings?.setsGrayUnownedGridReverse"
+							@change="toggle.setsGrayUnownedGridReverse"
+						/>
+					</SettingsItem>
 
 					<SettingsSeparator label="Database " icon="material-symbols:database" />
 

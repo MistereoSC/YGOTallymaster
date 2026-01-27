@@ -17,7 +17,7 @@ import {sortByDeckOrder} from '@/composables/useDeckList'
 import SettingsSection from '@/components/settings/SettingsSection.vue'
 import SettingsItem from '@/components/settings/SettingsItem.vue'
 import {useToast} from '@/composables/useToast'
-import {getOwnedCards} from '@/composables/useOwnedCards'
+import {getOwnedCards, useOwnedCards} from '@/composables/useOwnedCards'
 import {exportPopulatedToMarketString} from '@/libs/DeckParsers'
 import Files from '@/libs/Files'
 
@@ -174,6 +174,25 @@ function removeDuplicates() {
 		}
 	}
 	props.set.cards.splice(0, props.set.cards.length, ...uniqueCards)
+}
+
+const {getOwned} = useOwnedCards()
+function removeOwned() {
+	const grayed = new Set<number>()
+	const occurrenceCount: Record<number, number> = {}
+
+	props.set.cards.forEach((card, index) => {
+		const cardId = card.id
+		occurrenceCount[cardId] = (occurrenceCount[cardId] || 0) + 1
+		const currentOccurrence = occurrenceCount[cardId]
+		const ownedCount = Math.min(getOwned(cardId), 3)
+		if (3 - currentOccurrence < ownedCount) {
+			grayed.add(index)
+		}
+	})
+
+	const filteredCards = props.set.cards.filter((_, index) => !grayed.has(index))
+	props.set.cards.splice(0, props.set.cards.length, ...filteredCards)
 }
 
 // #endregion
@@ -356,6 +375,7 @@ const cardPrices = computed(() => {
 					v-else-if="settings?.setsDisplayAsList"
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
+					:gray-unowned-reverse="settings?.setsGrayUnownedGridReverse"
 					:show-owned-number="settings?.setsShowOwnedNumbers"
 					:item-size="settings?.listSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
@@ -369,6 +389,7 @@ const cardPrices = computed(() => {
 					v-else
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
+					:gray-unowned-reverse="settings?.setsGrayUnownedGridReverse"
 					:show-owned-number="settings?.setsShowOwnedNumbers"
 					:item-size="settings?.gridSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
@@ -437,6 +458,14 @@ const cardPrices = computed(() => {
 								description="Remove duplicate cards from the set"
 								icon-color-class="text-red-400"
 								@click="() => removeDuplicates()"
+							/>
+							<SettingsItem
+								icon="material-symbols:file-copy-off-rounded"
+								title="Remove Owned"
+								class="cursor-pointer hover:bg-red-900"
+								description="Remove cards that are already owned from the set"
+								icon-color-class="text-red-400"
+								@click="() => removeOwned()"
 							/>
 						</SettingsSection>
 

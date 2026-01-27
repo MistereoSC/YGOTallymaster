@@ -2,7 +2,7 @@
 import {TFullCollection, TFullSet} from '@/composables/useCardCollections'
 import SetPreview from './SetPreview.vue'
 import ConfirmCancelModal from '@/components/common/ConfirmCancelModal.vue'
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
 import Button from '@/components/common/Button.vue'
 import DropdownMenu from './DropdownMenu.vue'
 import {Icon} from '@iconify/vue'
@@ -10,16 +10,78 @@ import NameInputModal from '@/components/common/NameInputModal.vue'
 
 const props = defineProps<{
 	collection: TFullCollection
+	searchQuery?: string
+	sortBy?: 'date_desc' | 'date_asc' | 'name_asc' | 'name_desc' | 'cardAmount_asc' | 'cardAmount_desc'
+	allCollections?: TFullCollection[]
 }>()
 const emit = defineEmits<{
 	(e: 'createSet', name: string): void
 	(e: 'cloneSet', set: TFullSet): void
 	(e: 'deleteSet', set: TFullSet): void
 	(e: 'renameSet', set: TFullSet, newName: string): void
+	(e: 'moveSet', set: TFullSet, targetCollection: string): void
 	(e: 'clickSet', set: TFullSet): void
 	(e: 'deleteCollection', collection: TFullCollection): void
 	(e: 'renameCollection', collection: TFullCollection, newName: string): void
 }>()
+
+// -----------------------------------------------------------------
+// #region Collapse State
+// -----------------------------------------------------------------
+
+const isCollapsed = ref(false)
+
+function toggleCollapse() {
+	isCollapsed.value = !isCollapsed.value
+}
+
+// -----------------------------------------------------------------
+// #region Filtered and Sorted Sets
+// -----------------------------------------------------------------
+
+const filteredAndSortedSets = computed(() => {
+	let sets = [...props.collection.sets]
+
+	// Filter by search query
+	if (props.searchQuery && props.searchQuery.trim()) {
+		const query = props.searchQuery.toLowerCase()
+		sets = sets.filter((set) => set.name.toLowerCase().includes(query))
+	}
+
+	// Sort sets
+	if (props.sortBy === 'name_asc') {
+		sets.sort((a, b) => a.name.localeCompare(b.name))
+	} else if (props.sortBy === 'name_desc') {
+		sets.sort((a, b) => b.name.localeCompare(a.name))
+	} else if (props.sortBy === 'cardAmount_asc') {
+		sets.sort((a, b) => a.cards.length - b.cards.length)
+	} else if (props.sortBy === 'cardAmount_desc') {
+		sets.sort((a, b) => b.cards.length - a.cards.length)
+	} else if (props.sortBy === 'date_asc') {
+		sets.sort((a, b) => {
+			const dateA = new Date(a.created_at).getTime()
+			const dateB = new Date(b.created_at).getTime()
+			return dateA - dateB
+		})
+	} else {
+		// Default: sort by date (newest first)
+		sets.sort((a, b) => {
+			const dateA = new Date(a.created_at).getTime()
+			const dateB = new Date(b.created_at).getTime()
+			return dateB - dateA
+		})
+	}
+
+	return sets
+})
+
+const isSearching = computed(() => {
+	return !!(props.searchQuery && props.searchQuery.trim())
+})
+
+const hasNoResults = computed(() => {
+	return isSearching.value && filteredAndSortedSets.value.length === 0
+})
 
 // -----------------------------------------------------------------
 // #region Set Actions
@@ -122,9 +184,18 @@ function _getUniqueSetName(baseName: string): string {
 	<div class="px-4 py-3">
 		<!-- Collection Header -->
 		<div
-			class="w-full bg-linear-to-r from-primary-800 to-primary-700 rounded-lg px-4 py-1 flex items-center justify-between border border-primary-600 shadow-sm"
+			class="w-full bg-linear-to-r from-primary-800 to-primary-700 rounded-lg px-4 py-1 flex items-center justify-between border border-primary-600 shadow-sm cursor-pointer hover:from-primary-750 hover:to-primary-650 transition-colors"
+			@click="toggleCollapse"
 		>
 			<div class="flex items-center gap-3">
+				<Icon
+					:icon="
+						isCollapsed
+							? 'material-symbols:folder-rounded'
+							: 'material-symbols:folder-open-rounded'
+					"
+					class="text-xl text-contrast-600 transition-transform"
+				/>
 				<div class="flex flex-col">
 					<span class="font-semibold text-contrast-700">{{ props.collection.name }}</span>
 					<span class="text-xs text-contrast-500">
@@ -133,31 +204,48 @@ function _getUniqueSetName(baseName: string): string {
 					</span>
 				</div>
 			</div>
-			<DropdownMenu :items="menuItems">
-				<template #trigger>
-					<Button
-						rounded
-						size="small"
-						icon="material-symbols:more-vert"
-						v-tooltip.left="'Actions'"
-					/>
-				</template>
-			</DropdownMenu>
+			<div class="flex items-center gap-2" @click.stop>
+				<DropdownMenu :items="menuItems">
+					<template #trigger>
+						<Button
+							rounded
+							size="small"
+							icon="material-symbols:more-vert"
+							v-tooltip.left="'Actions'"
+						/>
+					</template>
+				</DropdownMenu>
+			</div>
 		</div>
 		<!-- Sets Grid -->
-		<div class="p-3 flex flex-wrap w-full gap-4">
-			<div v-for="set in props.collection.sets" :key="set.name">
+		<div v-if="!isCollapsed" class="p-3 flex flex-wrap w-full gap-4">
+			<!-- Empty State when searching -->
+			<div
+				v-if="hasNoResults"
+				class="w-full flex flex-col items-center justify-center py-8 text-contrast-500"
+			>
+				<Icon icon="material-symbols:search-off-rounded" class="text-4xl mb-2" />
+				<p class="text-sm">No matching sets</p>
+			</div>
+
+			<!-- Set Previews -->
+			<div v-for="set in filteredAndSortedSets" :key="set.name">
 				<SetPreview
 					:set="set"
+					:all-collections="props.allCollections"
+					:current-collection="props.collection.name"
 					@clickSet="() => emit('clickSet', set)"
 					@delete-set="() => onDeleteSet(set)"
 					@rename-set="() => onRenameSet(set)"
 					@clone-set="() => onCloneSet(set)"
+					@move-set="(targetCollection) => emit('moveSet', set, targetCollection)"
 				/>
 			</div>
+
+			<!-- Add Set Button (hidden when searching) -->
 			<div
 				class="w-43.25 h-64.5 grid place-items-center"
-				v-if="props.collection.sets.length < 64"
+				v-if="!isSearching && props.collection.sets.length < 256"
 			>
 				<NameInputModal item-type="Set" @confirm="(name) => onCreateSet(name)">
 					<template #trigger>

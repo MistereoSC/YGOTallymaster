@@ -59,7 +59,7 @@ function getCardCount(collectionName: string, setName: string): number {
 		</ContextMenuTrigger>
 		<ContextMenuPortal>
 			<ContextMenuContent
-				class="min-w-48 max-w-64 z-50 bg-primary-800 outline-none rounded-md p-1 shadow-md shadow-black/50 text-contrast-800"
+				class="scrollable min-w-48 max-w-64 z-50 bg-primary-800 outline-none rounded-md p-1 shadow-md shadow-black/50 text-contrast-800"
 			>
 				<!-- Header -->
 				<ContextMenuLabel class="text-xs text-contrast-500 px-2 py-1 flex">
@@ -92,7 +92,7 @@ function getCardCount(collectionName: string, setName: string): number {
 							</ContextMenuSubTrigger>
 							<ContextMenuPortal>
 								<ContextMenuSubContent
-									class="min-w-48 max-h-80 overflow-y-auto z-50 bg-primary-800 outline-none rounded-md p-1 shadow-md shadow-black/50 text-contrast-800"
+									class="scrollable min-w-48 max-h-80 overflow-y-auto z-50 bg-primary-800 outline-none rounded-md p-1 shadow-md shadow-black/50 text-contrast-800"
 									:side-offset="4"
 								>
 									<!-- Sets in collection -->

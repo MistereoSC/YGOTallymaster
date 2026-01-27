@@ -130,6 +130,28 @@ const useCardCollections = () => {
 		}
 	}
 
+	async function _moveSet(setName: string, oldCollectionName: string, newCollectionName: string) {
+		const success = await renameAndMoveSet(
+			setName,
+			setName,
+			oldCollectionName,
+			newCollectionName
+		)
+		if (success) {
+			const oldCollection = collections.value.find((c) => c.name === oldCollectionName)
+			const newCollection = collections.value.find((c) => c.name === newCollectionName)
+
+			if (oldCollection && newCollection) {
+				const setIndex = oldCollection.sets.findIndex((s) => s.name === setName)
+				if (setIndex !== -1) {
+					const set = oldCollection.sets[setIndex]
+					oldCollection.sets.splice(setIndex, 1)
+					newCollection.sets.unshift(set)
+				}
+			}
+		}
+	}
+
 	/**
 	 * Adds a card to an existing set within a collection.
 	 * Cards are added at the end of the set.
@@ -189,6 +211,7 @@ const useCardCollections = () => {
 		renameSet: _renameSet,
 		deleteCollection: _deleteCollection,
 		renameCollection: _renameCollection,
+		moveSet: _moveSet,
 		addCardToSet: _addCardToSet,
 		getCardCountInSet: _getCardCountInSet,
 		initialized,

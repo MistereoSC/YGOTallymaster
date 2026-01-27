@@ -243,6 +243,7 @@ const cardPrices = computed(() => {
 							:card-size="settings?.decklistGridCardSize || 'tiny'"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@card-shift-click="(card) => onCardShiftLClick(card)"
+							:show-owned-number="settings?.setsShowOwnedNumbers"
 						/>
 					</div>
 					<div>
@@ -300,6 +301,7 @@ const cardPrices = computed(() => {
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@card-shift-click="(card) => onCardShiftLClick(card)"
 							:horizontal="true"
+							:show-owned-number="settings?.setsShowOwnedNumbers"
 						/>
 					</div>
 				</div>

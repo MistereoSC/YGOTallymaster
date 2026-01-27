@@ -356,6 +356,7 @@ const cardPrices = computed(() => {
 					v-else-if="settings?.setsDisplayAsList"
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
+					:show-owned-number="settings?.setsShowOwnedNumbers"
 					:item-size="settings?.listSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:draggable="true"
@@ -368,6 +369,7 @@ const cardPrices = computed(() => {
 					v-else
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
+					:show-owned-number="settings?.setsShowOwnedNumbers"
 					:item-size="settings?.gridSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:draggable="true"

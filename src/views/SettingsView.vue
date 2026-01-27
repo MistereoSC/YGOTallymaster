@@ -213,12 +213,23 @@ function onEnglishNameSearchChange() {
 					<!-- Database Owned Numbers -->
 					<SettingsItem
 						icon="material-symbols:tag-rounded"
-						title="Always Show Owned Numbers"
+						title="Show Owned Numbers (Database)"
 						description="Display ownership count on all cards in Database, Archetypes and Releases tabs"
 					>
 						<Checkbox
 							:model-value="settings?.showOwnedNumbers"
 							@change="toggle.showOwnedNumbers"
+						/>
+					</SettingsItem>
+					<!-- Database Owned Numbers -->
+					<SettingsItem
+						icon="material-symbols:tag-rounded"
+						title="Show Owned Numbers (Sets/Decks)"
+						description="Display ownership count on all cards in Set and Deck Editors"
+					>
+						<Checkbox
+							:model-value="settings?.setsShowOwnedNumbers"
+							@change="toggle.setsShowOwnedNumbers"
 						/>
 					</SettingsItem>
 					<!-- Dim Unowned Cards (Database) -->

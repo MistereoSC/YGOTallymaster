@@ -83,6 +83,11 @@ export const useDatabaseSettings = () => {
 		settings.value.splitDatabaseView = to ?? !settings.value.splitDatabaseView
 		save()
 	}
+	function setsShowOwnedNumbers(to?: boolean) {
+		if (!settings.value) return
+		settings.value.setsShowOwnedNumbers = to ?? !settings.value.setsShowOwnedNumbers
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -131,6 +136,7 @@ export const useDatabaseSettings = () => {
 		descriptionHighlighting,
 		englishNameSearch,
 		splitDatabaseView,
+		setsShowOwnedNumbers,
 	}
 	const setFns = {
 		listSize,
@@ -187,6 +193,7 @@ export type TDatabaseSettings = {
 	decklistGridCardSize: TSizes
 	setsGrayUnownedGrid: boolean
 	setsDisplayAsList: boolean
+	setsShowOwnedNumbers: boolean
 
 	cardLanguage: TLanguageCodes
 	descriptionHighlighting: boolean
@@ -210,6 +217,7 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	decklistGridCardSize: 'tiny',
 	setsGrayUnownedGrid: false,
 	setsDisplayAsList: false,
+	setsShowOwnedNumbers: false,
 
 	cardLanguage: 'en',
 	descriptionHighlighting: true,

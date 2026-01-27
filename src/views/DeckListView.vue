@@ -17,24 +17,7 @@ onBeforeMount(async () => {
 	await getFullCardList()
 })
 
-// Search functionality
-const searchInput = ref('')
 const searchQuery = ref('')
-const DEBOUNCE_DELAY = 150
-let debounceTimeout: ReturnType<typeof setTimeout> | null = null
-
-function onSearchInput() {
-	if (debounceTimeout) clearTimeout(debounceTimeout)
-	debounceTimeout = setTimeout(() => {
-		searchQuery.value = searchInput.value.trim().toLowerCase()
-	}, DEBOUNCE_DELAY)
-}
-
-function onResetSearch() {
-	searchInput.value = ''
-	searchQuery.value = ''
-}
-
 const filteredDeckList = computed(() => {
 	if (!searchQuery.value) {
 		return deckList.value

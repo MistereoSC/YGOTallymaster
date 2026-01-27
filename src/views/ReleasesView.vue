@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
 import ArchetypeList from '@/components/database/ArchetypeList.vue'
 import VirtualListCustom from '@/components/database/VirtualListCustom.vue'

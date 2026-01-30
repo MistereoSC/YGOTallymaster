@@ -151,7 +151,7 @@ const sortOptions = ref([
 	{value: ESortBy.DEF_Desc, label: 'DEF (High-Low)', icon: 'material-symbols:shield'},
 	{value: ESortBy.Type, label: 'Card Type', icon: 'material-symbols:category'},
 	{value: 'Deck Order' as ESortBy, label: 'Deck Order', icon: 'material-symbols:view-list'},
-] as Array<{value: string; label: string; icon: string}>)
+] as Array<{value: ESortBy | ESortByPriceCM | ESortByPriceTCGP; label: string; icon: string}>)
 watch(
 	() => settingsInitialized.value,
 	(newVal) => {
@@ -187,7 +187,7 @@ watch(
 	{immediate: true}
 )
 
-function sortCards(sortBy: ESortBy) {
+function sortCards(sortBy: ESortBy | ESortByPriceCM | ESortByPriceTCGP) {
 	//@ts-ignore
 	if (sortBy === 'Deck Order') {
 		const sorted = sortByDeckOrder([...props.set.cards])

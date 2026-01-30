@@ -209,6 +209,31 @@ function removeDuplicates() {
 	}
 	props.set.cards.splice(0, props.set.cards.length, ...uniqueCards)
 }
+// for every card in the set, add duplicates until there are 3 copies
+function addDuplicates() {
+	const cardCounts: Record<number, number> = {}
+	// const cardsToAdd: TCardData[] = []
+
+	for (const card of props.set.cards) {
+		cardCounts[card.id] = (cardCounts[card.id] || 0) + 1
+	}
+
+	for (const cardId in cardCounts) {
+		const count = cardCounts[cardId]
+		const copiesToAdd = 3 - count
+		if (copiesToAdd > 0) {
+			const cardDataIndex = props.set.cards.findIndex((c) => c.id === parseInt(cardId))
+			if (cardDataIndex !== -1) {
+				for (let i = 0; i < copiesToAdd; i++) {
+					// cardsToAdd.push(props.set.cards[cardDataIndex])
+					props.set.cards.splice(cardDataIndex + 1, 0, props.set.cards[cardDataIndex])
+				}
+			}
+		}
+	}
+
+	// props.set.cards.push(...cardsToAdd)
+}
 
 const {getOwned} = useOwnedCards()
 function removeOwned() {
@@ -494,6 +519,14 @@ const cardPrices = computed(() => {
 								description="Remove duplicate cards from the set"
 								icon-color-class="text-red-400"
 								@click="() => removeDuplicates()"
+							/>
+							<SettingsItem
+								icon="material-symbols:file-copy-rounded"
+								title="Add Duplicates"
+								class="cursor-pointer hover:bg-red-900"
+								description="Add duplicate cards to the set until there are 3 copies of each"
+								icon-color-class="text-red-400"
+								@click="() => addDuplicates()"
 							/>
 							<SettingsItem
 								icon="material-symbols:file-copy-off-rounded"

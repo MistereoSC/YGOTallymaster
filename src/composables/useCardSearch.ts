@@ -13,7 +13,7 @@ import MiniSearch from 'minisearch'
 import {ref, markRaw} from 'vue'
 import {getReadyCardIds} from './useOwnedCards'
 import {getSetCardIds} from './useCardCollections'
-import {ESortBy} from '@/libs/interfaces/searchTypes'
+import {ESortBy, ESortByPriceCM, ESortByPriceTCGP} from '@/libs/interfaces/searchTypes'
 import {getSettings} from './useDatabaseSettings'
 
 // -----------------------------------------------------------
@@ -96,7 +96,7 @@ const TOKENIZE_FN = (text: string) => {
 }
 
 // Re-export ESortBy from searchTypes to maintain backwards compatibility
-export {ESortBy} from '@/libs/interfaces/searchTypes'
+export {ESortBy, ESortByPriceCM, ESortByPriceTCGP} from '@/libs/interfaces/searchTypes'
 
 // #endregion
 // -----------------------------------------------------------
@@ -575,7 +575,7 @@ const _find = {
 // #region Sort Functions
 // -----------------------------------------------------------
 
-function _sort(by: ESortBy, cardList: TCardData[]) {
+function _sort(by: ESortBy | ESortByPriceCM | ESortByPriceTCGP, cardList: TCardData[]) {
 	switch (by) {
 		case ESortBy.Search_Score:
 			if (activeQuery.value.term)
@@ -662,6 +662,34 @@ function _sort(by: ESortBy, cardList: TCardData[]) {
 				// If both are the same type, sort by race
 				const raceComparison = a.race?.localeCompare(b.race ?? '') ?? 0
 				return raceComparison === 0 ? a.name.localeCompare(b.name) : raceComparison
+			})
+		case ESortByPriceCM.Price_Cardmarket_Asc:
+			return cardList.sort((a, b) => {
+				const priceA = parseFloat(a.card_prices[0]?.cardmarket_price || '9999')
+				const priceB = parseFloat(b.card_prices[0]?.cardmarket_price || '9999')
+				const priceComparison = priceA - priceB
+				return priceComparison === 0 ? a.name.localeCompare(b.name) : priceComparison
+			})
+		case ESortByPriceCM.Price_Cardmarket_Desc:
+			return cardList.sort((a, b) => {
+				const priceA = parseFloat(a.card_prices[0]?.cardmarket_price || '0')
+				const priceB = parseFloat(b.card_prices[0]?.cardmarket_price || '0')
+				const priceComparison = priceB - priceA
+				return priceComparison === 0 ? a.name.localeCompare(b.name) : priceComparison
+			})
+		case ESortByPriceTCGP.Price_TCGPlayer_Asc:
+			return cardList.sort((a, b) => {
+				const priceA = parseFloat(a.card_prices[0]?.tcgplayer_price || '9999')
+				const priceB = parseFloat(b.card_prices[0]?.tcgplayer_price || '9999')
+				const priceComparison = priceA - priceB
+				return priceComparison === 0 ? a.name.localeCompare(b.name) : priceComparison
+			})
+		case ESortByPriceTCGP.Price_TCGPlayer_Desc:
+			return cardList.sort((a, b) => {
+				const priceA = parseFloat(a.card_prices[0]?.tcgplayer_price || '0')
+				const priceB = parseFloat(b.card_prices[0]?.tcgplayer_price || '0')
+				const priceComparison = priceB - priceA
+				return priceComparison === 0 ? a.name.localeCompare(b.name) : priceComparison
 			})
 
 		default:

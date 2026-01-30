@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {TFullSet, useCardCollections} from '@/composables/useCardCollections'
-import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
+import {computed, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import Button from '@/components/common/Button.vue'
 import {Icon} from '@iconify/vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
-import {ESortBy, _sort} from '@/composables/useCardSearch'
+import {ESortBy, ESortByPriceCM, ESortByPriceTCGP, _sort} from '@/composables/useCardSearch'
 import CardFullView from '@/components/database/CardFullView.vue'
 import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import CardFilter from '@/components/database/CardFilter.vue'
@@ -22,7 +22,7 @@ import {exportPopulatedToMarketString} from '@/libs/DeckParsers'
 import Files from '@/libs/Files'
 
 const {addToast} = useToast()
-const {settings} = useDatabaseSettings()
+const {settings, initialized: settingsInitialized} = useDatabaseSettings()
 const {resetSearch, fullCardList, searchResults, search, initialized} = useCardSearch()
 const {saveSet} = useCardCollections()
 
@@ -136,7 +136,7 @@ function onDeckAreaWheel(e: WheelEvent) {
 // ----------------------------------------------
 // #region Sorting and Utilities
 // ----------------------------------------------
-const sortOptions = [
+const sortOptions = ref([
 	{value: ESortBy.Name_Asc, label: 'Name (A-Z)', icon: 'material-symbols:sort-by-alpha'},
 	{value: ESortBy.Name_Desc, label: 'Name (Z-A)', icon: 'material-symbols:sort-by-alpha'},
 	{value: ESortBy.TCG_Date_Asc, label: 'Date (Old-New)', icon: 'material-symbols:calendar-month'},
@@ -151,7 +151,41 @@ const sortOptions = [
 	{value: ESortBy.DEF_Desc, label: 'DEF (High-Low)', icon: 'material-symbols:shield'},
 	{value: ESortBy.Type, label: 'Card Type', icon: 'material-symbols:category'},
 	{value: 'Deck Order' as ESortBy, label: 'Deck Order', icon: 'material-symbols:view-list'},
-]
+] as Array<{value: string; label: string; icon: string}>)
+watch(
+	() => settingsInitialized.value,
+	(newVal) => {
+		if (newVal === 'ready')
+			if (settings.value?.cardPricesVendor === 'cardmarket_price') {
+				sortOptions.value.push(
+					{
+						value: ESortByPriceCM.Price_Cardmarket_Asc,
+						label: 'Price (Low-High)',
+						icon: 'tabler:currency-dollar',
+					},
+					{
+						value: ESortByPriceCM.Price_Cardmarket_Desc,
+						label: 'Price (High-Low)',
+						icon: 'tabler:currency-dollar',
+					}
+				)
+			} else if (settings.value?.cardPricesVendor === 'tcgplayer_price') {
+				sortOptions.value.push(
+					{
+						value: ESortByPriceTCGP.Price_TCGPlayer_Asc,
+						label: 'Price (Low-High)',
+						icon: 'tabler:currency-dollar',
+					},
+					{
+						value: ESortByPriceTCGP.Price_TCGPlayer_Desc,
+						label: 'Price (High-Low)',
+						icon: 'tabler:currency-dollar',
+					}
+				)
+			}
+	},
+	{immediate: true}
+)
 
 function sortCards(sortBy: ESortBy) {
 	//@ts-ignore
@@ -413,7 +447,7 @@ const cardPrices = computed(() => {
 					<div
 						class="max-h-[50vh] overflow-y-scroll scrollable border-b border-primary-500 p-2 pr-1"
 					>
-						<CardFilter :search-while-typing="true" :show-set-filter="true"/>
+						<CardFilter :search-while-typing="true" :show-set-filter="true" />
 					</div>
 					<div class="h-full overflow-hidden">
 						<CardListVirtualList

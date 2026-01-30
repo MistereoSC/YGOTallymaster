@@ -13,3 +13,13 @@ export enum ESortBy {
 	Type = 'Card Type',
 	Search_Score = 'Text Search Score',
 }
+
+export enum ESortByPriceCM {
+	Price_Cardmarket_Asc = 'Price (Low-High) ',
+	Price_Cardmarket_Desc = 'Price (High-Low) ',
+}
+
+export enum ESortByPriceTCGP {
+	Price_TCGPlayer_Asc = 'Price (Low-High)',
+	Price_TCGPlayer_Desc = 'Price (High-Low)',
+}

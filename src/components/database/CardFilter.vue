@@ -7,6 +7,8 @@ import {
 	type TSearchQuery,
 	type TCoreCardType,
 	ESortBy,
+	ESortByPriceCM,
+	ESortByPriceTCGP,
 	useCardSearch,
 } from '@/composables/useCardSearch'
 import ToggleButton from '@/components/common/ToggleButton.vue'
@@ -32,6 +34,7 @@ import CardLinkSelection from './CardLinkSelection.vue'
 import FilterSection from './FilterSection.vue'
 import ToggleButtonGroup from '@/components/common/ToggleButtonGroup.vue'
 import SetFilterSelector from './SetFilterSelector.vue'
+import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 
 const props = defineProps<{
 	searchWhileTyping?: boolean
@@ -44,6 +47,7 @@ const props = defineProps<{
 // -----------------------------------------
 
 const {search, resetSearch, activeQuery, sortedBy, sort} = useCardSearch()
+const {settings} = useDatabaseSettings()
 const searchInput = ref(activeQuery.value.term || '')
 
 // Flag to track self-initiated changes to activeQuery
@@ -290,6 +294,16 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 					<option v-for="(label, key) in ESortBy" :key="key" :value="label">
 						{{ label }}
 					</option>
+					<template v-if="settings?.cardPricesVendor === 'cardmarket_price'">
+						<option v-for="(label, key) in ESortByPriceCM" :key="key" :value="label">
+							{{ label }}
+						</option>
+					</template>
+					<template v-else-if="settings?.cardPricesVendor === 'tcgplayer_price'">
+						<option v-for="(label, key) in ESortByPriceTCGP" :key="key" :value="label">
+							{{ label }}
+						</option>
+					</template>
 				</select>
 				<Icon
 					icon="material-symbols:arrow-drop-down-rounded"

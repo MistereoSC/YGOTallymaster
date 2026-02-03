@@ -1,9 +1,18 @@
 <script lang="ts" setup>
-import {onMounted, ref, computed, onUnmounted, nextTick, watch} from 'vue'
+import {
+	onMounted,
+	ref,
+	computed,
+	onUnmounted,
+	nextTick,
+	watch,
+	type ComponentPublicInstance,
+} from 'vue'
 import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardPreview from '@/components/database/CardPreview.vue'
 import {Icon} from '@iconify/vue'
-import CardContextMenu from '../cards/CardContextMenu.vue'
+import CardContextMenu from '@/components/cards/CardContextMenu.vue'
+import {useToast} from '@/composables/useToast'
 
 interface IProps {
 	cardList: TCardData[]
@@ -17,11 +26,14 @@ interface IProps {
 	grayUnowned?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 	showCardContextMenu?: boolean
+	showRefreshImageButton?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
 	itemGapPx: 16,
 	containerPaddingPx: 8,
+
+	showRefreshImageButton: false,
 })
 
 const emit = defineEmits<{
@@ -133,6 +145,23 @@ function onHoverEnter(card: TCardData) {
 	emit('cardHovered', card)
 }
 
+// Map to store refs to CardPreview components by card ID
+const cardPreviewRefs = ref<Map<number, InstanceType<typeof CardPreview>>>(new Map())
+function setCardPreviewRef(cardId: number, el: ComponentPublicInstance | Element | null) {
+	if (el) {
+		cardPreviewRefs.value.set(cardId, el as InstanceType<typeof CardPreview>)
+	} else {
+		cardPreviewRefs.value.delete(cardId)
+	}
+}
+
+async function handleReloadImage(cardId: number) {
+	const cardPreview = cardPreviewRefs.value.get(cardId)
+	if (cardPreview && cardPreview.forceReloadImage) {
+		await cardPreview.forceReloadImage()
+	}
+}
+
 // #endregion
 // ----------------------------------------------
 // #region Setup
@@ -238,8 +267,14 @@ defineExpose({
 				}"
 			>
 				<div v-for="{card} in visibleCards" :key="card.id">
-					<CardContextMenu :card="card" :disabled="!props.showCardContextMenu">
+					<CardContextMenu
+						:card="card"
+						:disabled="!props.showCardContextMenu"
+						:show-reload-image-button="props.showRefreshImageButton"
+						@reload-image="handleReloadImage"
+					>
 						<CardPreview
+							:ref="(el) => setCardPreviewRef(card.id, el)"
 							:card="card"
 							:active="card.id === props.activeCardId"
 							:size="props.itemSize"

@@ -20,10 +20,16 @@ import {useToast} from '@/composables/useToast'
 interface IProps {
 	card: TCardData
 	disabled?: boolean
+	showReloadImageButton?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	disabled: false,
+	showReloadImageButton: false,
 })
+
+const emit = defineEmits<{
+	(e: 'reloadImage', cardId: number): void
+}>()
 
 const {collections, addCardToSet, getCardCountInSet} = useCardCollections()
 const {addToast} = useToast()
@@ -39,6 +45,10 @@ async function handleAddToSet(collectionName: string, setName: string) {
 	} else {
 		addToast(`"${props.card.name}" already has 3 copies in ${setName}`, 'warning')
 	}
+}
+
+function handleReloadImage() {
+	emit('reloadImage', props.card.id)
 }
 
 function getCardCount(collectionName: string, setName: string): number {
@@ -131,6 +141,21 @@ function getCardCount(collectionName: string, setName: string): number {
 					<Icon icon="material-symbols:info-outline-rounded" class="mr-2 text-lg" />
 					No collections with sets
 				</div>
+
+				<!-- Reload Image Button -->
+				<template v-if="props.showReloadImageButton">
+					<ContextMenuSeparator class="h-px bg-primary-600 mx-1 my-1" />
+					<ContextMenuItem
+						class="group text-sm cursor-pointer leading-none rounded-[3px] flex items-center h-7 relative px-2 select-none outline-none data-highlighted:bg-accent-500"
+						@select="handleReloadImage"
+					>
+						<Icon
+							icon="material-symbols:refresh-rounded"
+							class="mr-2 text-lg text-secondary-400"
+						/>
+						Re-Fetch Image
+					</ContextMenuItem>
+				</template>
 			</ContextMenuContent>
 		</ContextMenuPortal>
 	</ContextMenuRoot>

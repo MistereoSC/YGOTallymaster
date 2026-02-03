@@ -41,9 +41,13 @@ const numOwned = computed(() => {
 onMounted(async () => {
 	await getPreviewImage()
 })
-async function getPreviewImage() {
+async function getPreviewImage(forceReload: boolean = false) {
 	try {
-		const result = await loadImage(props.card.id, props.size === 'large' ? 'normal' : 'small')
+		const result = await loadImage(
+			props.card.id,
+			props.size === 'large' ? 'normal' : 'small',
+			forceReload
+		)
 		if (result.success && result.localPath) {
 			// Get image as data URL to avoid file:// protocol issues
 			const dataUrlResult = await window.electronImage.getDataUrl(result.localPath)
@@ -65,6 +69,17 @@ async function getPreviewImage() {
 		isLoading.value = false
 	}
 }
+
+async function forceReloadImage() {
+	imageUrl.value = null
+	isLoading.value = true
+	hasError.value = false
+	await getPreviewImage(true)
+}
+
+defineExpose({
+	forceReloadImage,
+})
 watch(
 	() => props.card.id,
 	(newVal, oldVal) => {
@@ -78,7 +93,7 @@ watch(
 )
 
 function onClick(e: PointerEvent) {
-	if(e.shiftKey) emit('shiftClick', props.card)
+	if (e.shiftKey) emit('shiftClick', props.card)
 	else emit('click', props.card)
 }
 </script>

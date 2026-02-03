@@ -161,6 +161,7 @@ const {settings} = useDatabaseSettings()
 				:gray-unowned="settings?.grayUnowned"
 				:show-banlist-for="settings?.showBanlistFor || 'none'"
 				:show-card-context-menu="true"
+				:show-refresh-image-button="true"
 			/>
 
 			<div

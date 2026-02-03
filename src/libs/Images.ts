@@ -8,7 +8,8 @@ export interface ImageResult {
 
 export async function loadImage(
 	cardId: string | number,
-	size: 'small' | 'normal' | 'cropped' = 'small'
+	size: 'small' | 'normal' | 'cropped' = 'small',
+	forceReload: boolean = false
 ): Promise<ImageResult> {
 	try {
 		let imageUrl = 'https://images.ygoprodeck.com/images/cards'
@@ -20,14 +21,16 @@ export async function loadImage(
 		const localPath = `/images/cards/${size}/${cardId}.jpg`
 		const fullLocalPath = appPath + localPath
 
-		// Check if image already exists locally
-		const existsResult = (await Files.exists(localPath)).exists
-		if (existsResult) {
-			// console.debug('Image:::Download::Card already on disk', cardId)
-			return {success: true, localPath: fullLocalPath}
+		// Check if image already exists locally (skip if forceReload is true)
+		if (!forceReload) {
+			const existsResult = (await Files.exists(localPath)).exists
+			if (existsResult) {
+				// console.debug('Image:::Download::Card already on disk', cardId)
+				return {success: true, localPath: fullLocalPath}
+			}
 		}
 
-		// Image doesn't exist, download it
+		// Image doesn't exist or forceReload is true, download it
 		// console.debug('Image:::Download::Downloading image for card', cardId)
 		const downloadResult = await window.electronImage.downloadImage(imageUrl, fullLocalPath)
 		if (!downloadResult.success) {

@@ -200,6 +200,7 @@ const emit = defineEmits<{
 			</div>
 			<div class="p-4">
 				<span
+					v-if="card.misc_info[0].tcg_date"
 					class="leading-relaxed whitespace-pre-line font-semibold text-contrast-600 text-sm flex gap-2"
 				>
 					<div class="flex">
@@ -215,6 +216,9 @@ const emit = defineEmits<{
 							{{ card.card_prices[0].tcgplayer_price || 'Unknown' }} </span
 						>$
 					</div>
+				</span>
+				<span v-else class="text-contrast-300 text-sm">
+					Prices unavailable for unreleased cards.
 				</span>
 			</div>
 		</div>

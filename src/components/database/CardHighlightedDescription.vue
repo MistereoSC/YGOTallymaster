@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import {TFrameType} from '@/libs/interfaces/YGOProInterfaces'
+
 const props = defineProps<{
 	description: string
-	frameType?: string
+	frameType?: TFrameType
 	displayLinks?: boolean
 }>()
 const emit = defineEmits<{
@@ -79,8 +81,21 @@ function replaceQuotedCardNames(text: string, markers: typeof MARKERS): string {
 }
 
 function getDescriptionWithHighlights(): string {
+	if (props.frameType === 'token' || props.frameType === 'normal')
+		return `<i class="desc-flavor">${props.description}</i>`
+
 	let description = props.description
 
+	// 0. Replace pendulum-normal flavor text
+	let pendulumFlavorText = ''
+	if (props.frameType === 'normal_pendulum') {
+		const eArr = description.split('\[ Monster Effect \]')
+		if (eArr.length <= 1) return `<i class="desc-flavor">${props.description}</i>`
+		pendulumFlavorText = eArr[1].trim()
+		description = eArr[0].trim() + MARKERS.SPACER + '\n[ Monster Effect ]\n'
+	}
+
+	// 0. Normalize bullet points to start on new lines
 	description = description.replace(/[^\n]\●/g, '\n\●')
 
 	// 1. Highlight Pendulum Effect section headers
@@ -129,7 +144,7 @@ function getDescriptionWithHighlights(): string {
 		}
 	)
 
-	description = description.replace(/\./g, `.\n${MARKERS.SPACER}`)
+	description = description.replace(/\. /g, `.\n${MARKERS.SPACER}`)
 
 	// 6. Replace quoted text with clickable links (before escaping)
 	description = replaceQuotedCardNames(description, MARKERS)
@@ -147,6 +162,10 @@ function getDescriptionWithHighlights(): string {
 		.replace(new RegExp(MARKERS.COST_END, 'g'), '</span>')
 		.replace(new RegExp(MARKERS.BOLD_START, 'g'), '<strong>')
 		.replace(new RegExp(MARKERS.BOLD_END, 'g'), '</strong>')
+
+	if (props.frameType === 'normal_pendulum' && pendulumFlavorText) {
+		description += `<i class="desc-flavor">${pendulumFlavorText}</i>`
+	}
 
 	if (props.displayLinks)
 		description = description
@@ -253,6 +272,11 @@ function onDescriptionClick(event: MouseEvent) {
 	:deep(.desc-spacer) {
 		display: block;
 		height: 0.5rem;
+	}
+
+	:deep(.desc-flavor) {
+		color: var(--color-contrast-500);
+		font-style: italic;
 	}
 }
 </style>

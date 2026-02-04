@@ -10,6 +10,8 @@ import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
+
+const {settings} = useDatabaseSettings()
 const {searchResults, fullCardList, resetSearch, search} = useCardSearch()
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
@@ -75,11 +77,6 @@ function onCardShiftLClick(card: TCardData) {
 	const searchTerm = card.archetype || card.name
 	search({term: searchTerm})
 }
-// #endregion
-// ----------------------------------------------
-// #region Settings
-// ----------------------------------------------
-const {settings} = useDatabaseSettings()
 
 // #endregion
 // ----------------------------------------------
@@ -123,11 +120,10 @@ const {settings} = useDatabaseSettings()
 		>
 			<div
 				v-if="settings?.splitDatabaseView"
-				class="border-l border-primary-600 min-w-96 w-[25vw] max-w-116 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+				class="border-r border-primary-600 min-w-96 w-[25vw] max-w-116 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
-				<div class="h-full overflow-y-scroll scrollable p-3 pr-2">
+				<div class="h-full overflow-y-scroll scrollable p-3 pr-2" v-if="activeCard">
 					<CardFullView
-						v-if="activeCard"
 						:card="activeCard"
 						:description-highlighting="settings?.descriptionHighlighting"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"

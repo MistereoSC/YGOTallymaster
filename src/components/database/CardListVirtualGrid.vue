@@ -12,7 +12,6 @@ import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardPreview from '@/components/database/CardPreview.vue'
 import {Icon} from '@iconify/vue'
 import CardContextMenu from '@/components/cards/CardContextMenu.vue'
-import {useToast} from '@/composables/useToast'
 
 interface IProps {
 	cardList: TCardData[]

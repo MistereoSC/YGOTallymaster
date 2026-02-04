@@ -32,6 +32,7 @@ const MARKERS = {
 	LINK_END: '\x00LINK_E\x00',
 	BOLD_START: '\x00BOLD_S\x00',
 	BOLD_END: '\x00BOLD_E\x00',
+	SPACER: '\x00SPC\x00',
 }
 
 function replaceQuotedCardNames(text: string, markers: typeof MARKERS): string {
@@ -79,6 +80,7 @@ function replaceQuotedCardNames(text: string, markers: typeof MARKERS): string {
 
 function getDescriptionWithHighlights(): string {
 	let description = props.description
+
 	description = description.replace(/[^\n]\●/g, '\n\●')
 
 	// 1. Highlight Pendulum Effect section headers
@@ -127,11 +129,14 @@ function getDescriptionWithHighlights(): string {
 		}
 	)
 
+	description = description.replace(/\./g, `.\n${MARKERS.SPACER}`)
+
 	// 6. Replace quoted text with clickable links (before escaping)
 	description = replaceQuotedCardNames(description, MARKERS)
 
 	description = escapeHtml(description)
 	description = description
+		.replace(new RegExp(MARKERS.SPACER, 'g'), '<span class="desc-spacer"></span>')
 		.replace(new RegExp(MARKERS.SECTION_START, 'g'), '<span class="desc-section-header">')
 		.replace(new RegExp(MARKERS.SECTION_END, 'g'), '</span>')
 		.replace(new RegExp(MARKERS.SUMMON_START, 'g'), '<span class="desc-summon-material">')
@@ -243,6 +248,11 @@ function onDescriptionClick(event: MouseEvent) {
 	:deep(.desc-card-quote) {
 		color: var(--color-accent-100);
 		border-bottom: 1px dashed var(--color-primary-400);
+	}
+
+	:deep(.desc-spacer) {
+		display: block;
+		height: 0.5rem;
 	}
 }
 </style>

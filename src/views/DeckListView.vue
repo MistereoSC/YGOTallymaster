@@ -168,7 +168,7 @@ function _getUniqueName(name: string): string {
 					<button
 						v-if="searchQuery"
 						@click="searchQuery = ''"
-						class="absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 hover:text-contrast-700 transition-colors"
+						class="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 hover:text-contrast-700 transition-colors"
 					>
 						<Icon icon="material-symbols:close-rounded" class="text-lg" />
 					</button>

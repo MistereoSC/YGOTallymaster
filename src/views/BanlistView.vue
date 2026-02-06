@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {onMounted, ref, watch} from 'vue'
+import {onMounted, ref, watch, computed} from 'vue'
 import Spinner from '@/components/common/Spinner.vue'
 import {getBanlist} from '@/libs/Banlist'
 import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
@@ -48,6 +48,35 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 	activeBanlist.value = to ?? 'ban_tcg'
 	await initializeList()
 }
+
+// Search functionality
+const searchInput = ref('')
+
+const DEBOUNCE_DELAY = 100
+let debounceTimeout: ReturnType<typeof setTimeout> | null = null
+function onSearchInput(e: KeyboardEvent) {
+	if (e.key === 'Enter') {
+		return
+	}
+	if (debounceTimeout) clearTimeout(debounceTimeout)
+	debounceTimeout = setTimeout(() => {}, DEBOUNCE_DELAY)
+}
+function onReset() {
+	searchInput.value = ''
+}
+
+const filteredBanlist = computed(() => {
+	if (!banlist.value) return null
+	const query = searchInput.value.trim().toLowerCase()
+	if (query === '') {
+		return [...banlist.value.forbidden, ...banlist.value.limited, ...banlist.value.semi_limited]
+	}
+	return [
+		...banlist.value.forbidden.filter((card) => card.name.toLowerCase().includes(query)),
+		...banlist.value.limited.filter((card) => card.name.toLowerCase().includes(query)),
+		...banlist.value.semi_limited.filter((card) => card.name.toLowerCase().includes(query)),
+	]
+})
 </script>
 
 <template>
@@ -56,18 +85,42 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 			<div
 				class="h-12 w-full flex justify-between px-4 py-1 items-center bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
 			>
-				<div class="flex gap-3 items-center">
-					<div class="flex flex-col">
-						<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
-							Banlist
-						</h2>
-						<p class="text-xs text-contrast-500">
-							<span class="font-medium">
-								{{ banlist.forbidden.length }} Forbidden |
-								{{ banlist.limited.length }} Limited |
-								{{ banlist.semi_limited.length }} Semi-Limited
-							</span>
-						</p>
+				<div class="flex items-center gap-3 flex-1">
+					<div class="flex gap-3 items-center">
+						<div class="flex flex-col">
+							<h2 class="font-semibold text-contrast-700 text-sm leading-tight">
+								Banlist
+							</h2>
+							<p class="text-xs text-contrast-500">
+								<span class="font-medium">
+									{{ banlist.forbidden.length }} Forbidden |
+									{{ banlist.limited.length }} Limited |
+									{{ banlist.semi_limited.length }} Semi-Limited
+								</span>
+							</p>
+						</div>
+					</div>
+
+					<!-- Search Field -->
+					<div class="relative ml-4 flex-1 max-w-xs">
+						<Icon
+							icon="material-symbols:search-rounded"
+							class="absolute left-2.5 top-1/2 -translate-y-1/2 text-contrast-500 text-lg"
+						/>
+						<input
+							v-model="searchInput"
+							@keyup="(e) => onSearchInput(e)"
+							type="text"
+							placeholder="Search cards..."
+							class="w-full bg-primary-800 text-contrast-700 placeholder-contrast-500 rounded-md pl-9 pr-3 py-1.5 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors"
+						/>
+						<button
+							v-if="searchInput"
+							@click="onReset"
+							class="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 hover:text-contrast-700 transition-colors"
+						>
+							<Icon icon="material-symbols:close-rounded" class="text-lg" />
+						</button>
 					</div>
 				</div>
 				<div class="relative">
@@ -94,7 +147,7 @@ async function switchBanlist(to: keyof typeof EBanlistFormat) {
 			</div>
 			<div class="h-full w-full grid grid-cols-[1fr_auto] overflow-hidden">
 				<CardListVirtualList
-					:cardList="[...banlist.forbidden, ...banlist.limited, ...banlist.semi_limited]"
+					:cardList="filteredBanlist ?? []"
 					:item-size="'small'"
 					@card-clicked="(card) => (activeCard = card)"
 					:active-card-id="activeCard?.id"

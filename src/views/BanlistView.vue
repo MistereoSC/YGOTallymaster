@@ -164,6 +164,7 @@ const filteredBanlist = computed(() => {
 							:description-highlighting="settings?.descriptionHighlighting"
 							:show-banlist-for="activeBanlist && 'ban_tcg'"
 							:show-card-prices="settings?.cardPricesVendor !== 'none'"
+							:show-release-info="settings?.showDescriptionReleases"
 						/>
 					</div>
 				</div>

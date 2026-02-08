@@ -13,6 +13,7 @@ const props = defineProps<{
 	descriptionHighlighting?: boolean
 	linkHighlighting?: boolean
 	showCardPrices?: boolean
+	showReleaseInfo?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -20,6 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const filteredSets = computed(() => {
+	if(!props.card.card_sets) return null
 	const seen = new Set<string>()
 	return props.card.card_sets.filter((set) => {
 		const code = set.set_code
@@ -172,7 +174,7 @@ const filteredSets = computed(() => {
 		</div>
 
 		<!-- Releases -->
-		<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600">
+		<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600" v-if="props.showReleaseInfo">
 			<div class="px-4 py-2 bg-primary-700/50 border-b border-primary-600">
 				<span class="text-xs font-semibold text-contrast-400 uppercase tracking-wider"
 					>Releases</span
@@ -197,8 +199,8 @@ const filteredSets = computed(() => {
 					</div>
 				</span>
 
-				<div class="w-full h-px bg-gray-500 my-2"></div>
-				<div class="px-4">
+				<div class="w-full h-px bg-gray-500 my-2" v-if="filteredSets"></div>
+				<div class="px-4" v-if="filteredSets">
 					<span
 						v-for="set in filteredSets"
 						class="leading-relaxed whitespace-pre-line font-semibold text-contrast-600 text-sm flex gap-2"

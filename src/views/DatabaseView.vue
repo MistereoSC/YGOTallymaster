@@ -128,6 +128,7 @@ function onCardShiftLClick(card: TCardData) {
 						:description-highlighting="settings?.descriptionHighlighting"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 						:show-card-prices="settings?.cardPricesVendor !== 'none'"
+						:show-release-info="settings?.showDescriptionReleases"
 					/>
 				</div>
 			</div>
@@ -172,6 +173,7 @@ function onCardShiftLClick(card: TCardData) {
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 						:show-card-prices="settings?.cardPricesVendor !== 'none'"
 						:show-md-rarity="settings?.displayMDRarity"
+						:show-release-info="settings?.showDescriptionReleases"
 					/>
 					<CardFilter
 						:search-while-typing="true"

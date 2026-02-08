@@ -163,6 +163,34 @@ const cardPrices = computed(() => {
 		}, 0)
 		.toFixed(2)
 })
+
+const amountMainMonsters = computed(() => {
+	return cards.value.main.filter((c) => c.frameType !== 'spell' && c.frameType !== 'trap').length
+})
+const amountMainSpells = computed(() => {
+	return cards.value.main.filter((c) => c.frameType === 'spell').length
+})
+const amountMainTraps = computed(() => {
+	return cards.value.main.filter((c) => c.frameType === 'trap').length
+})
+
+const amountExtraLink = computed(() => {
+	return cards.value.extra.filter((c) => c.frameType === 'link').length
+})
+const amountExtraSynchro = computed(() => {
+	return cards.value.extra.filter(
+		(c) => c.frameType === 'synchro' || c.frameType === 'synchro_pendulum'
+	).length
+})
+const amountExtraXyz = computed(() => {
+	return cards.value.extra.filter((c) => c.frameType === 'xyz' || c.frameType === 'xyz_pendulum')
+		.length
+})
+const amountExtraFusion = computed(() => {
+	return cards.value.extra.filter(
+		(c) => c.frameType === 'fusion' || c.frameType === 'fusion_pendulum'
+	).length
+})
 </script>
 
 <template>
@@ -235,22 +263,9 @@ const cardPrices = computed(() => {
 			</div>
 			<div class="h-full grid grid-rows-[1fr_auto_auto] overflow-hidden">
 				<div class="overflow-hidden grid grid-rows-[auto_auto_1fr] relative">
-					<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-12">
-						<DeckCardGrid
-							v-model="cards.main"
-							@cardHover="onCardHover"
-							:gray-unowned="settings?.decklistGrayUnownedGrid"
-							:card-size="settings?.decklistGridCardSize || 'tiny'"
-							:show-banlist-for="settings?.showBanlistFor || 'none'"
-							@card-shift-click="(card) => onCardShiftLClick(card)"
-							:show-owned-number="settings?.setsShowOwnedNumbers"
-							:show-owned-heart="settings?.setsShowOwnedHeart"
-							:show-md-rarity="settings?.displayMDRarity"
-						/>
-					</div>
 					<div>
 						<div
-							class="absolute items-center flex top-0 left-0 right-0 px-3 py-1 bg-linear-to-r from-primary-700/95 to-primary-800/90 backdrop-blur-sm border-b border-primary-600"
+							class="items-center flex px-3 py-1 bg-linear-to-r from-primary-700/95 to-primary-800/90 backdrop-blur-sm border-b border-primary-600"
 						>
 							<div class="flex items-center gap-2">
 								<Icon
@@ -269,7 +284,44 @@ const cardPrices = computed(() => {
 									{{ cards.main.length }}
 								</span>
 							</div>
+
+							<div class="flex items-center gap-3 ml-auto px-3">
+								<span class="flex items-center gap-1 text-gray-400 font-semibold">
+									<Icon
+										icon="material-symbols:credit-card"
+										class="text-card-effect text-base"
+									/>
+									{{ amountMainMonsters }}
+								</span>
+								<span class="flex items-center gap-1 text-gray-400 font-semibold">
+									<Icon
+										icon="material-symbols:credit-card"
+										class="text-card-spell text-base"
+									/>
+									{{ amountMainSpells }}
+								</span>
+								<span class="flex items-center gap-1 text-gray-400 font-semibold">
+									<Icon
+										icon="material-symbols:credit-card"
+										class="text-card-trap text-base"
+									/>
+									{{ amountMainTraps }}
+								</span>
+							</div>
 						</div>
+					</div>
+					<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-2">
+						<DeckCardGrid
+							v-model="cards.main"
+							@cardHover="onCardHover"
+							:gray-unowned="settings?.decklistGrayUnownedGrid"
+							:card-size="settings?.decklistGridCardSize || 'tiny'"
+							:show-banlist-for="settings?.showBanlistFor || 'none'"
+							@card-shift-click="(card) => onCardShiftLClick(card)"
+							:show-owned-number="settings?.setsShowOwnedNumbers"
+							:show-owned-heart="settings?.setsShowOwnedHeart"
+							:show-md-rarity="settings?.displayMDRarity"
+						/>
 					</div>
 				</div>
 				<div class="border-primary-600 border-t overflow-hidden grid grid-rows-[auto_1fr]">
@@ -292,6 +344,49 @@ const cardPrices = computed(() => {
 							>
 								{{ cards.extra.length }}
 							</span>
+							<div class="flex items-center gap-3 ml-auto px-3">
+								<span
+									class="flex items-center gap-1 text-gray-400 font-semibold"
+									v-if="amountExtraLink"
+								>
+									<Icon
+										icon="material-symbols:credit-card"
+										class="text-card-link text-base"
+									/>
+									{{ amountExtraLink }}
+								</span>
+								<span
+									class="flex items-center gap-1 text-gray-400 font-semibold"
+									v-if="amountExtraXyz"
+								>
+									<Icon
+										icon="material-symbols:credit-card"
+										class="text-card-xyz text-base"
+									/>
+									{{ amountExtraXyz }}
+								</span>
+								<span
+									class="flex items-center gap-1 text-gray-400 font-semibold"
+									v-if="amountExtraSynchro"
+								>
+									<Icon
+										icon="material-symbols:credit-card"
+										class="text-card-synchro text-base"
+									/>
+									{{ amountExtraSynchro }}
+								</span>
+
+								<span
+									class="flex items-center gap-1 text-gray-400 font-semibold"
+									v-if="amountExtraFusion"
+								>
+									<Icon
+										icon="material-symbols:credit-card"
+										class="text-card-fusion text-base"
+									/>
+									{{ amountExtraFusion }}
+								</span>
+							</div>
 						</div>
 					</div>
 					<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-1">

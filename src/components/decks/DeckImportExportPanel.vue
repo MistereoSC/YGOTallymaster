@@ -12,6 +12,8 @@ import {useToast} from '@/composables/useToast'
 import {getOwnedCards} from '@/composables/useOwnedCards'
 import Files from '@/libs/Files'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
+import {ref} from 'vue'
+import DeckImportModal from './DeckImportModal.vue'
 
 const {addToast} = useToast()
 const props = defineProps<{
@@ -20,6 +22,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
 	(e: 'ydkImported', ydkContent: string): void
+	(e: 'readableDeckImported', importedCards: TDeckCardsPopulated): void
 }>()
 
 // ---------------------------------------------------------
@@ -122,6 +125,13 @@ async function exportUnownedTxtFile() {
 // #region Import Functions
 // ---------------------------------------------------------
 
+// Paste Decklist Modal
+const showPasteModal = ref(false)
+function onPasteImportApply(importedCards: TDeckCardsPopulated) {
+	emit('readableDeckImported', importedCards)
+	showPasteModal.value = false
+}
+
 async function importYdkFile() {
 	try {
 		const fsDialogOptions = {
@@ -221,6 +231,13 @@ async function _getOwnedMarketString() {
 				description="Copy unowned cards list to clipboard"
 				@click="() => clipboardUnowned()"
 			/>
+			<Button
+				size="small"
+				rounded
+				icon="material-symbols:content-paste-rounded"
+				@click="showPasteModal = true"
+				v-tooltip.bottom="'Paste Decklist'"
+			/>
 		</SettingsSection>
 		<SettingsSection title="Import Deck" icon="tabler:package-import">
 			<SettingsItem
@@ -230,8 +247,22 @@ async function _getOwnedMarketString() {
 				class="cursor-pointer"
 				@click="() => importYdkFile()"
 			/>
+			<SettingsItem
+				icon="tabler:file-import"
+				title="Paste decklist"
+				description="Paste Decklist in readable format."
+				class="cursor-pointer"
+				@click="() => (showPasteModal = true)"
+			/>
 		</SettingsSection>
 	</div>
+
+	<!-- Paste Decklist Modal -->
+	<DeckImportModal
+		:open="showPasteModal"
+		@cancel="showPasteModal = false"
+		@apply="onPasteImportApply"
+	/>
 </template>
 
 <style lang="scss" scoped></style>

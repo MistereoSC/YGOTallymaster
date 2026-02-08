@@ -147,6 +147,9 @@ async function onYdkImported(ydkContent: string) {
 	const imported = ydkToJsonIds(ydkContent)
 	cards.value = await deckIdsToPopulated(imported)
 }
+function onReadableImport(importedCards: TDeckCardsPopulated) {
+	cards.value = importedCards
+}
 
 const cardPrices = computed(() => {
 	if (!settings.value?.cardPricesVendor || settings.value.cardPricesVendor === 'none') return 0
@@ -154,6 +157,7 @@ const cardPrices = computed(() => {
 		.concat(cards.value.extra)
 		.concat(cards.value.side)
 		.reduce((sum, card) => {
+			if(!card.misc_info[0]?.tcg_date) return sum
 			const prices = card.card_prices[0]
 			if (!prices) return sum
 			//@ts-ignore
@@ -451,6 +455,7 @@ const amountExtraFusion = computed(() => {
 						:deck-cards="cards"
 						:deck-name="props.deckData.name"
 						@ydk-imported="(ydk) => onYdkImported(ydk)"
+						@readable-deck-imported="(importedCards) => onReadableImport(importedCards)"
 					/>
 				</div>
 				<div

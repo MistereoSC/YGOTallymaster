@@ -20,6 +20,7 @@ import {useToast} from '@/composables/useToast'
 import {getOwnedCards, useOwnedCards} from '@/composables/useOwnedCards'
 import {exportPopulatedToMarketString} from '@/libs/DeckParsers'
 import Files from '@/libs/Files'
+import SetImportModal from '@/components/collections/SetImportModal.vue'
 
 const {addToast} = useToast()
 const {settings, initialized: settingsInitialized} = useDatabaseSettings()
@@ -354,6 +355,8 @@ const cardPrices = computed(() => {
 	if (!settings.value?.cardPricesVendor || settings.value.cardPricesVendor === 'none') return 0
 	return props.set.cards
 		.reduce((sum, card) => {
+			if (!card.misc_info[0]?.tcg_date) return sum
+
 			const prices = card.card_prices[0]
 			if (!prices) return sum
 			//@ts-ignore
@@ -367,6 +370,31 @@ const uniqueCardsAmount = computed(() => {
 	const uniqueIds = new Set(props.set.cards.map((c) => c.id))
 	return uniqueIds.size
 })
+
+// Paste Card List Modal
+const showPasteModal = ref(false)
+function onPasteImportApply(importedCards: TCardData[]) {
+	// Add cards to the set while grouping same cards together
+	for (const card of importedCards) {
+		// Find the last index of this card in the set
+		let lastIndex = -1
+		for (let i = props.set.cards.length - 1; i >= 0; i--) {
+			if (props.set.cards[i].id === card.id) {
+				lastIndex = i
+				break
+			}
+		}
+		if (lastIndex !== -1) {
+			// Insert after the last occurrence
+			props.set.cards.splice(lastIndex + 1, 0, card)
+		} else {
+			// No existing copy, add to the end
+			props.set.cards.push(card)
+		}
+	}
+	showPasteModal.value = false
+	addToast(`Added ${importedCards.length} cards to set`, 'success', 3000)
+}
 // #endregion
 // ----------------------------------------------
 </script>
@@ -590,6 +618,15 @@ const uniqueCardsAmount = computed(() => {
 								@click="() => clipboardUnowned()"
 							/>
 						</SettingsSection>
+						<SettingsSection title="Import" icon="tabler:package-import">
+							<SettingsItem
+								icon="tabler:file-import"
+								title="Paste card list"
+								description="Paste card list in readable format."
+								class="cursor-pointer"
+								@click="() => (showPasteModal = true)"
+							/>
+						</SettingsSection>
 					</div>
 				</div>
 			</div>
@@ -598,6 +635,14 @@ const uniqueCardsAmount = computed(() => {
 	<div v-else class="w-full h-full grid place-items-center">
 		<Spinner />
 	</div>
+
+	<!-- Paste Card List Modal -->
+	<SetImportModal
+		:open="showPasteModal"
+		:existing-cards="props.set.cards"
+		@cancel="showPasteModal = false"
+		@apply="onPasteImportApply"
+	/>
 </template>
 
 <style lang="scss" scoped></style>

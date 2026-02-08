@@ -12,7 +12,7 @@ import {deckIdsToPopulated, ydkToJsonIds} from '@/libs/DeckParsers'
 import {TDeckCardsPopulated, TDeckData} from '@/libs/Decks'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {Icon} from '@iconify/vue'
-import {computed, onBeforeUnmount, onMounted, onUnmounted, ref} from 'vue'
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref} from 'vue'
 import DeckImportExportPanel from './DeckImportExportPanel.vue'
 
 const props = defineProps<{
@@ -54,18 +54,15 @@ function onDeckAreaWheel(e: WheelEvent) {
 	}
 }
 
-onMounted(async () => {
+onBeforeMount(() => {
 	resetSearch()
+})
+onMounted(async () => {
 	cards.value = await deckIdsToPopulated(props.deckData)
 	loading.value = false
 
 	window.addEventListener('keydown', onKeyDown)
 	window.addEventListener('keyup', onKeyUp)
-})
-
-onUnmounted(() => {
-	window.removeEventListener('keydown', onKeyDown)
-	window.removeEventListener('keyup', onKeyUp)
 })
 
 const hoveredCard = ref<null | TCardData>(null)
@@ -117,6 +114,8 @@ function onSortClick() {
 }
 
 onBeforeUnmount(async () => {
+	window.removeEventListener('keydown', onKeyDown)
+	window.removeEventListener('keyup', onKeyUp)
 	const newDeckData = {...props.deckData}
 	newDeckData.main = cards.value.main.map((c) => c.id)
 	newDeckData.extra = cards.value.extra.map((c) => c.id)

@@ -154,6 +154,8 @@ const useCardSearch = () => {
 		return cOut
 	}
 	const resetSearch = () => {
+		sort(ESortBy.Name_Asc)
+		sortedBy.value = ESortBy.Name_Asc
 		searchResults.value = null
 		activeQuery.value = {}
 	}

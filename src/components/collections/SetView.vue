@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {TFullSet, useCardCollections} from '@/composables/useCardCollections'
-import {computed, onBeforeUnmount, onMounted, ref, watch} from 'vue'
+import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref, watch} from 'vue'
 import Button from '@/components/common/Button.vue'
 import {Icon} from '@iconify/vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
@@ -33,13 +33,15 @@ const props = defineProps<{
 const emit = defineEmits<{
 	(e: 'close'): void
 }>()
+onBeforeMount(() => {
+	resetSearch()
+})
 onMounted(() => {
 	if (props.set.cards.length > 0) {
 		hoveredCard.value = props.set.cards[0]
 	}
 	window.addEventListener('keydown', onKeyDown)
 	window.addEventListener('keyup', onKeyUp)
-	resetSearch()
 })
 onBeforeUnmount(async () => {
 	await saveSet(props.collectionName, props.set)

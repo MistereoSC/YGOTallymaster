@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Button from '@/components/common/Button.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
-import {ref, computed} from 'vue'
+import {ref, computed, onBeforeMount} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardFullView from './CardFullView.vue'
 import CardListVirtualGrid from './CardListVirtualGrid.vue'
@@ -27,7 +27,10 @@ function toggleFilter() {
 	activePanel.value = activePanel.value === 'filter' ? 'card' : 'filter'
 }
 
-const {searchResults} = useCardSearch()
+const {searchResults, resetSearch} = useCardSearch()
+onBeforeMount(() => {
+	resetSearch()
+})
 
 const filteredCardList = computed(() => {
 	if (searchResults.value === null) {

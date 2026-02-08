@@ -360,6 +360,11 @@ const cardPrices = computed(() => {
 		}, 0)
 		.toFixed(2)
 })
+
+const uniqueCardsAmount = computed(() => {
+	const uniqueIds = new Set(props.set.cards.map((c) => c.id))
+	return uniqueIds.size
+})
 // #endregion
 // ----------------------------------------------
 </script>
@@ -385,7 +390,9 @@ const cardPrices = computed(() => {
 						</h2>
 						<p class="text-xs text-contrast-500">
 							<span class="font-medium">
-								{{ collectionName }} - {{ props.set.cards.length }} cards
+								{{ collectionName }} - {{ props.set.cards.length }} cards -
+								{{ uniqueCardsAmount }}
+								unique
 								<span
 									v-if="
 										settings?.cardPricesVendor &&

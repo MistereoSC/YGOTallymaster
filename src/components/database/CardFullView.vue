@@ -5,6 +5,7 @@ import {Icon} from '@iconify/vue'
 import AttributeIcon from './AttributeIcon.vue'
 import CardBanIcon from '@/components/cards/CardBanIcon.vue'
 import CardHighlightedDescription from './CardHighlightedDescription.vue'
+import {computed} from 'vue'
 
 const props = defineProps<{
 	card: TCardData
@@ -17,6 +18,16 @@ const props = defineProps<{
 const emit = defineEmits<{
 	(e: 'linkClick', text: string): void
 }>()
+
+const filteredSets = computed(() => {
+	const seen = new Set<string>()
+	return props.card.card_sets.filter((set) => {
+		const code = set.set_code
+		if (seen.has(code)) return false
+		seen.add(code)
+		return true
+	})
+})
 </script>
 
 <template>
@@ -160,16 +171,16 @@ const emit = defineEmits<{
 			</div>
 		</div>
 
-		<!-- Release Dates -->
+		<!-- Releases -->
 		<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600">
 			<div class="px-4 py-2 bg-primary-700/50 border-b border-primary-600">
 				<span class="text-xs font-semibold text-contrast-400 uppercase tracking-wider"
-					>Release Date</span
+					>Releases</span
 				>
 			</div>
-			<div class="p-4">
+			<div class="py-4">
 				<span
-					class="leading-relaxed whitespace-pre-line font-semibold text-contrast-600 text-sm flex gap-2"
+					class="leading-relaxed whitespace-pre-line font-semibold text-contrast-600 text-sm flex gap-2 px-4"
 				>
 					<div class="flex gap-2">
 						<span class="font-bold w-9">TCG:</span>
@@ -185,6 +196,29 @@ const emit = defineEmits<{
 						}}</span>
 					</div>
 				</span>
+
+				<div class="w-full h-px bg-gray-500 my-2"></div>
+				<div class="px-4">
+					<span
+						v-for="set in filteredSets"
+						class="leading-relaxed whitespace-pre-line font-semibold text-contrast-600 text-sm flex gap-2"
+					>
+						<span class="flex items-center font-mono">
+							<p class="text-accent-300 text-base">
+								{{ set.set_code.split('-')[0] }}
+							</p>
+							<p class="text-xs text-gray-500">
+								-xx{{ set.set_code.split('-')[1].slice(2) }}
+							</p>
+						</span>
+						<span>
+							<span>{{ set.set_name }}</span>
+							<!-- <span class="text-xs pl-1 text-gray-500">{{
+								set.set_rarity_code
+							}}</span> -->
+						</span>
+					</span>
+				</div>
 			</div>
 		</div>
 

@@ -103,6 +103,11 @@ export const useDatabaseSettings = () => {
 		settings.value.displayMDRarity = to ?? !settings.value.displayMDRarity
 		save()
 	}
+	function showDescriptionReleases(to?: boolean) {
+		if (!settings.value) return
+		settings.value.showDescriptionReleases = to ?? !settings.value.showDescriptionReleases
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -155,6 +160,7 @@ export const useDatabaseSettings = () => {
 		setsGrayUnownedGridReverse,
 		setsShowOwnedHeart,
 		displayMDRarity,
+		showDescriptionReleases,
 	}
 	const setFns = {
 		listSize,
@@ -217,6 +223,7 @@ export type TDatabaseSettings = {
 
 	cardLanguage: TLanguageCodes
 	descriptionHighlighting: boolean
+	showDescriptionReleases: boolean
 	englishNameSearch: boolean
 	cardPricesVendor: TVendor
 	splitDatabaseView: boolean
@@ -244,6 +251,7 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 
 	cardLanguage: 'en',
 	descriptionHighlighting: true,
+	showDescriptionReleases: true,
 	englishNameSearch: false,
 	cardPricesVendor: 'none',
 	splitDatabaseView: false,

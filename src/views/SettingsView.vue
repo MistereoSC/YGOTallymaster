@@ -208,7 +208,19 @@ function onEnglishNameSearchChange() {
 							@change="toggle.descriptionHighlighting"
 						/>
 					</SettingsItem>
-										<SettingsItem
+					<!-- Show Description Releases -->
+					<SettingsItem
+						icon="material-symbols:calendar-month-rounded"
+						title="Show Releases"
+						description="Show release information in card descriptions."
+					>
+						<Checkbox
+							:model-value="settings?.showDescriptionReleases"
+							@change="toggle.showDescriptionReleases"
+						/>
+					</SettingsItem>
+
+					<SettingsItem
 						icon="material-symbols:star-rounded"
 						title="Display Master Duel Rarity"
 						description="Show Master Duel rarity icons in card grids."

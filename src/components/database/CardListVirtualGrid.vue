@@ -26,6 +26,7 @@ interface IProps {
 	showBanlistFor?: TBanlistFormat | 'none'
 	showCardContextMenu?: boolean
 	showRefreshImageButton?: boolean
+	showMdRarity?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
@@ -33,6 +34,7 @@ const props = withDefaults(defineProps<IProps>(), {
 	containerPaddingPx: 8,
 
 	showRefreshImageButton: false,
+	showMdRarity: false,
 })
 
 const emit = defineEmits<{
@@ -286,6 +288,7 @@ defineExpose({
 							:gray-unowned="props.grayUnowned"
 							:show-banlist-for="props.showBanlistFor"
 							:show-context-menu="props.showCardContextMenu"
+							:show-m-d-rarity="props.showMdRarity"
 						/>
 					</CardContextMenu>
 				</div>

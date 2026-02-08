@@ -102,6 +102,7 @@ const filteredCardList = computed(() => {
 					:show-owned-number="settings?.showOwnedNumbers"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:show-card-context-menu="true"
+					:show-md-rarity="settings?.displayMDRarity"
 				/>
 			</div>
 			<div

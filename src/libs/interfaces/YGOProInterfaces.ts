@@ -65,7 +65,7 @@ type TCardDataMisc = {
 	ocg_date: string
 	konami_id: number
 	beta_name?: string
-	md_rarity?: string
+	md_rarity?: TMDRarity
 	has_effect: number
 	genesys_points?: number
 	staple?: 'Yes'
@@ -76,7 +76,7 @@ type TCardDataMisc = {
 // -----------------------------------------------------------
 // region Public Interfaces
 // -----------------------------------------------------------
-
+export type TMDRarity = 'Common' | 'Rare' | 'Super Rare' | 'Ultra Rare'
 export type TCardData = TGeneralCardData & Partial<TMonsterCardData>
 
 export type TSetListData = {

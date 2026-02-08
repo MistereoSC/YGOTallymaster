@@ -208,6 +208,16 @@ function onEnglishNameSearchChange() {
 							@change="toggle.descriptionHighlighting"
 						/>
 					</SettingsItem>
+										<SettingsItem
+						icon="material-symbols:star-rounded"
+						title="Display Master Duel Rarity"
+						description="Show Master Duel rarity icons in card grids."
+					>
+						<Checkbox
+							:model-value="settings?.displayMDRarity"
+							@change="toggle.displayMDRarity"
+						/>
+					</SettingsItem>
 
 					<SettingsSeparator label="Owned Cards" icon="tabler:heart-filled" />
 					<!-- Database Owned Numbers -->

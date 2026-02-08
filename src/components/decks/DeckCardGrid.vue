@@ -14,6 +14,7 @@ interface IProps {
 	cardSize?: 'tiny' | 'small' | 'medium' | 'large'
 	showBanlistFor?: TBanlistFormat | 'none'
 	horizontal?: boolean
+	showMdRarity?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	allowCardRemoval: true,
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<IProps>(), {
 	showOwnedHeart: false,
 	cardSize: 'tiny',
 	horizontal: false,
+	showMdRarity: false,
 })
 
 const {getOwned} = useOwnedCards()
@@ -183,6 +185,7 @@ function onHorizontalWheel(event: WheelEvent) {
 					'hover:z-10 -ml-8': props.horizontal,
 				}"
 				:show-owned-heart="props.showOwnedHeart"
+				:show-m-d-rarity="props.showMdRarity"
 			/>
 		</div>
 	</div>

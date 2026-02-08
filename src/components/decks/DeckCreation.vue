@@ -245,6 +245,7 @@ const cardPrices = computed(() => {
 							@card-shift-click="(card) => onCardShiftLClick(card)"
 							:show-owned-number="settings?.setsShowOwnedNumbers"
 							:show-owned-heart="settings?.setsShowOwnedHeart"
+							:show-md-rarity="settings?.displayMDRarity"
 						/>
 					</div>
 					<div>
@@ -304,6 +305,7 @@ const cardPrices = computed(() => {
 							:horizontal="true"
 							:show-owned-number="settings?.setsShowOwnedNumbers"
 							:show-owned-heart="settings?.setsShowOwnedHeart"
+							:show-md-rarity="settings?.displayMDRarity"
 						/>
 					</div>
 				</div>
@@ -340,6 +342,7 @@ const cardPrices = computed(() => {
 							:horizontal="true"
 							:show-owned-number="settings?.setsShowOwnedNumbers"
 							:show-owned-heart="settings?.setsShowOwnedHeart"
+							:show-md-rarity="settings?.displayMDRarity"
 						/>
 					</div>
 				</div>

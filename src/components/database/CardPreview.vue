@@ -6,6 +6,7 @@ import {Icon} from '@iconify/vue'
 import CardOwnHeart from '@/components/cards/CardOwnHeart.vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
 import CardBanIcon from '@/components/cards/CardBanIcon.vue'
+import CardMDRarityIcon from '../cards/CardMDRarityIcon.vue'
 
 interface IProps {
 	card: TCardData
@@ -17,6 +18,7 @@ interface IProps {
 	showOwnedHeart?: boolean
 	showOwnedNumber?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
+	showMDRarity?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'small',
@@ -24,6 +26,7 @@ const props = withDefaults(defineProps<IProps>(), {
 	showOwnedHeart: false,
 	active: false,
 	showOwnedNumber: false,
+	showMDRarity: false,
 })
 const emit = defineEmits<{
 	(e: 'click', value: TCardData): void
@@ -155,7 +158,11 @@ function onClick(e: PointerEvent) {
 				{{ numOwned }}
 			</div>
 		</div>
-		<div class="absolute left-2 top-2">
+		<div class="absolute left-0 top-0 flex flex-col gap-1 cursor-pointer">
+			<CardMDRarityIcon
+				v-if="props.showMDRarity"
+				:md-rarity="props.card.misc_info[0]?.md_rarity"
+			/>
 			<CardBanIcon
 				:show-banlist-for="props.showBanlistFor"
 				:banlist-info="props.card.banlist_info"

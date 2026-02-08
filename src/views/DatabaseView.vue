@@ -171,6 +171,7 @@ function onCardShiftLClick(card: TCardData) {
 						:description-highlighting="settings?.descriptionHighlighting"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 						:show-card-prices="settings?.cardPricesVendor !== 'none'"
+						:show-md-rarity="settings?.displayMDRarity"
 					/>
 					<CardFilter
 						:search-while-typing="true"

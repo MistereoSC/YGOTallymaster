@@ -98,6 +98,11 @@ export const useDatabaseSettings = () => {
 		settings.value.setsShowOwnedHeart = to ?? !settings.value.setsShowOwnedHeart
 		save()
 	}
+	function displayMDRarity(to?: boolean) {
+		if (!settings.value) return
+		settings.value.displayMDRarity = to ?? !settings.value.displayMDRarity
+		save()
+	}
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -149,6 +154,7 @@ export const useDatabaseSettings = () => {
 		setsShowOwnedNumbers,
 		setsGrayUnownedGridReverse,
 		setsShowOwnedHeart,
+		displayMDRarity,
 	}
 	const setFns = {
 		listSize,
@@ -214,6 +220,7 @@ export type TDatabaseSettings = {
 	englishNameSearch: boolean
 	cardPricesVendor: TVendor
 	splitDatabaseView: boolean
+	displayMDRarity: boolean
 }
 // Default settings
 const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
@@ -240,4 +247,5 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	englishNameSearch: false,
 	cardPricesVendor: 'none',
 	splitDatabaseView: false,
+	displayMDRarity: false,
 }

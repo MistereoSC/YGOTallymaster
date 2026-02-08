@@ -310,6 +310,16 @@ async function exportAsText() {
 		return
 	}
 }
+async function clipboardAsText() {
+	try {
+		const list = exportPopulatedToMarketString(props.set.cards)
+		await navigator.clipboard.writeText(list)
+		addToast('Set copied to clipboard!', 'success', 3000)
+	} catch (err) {
+		addToast('Failed to copy set to clipboard', 'error', 3000)
+		console.error('Clipboard error:', err)
+	}
+}
 
 async function _getUnownedMarketString() {
 	const ownedCards = await getOwnedCards()
@@ -459,6 +469,7 @@ const cardPrices = computed(() => {
 					@card-shift-clicked="(card) => onCardShiftLClick(card)"
 					@card-right-clicked="(card) => onCardRemove(card)"
 					@reorder="onCardReorder"
+					:show-md-rarity="settings?.displayMDRarity"
 				/>
 			</div>
 			<div
@@ -546,6 +557,13 @@ const cardPrices = computed(() => {
 								class="cursor-pointer"
 								description="Export set as readable .txt file"
 								@click="() => exportAsText()"
+							/>
+							<SettingsItem
+								icon="tabler:clipboard-list-filled"
+								title="Clipboard as Text"
+								class="cursor-pointer"
+								description="Copy set to clipboard"
+								@click="() => clipboardAsText()"
 							/>
 							<SettingsItem
 								icon="tabler:heart-broken-filled"

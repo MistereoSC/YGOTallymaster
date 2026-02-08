@@ -18,12 +18,14 @@ interface IProps {
 	grayUnownedReverse?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 	draggable?: boolean
+	showMdRarity?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
 	itemGapPx: 16,
 	containerPaddingPx: 8,
 	draggable: true,
+	showMdRarity: false,
 })
 
 const emit = defineEmits<{
@@ -343,6 +345,7 @@ defineExpose({
 						:gray-override="grayedOutIndices.has(index)"
 						:show-banlist-for="props.showBanlistFor"
 						:class="props.draggable ? 'cursor-grab active:cursor-grabbing' : ''"
+						:show-m-d-rarity="props.showMdRarity"
 					/>
 				</div>
 			</div>

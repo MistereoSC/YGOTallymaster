@@ -208,6 +208,17 @@ function onEnglishNameSearchChange() {
 							@change="toggle.descriptionHighlighting"
 						/>
 					</SettingsItem>
+					<!-- Show Staples Slider -->
+					<SettingsItem
+						icon="material-symbols:filter-alt-outline"
+						title="Enable 'Staples' Filter"
+						description="Show slider in card filters to show cards considered 'staples' by YGOProDeck."
+					>
+						<Checkbox
+							:model-value="settings?.showStaplesSlider"
+							@change="toggle.showStaplesSlider"
+						/>
+					</SettingsItem>
 					<!-- Show Description Releases -->
 					<SettingsItem
 						icon="material-symbols:calendar-month-rounded"
@@ -531,12 +542,20 @@ function onEnglishNameSearchChange() {
 					</div>
 				</SettingsSection>
 
-				<!-- Database & Updates Section -->
+				<!-- Application & Updates Section -->
 				<SettingsSection
 					icon="material-symbols:cloud-sync-rounded"
-					title="Database & Updates"
-					description="Manage database updates and synchronization"
+					title="Application & Updates"
+					description="Manage database updates and application files"
 				>
+					<!-- Open Folder -->
+					<SettingsItem
+						icon="material-symbols:folder-data-rounded"
+						title="Application Data"
+						description="Open the folder containing app data, images, and configurations"
+					>
+						<Button label="Open Folder" size="small" @click="onOpenFolder" />
+					</SettingsItem>
 					<!-- Auto Update Toggle -->
 					<SettingsItem
 						icon="material-symbols:sync-rounded"
@@ -573,21 +592,6 @@ function onEnglishNameSearchChange() {
 							variant="tertiary"
 							@click="onForceReset"
 						/>
-					</SettingsItem>
-				</SettingsSection>
-
-				<!-- Application Section -->
-				<SettingsSection
-					icon="material-symbols:folder-open-rounded"
-					title="Application"
-					description="Application data and storage settings"
-				>
-					<SettingsItem
-						icon="material-symbols:folder-data-rounded"
-						title="Application Data"
-						description="Open the folder containing app data, images, and configurations"
-					>
-						<Button label="Open Folder" size="small" @click="onOpenFolder" />
 					</SettingsItem>
 				</SettingsSection>
 

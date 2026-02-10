@@ -40,6 +40,7 @@ const props = defineProps<{
 	searchWhileTyping?: boolean
 	showSetFilter?: boolean
 	showInfoPanel?: boolean
+	showStaplesToggle?: boolean
 }>()
 // #endregion
 // -----------------------------------------
@@ -86,6 +87,11 @@ function onReset(fullReset = true) {
 	if (toggledOwned.value) {
 		onSearch()
 	}
+}
+
+function onResetSearchInput() {
+	searchInput.value = ''
+	onSearch()
 }
 
 const DEBOUNCE_DELAY = 100
@@ -327,27 +333,42 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		<div
 			class="px-3 py-2 rounded-lg bg-primary-800 border border-primary-600 flex items-center gap-2"
 		>
-			<Icon icon="material-symbols:search-rounded" class="text-contrast-400 text-lg" />
-			<input
-				v-model="searchInput"
-				@keyup="(e) => onSearchInput(e)"
-				type="text"
-				placeholder="Search card name/description..."
-				class="flex-1 px-2 py-1 rounded-md bg-primary-700 border border-primary-600 focus:outline-none focus:border-accent-500 placeholder:text-contrast-400 text-sm"
-			/>
+			<div class="relative w-full">
+				<Icon
+					icon="material-symbols:search-rounded"
+					class="absolute left-2.5 top-1/2 -translate-y-1/2 text-contrast-500 text-lg"
+				/>
+				<input
+					v-model="searchInput"
+					@keyup="(e) => onSearchInput(e)"
+					type="text"
+					placeholder="Search card name/description..."
+					class="w-full bg-primary-800 text-contrast-700 placeholder-contrast-500 rounded-md pl-9 pr-3 py-1.5 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors"
+				/>
+				<button
+					v-if="searchInput"
+					@click="() => onResetSearchInput()"
+					class="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 hover:text-contrast-700 transition-colors"
+				>
+					<Icon icon="material-symbols:close-rounded" class="text-lg" />
+				</button>
+			</div>
 			<Button
 				icon="material-symbols:filter-alt-off-rounded"
 				class="aspect-square"
 				size="small"
-				@click="onReset"
+				@click="() => onReset()"
 				v-tooltip.bottom="'Reset all filters'"
 			/>
 		</div>
 
 		<!-- Staple Filter -->
-		<div class="px-3 py-2 rounded-lg bg-primary-800 border border-primary-600">
+		<div
+			class="px-3 py-2 rounded-lg bg-primary-800 border border-primary-600"
+			v-if="props.showStaplesToggle"
+		>
 			<ToggleSwitch
-				label="Show only Cards marked as 'Staple'"
+				label="Show only Cards considered 'Staple'"
 				:model-value="toggledStaple"
 				@toggle="toggleStaple"
 			/>
@@ -363,10 +384,10 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 		<!-- Core Card Types -->
 		<FilterSection title="Monster/Spell/Trap" @reset="resetCoreType">
 			<ToggleButton
-				v-for="type in ['Monster', 'Spell', 'Trap'] as TCoreCardType[]"
+				v-for="type in ['Monster', 'Spell', 'Trap']"
 				:key="type"
 				:model-value="toggledCoreType === type"
-				@toggle="toggleCoreType(type)"
+				@toggle="toggleCoreType(type as TCoreCardType)"
 			>
 				<Icon
 					icon="material-symbols:credit-card"
@@ -376,7 +397,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 						'text-card-trap': type === 'Trap',
 					}"
 				/>
-				<span class="py-1 w-15 font-bold text-sm">{{ type }}</span>
+				<span class="w-15 font-bold text-sm">{{ type }}</span>
 			</ToggleButton>
 		</FilterSection>
 
@@ -390,7 +411,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 					@toggle="attributes.toggle"
 				>
 					<template #default="{option}">
-						<AttributeIcon size="small" :attribute="option" />
+						<AttributeIcon size="tiny" :attribute="option" />
 						<span class="w-13 font-bold text-sm">{{ option }}</span>
 					</template>
 				</ToggleButtonGroup>
@@ -425,7 +446,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				<ToggleButtonGroup
 					:options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]"
 					:model-value="levels.items.value"
-					item-width="w-8"
+					itemPtClass="w-6"
 					@toggle="levels.toggle"
 				/>
 			</FilterSection>
@@ -434,7 +455,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 			<FilterSection title="Attack & Defense" operand="AND" @reset="resetAtkDefFilters">
 				<div class="flex items-center justify-center flex-col gap-2 w-full">
 					<div class="flex gap-2 items-center">
-						<span class="font-bold">ATK</span>
+						<Icon icon="material-symbols:swords-rounded" class="text-red-400" />
 						<NumberInputMinMax
 							v-model="atkFilter"
 							:min-val="-1"
@@ -443,7 +464,7 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 						/>
 					</div>
 					<div class="flex gap-2 items-center">
-						<span class="font-bold">DEF</span>
+						<Icon icon="material-symbols:shield-rounded" class="text-blue-400" />
 						<NumberInputMinMax
 							v-model="defFilter"
 							:min-val="-1"
@@ -451,7 +472,12 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 							@change="onSearch"
 						/>
 					</div>
-					<span class="text-xm text-contrast-400"> Enter '-1' for ?-Values </span>
+					<span
+						class="text-sm font-semibold text-contrast-400"
+						v-if="props.showInfoPanel"
+					>
+						Enter '-1' for ?-Values
+					</span>
 				</div>
 			</FilterSection>
 
@@ -460,18 +486,8 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				<ToggleButtonGroup
 					:options="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]"
 					:model-value="scales.items.value"
-					item-width="w-8"
+					itemPtClass="w-6"
 					@toggle="scales.toggle"
-				/>
-			</FilterSection>
-
-			<!-- Link Values -->
-			<FilterSection title="Link Values" operand="OR" @reset="linkvals.resetAndSearch">
-				<ToggleButtonGroup
-					:options="[1, 2, 3, 4, 5, 6, 7, 8]"
-					:model-value="linkvals.items.value"
-					item-width="w-8"
-					@toggle="linkvals.toggle"
 				/>
 			</FilterSection>
 
@@ -480,11 +496,36 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 				title="Links"
 				:operand="linkMarkers.operand.value"
 				has-operand-toggle
-				@reset="linkMarkers.resetAndSearch"
+				@reset="
+					() => {
+						linkMarkers.reset()
+						linkvals.resetAndSearch()
+					}
+				"
 				@toggle-operand="linkMarkers.toggleOperand"
 			>
-				<div class="bg-primary-700 rounded-md">
-					<CardLinkSelection v-model="linkMarkers.items.value" @change="onSearch" />
+				<div class="grid grid-cols-[auto_1fr] gap-8">
+					<div class="bg-primary-700 rounded-md">
+						<CardLinkSelection v-model="linkMarkers.items.value" @change="onSearch" />
+					</div>
+					<div>
+						<div class="flex items-center gap-2 justify-center mb-0.5">
+							<span class="text-contrast-500">Link-Values</span>
+							<span
+								class="text-xs px-1 py-0.5 rounded bg-primary-600 text-contrast-400"
+							>
+								OR
+							</span>
+						</div>
+						<div class="grid grid-cols-3 gap-2 items-center justify-center">
+							<ToggleButtonGroup
+								:options="[1, 2, 3, 4, 5, 6]"
+								:model-value="linkvals.items.value"
+								itemPtClass="w-6"
+								@toggle="linkvals.toggle"
+							/>
+						</div>
+					</div>
 				</div>
 			</FilterSection>
 		</template>

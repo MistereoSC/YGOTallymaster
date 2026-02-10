@@ -16,7 +16,7 @@ function onClick() {
 </script>
 
 <template>
-	<div class="flex gap-2">
+	<div class="flex gap-2 font-semibold">
 		<span
 			class="transition-colors"
 			:class="{'text-contrast-400': props.modelValue}"

@@ -45,7 +45,7 @@ const emit = defineEmits<{
 				/>
 			</span>
 		</div>
-		<div class="p-3 flex gap-2 flex-wrap items-center justify-center">
+		<div class="px-2 py-3 flex gap-2 flex-wrap items-center justify-center">
 			<slot />
 		</div>
 	</div>

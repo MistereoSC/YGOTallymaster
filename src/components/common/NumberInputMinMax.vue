@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import {Icon} from '@iconify/vue'
 import {onMounted, ref, watch} from 'vue'
 
 const props = defineProps<{
@@ -37,11 +38,7 @@ function focusMaxInput() {
 	maxInputRef.value?.focus()
 }
 
-function clampValue(
-	value: number | null,
-	min: number,
-	max: number
-): number | null {
+function clampValue(value: number | null, min: number, max: number): number | null {
 	if (value === null) return null
 	return Math.max(min, Math.min(max, value))
 }
@@ -98,20 +95,14 @@ watch([minInput, maxInput], ([newMin, newMax]) => {
 	// Convert empty strings to null and ensure we have numbers
 	const parsedMin =
 		// @ts-ignore
-		newMin === '' || newMin === null || newMin === undefined
-			? null
-			: Number(newMin)
+		newMin === '' || newMin === null || newMin === undefined ? null : Number(newMin)
 	const parsedMax =
 		// @ts-ignore
-		newMax === '' || newMax === null || newMax === undefined
-			? null
-			: Number(newMax)
+		newMax === '' || newMax === null || newMax === undefined ? null : Number(newMax)
 
 	// Only clamp non-null values to bounds
-	const clampedMin =
-		parsedMin === null ? null : validateAndClampMin(parsedMin)
-	const clampedMax =
-		parsedMax === null ? null : validateAndClampMax(parsedMax)
+	const clampedMin = parsedMin === null ? null : validateAndClampMin(parsedMin)
+	const clampedMax = parsedMax === null ? null : validateAndClampMax(parsedMax)
 
 	// Update the input refs if values were clamped (but only for non-null values)
 	if (parsedMin !== null && clampedMin !== parsedMin) {
@@ -130,10 +121,10 @@ watch([minInput, maxInput], ([newMin, newMax]) => {
 	<div class="flex gap-2">
 		<div
 			@click="focusMaxInput"
-			class="rounded-sm bg-primary-700 flex gap-1 items-center"
+			class="rounded-sm bg-primary-700 flex gap-1 items-center overflow-hidden"
 		>
-			<div class="bg-primary-600 px-2 mr-1">
-				<i class="font-bold text-lg">≥</i>
+			<div class="bg-primary-600 px-1 h-full flex items-center">
+				<Icon icon="tabler:math-equal-lower" />
 			</div>
 			<input
 				v-model="maxInput"
@@ -147,10 +138,10 @@ watch([minInput, maxInput], ([newMin, newMax]) => {
 		</div>
 		<div
 			@click="focusMinInput"
-			class="rounded-sm bg-primary-700 flex gap-1 items-center"
+			class="rounded-sm bg-primary-700 flex gap-1 items-center overflow-hidden"
 		>
-			<div class="bg-primary-600 px-2 mr-1">
-				<i class="font-bold text-lg">≤</i>
+			<div class="bg-primary-600 px-1 h-full flex items-center">
+				<Icon icon="tabler:math-equal-greater" />
 			</div>
 			<input
 				v-model="minInput"

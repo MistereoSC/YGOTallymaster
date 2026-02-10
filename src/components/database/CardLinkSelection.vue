@@ -26,7 +26,7 @@ function toggleMarker(marker: TLinkMarkers) {
 <template>
 	<div class="grid grid-cols-3 grid-rows-3 w-24 h-24 relative pb-1 pr-1">
 		<div
-			class="absolute top-4.5 left-4.5 right-3.5 bottom-3.5 border-accent-900 border-4 rounded-sm"
+			class="absolute top-4.5 left-4.5 right-4 bottom-4 border-accent-700/80 border-4 rounded-sm"
 		></div>
 
 		<div
@@ -36,10 +36,7 @@ function toggleMarker(marker: TLinkMarkers) {
 			}"
 			@click="toggleMarker('Top-Left')"
 		>
-			<Icon
-				icon="material-symbols:arrow-left-rounded"
-				class="text-4xl rotate-45"
-			/>
+			<Icon icon="material-symbols:arrow-left-rounded" class="text-4xl rotate-45" />
 		</div>
 		<div
 			class="cursor-pointer hover:text-accent-300"
@@ -48,10 +45,7 @@ function toggleMarker(marker: TLinkMarkers) {
 			}"
 			@click="toggleMarker('Top')"
 		>
-			<Icon
-				icon="material-symbols:arrow-left-rounded"
-				class="text-4xl rotate-90"
-			/>
+			<Icon icon="material-symbols:arrow-left-rounded" class="text-4xl rotate-90 ml-px" />
 		</div>
 		<div
 			class="cursor-pointer hover:text-accent-300"
@@ -60,10 +54,7 @@ function toggleMarker(marker: TLinkMarkers) {
 			}"
 			@click="toggleMarker('Top-Right')"
 		>
-			<Icon
-				icon="material-symbols:arrow-left-rounded"
-				class="text-4xl rotate-135"
-			/>
+			<Icon icon="material-symbols:arrow-left-rounded" class="text-4xl rotate-135" />
 		</div>
 		<div
 			class="cursor-pointer hover:text-accent-300"
@@ -72,10 +63,7 @@ function toggleMarker(marker: TLinkMarkers) {
 			}"
 			@click="toggleMarker('Left')"
 		>
-			<Icon
-				icon="material-symbols:arrow-left-rounded"
-				class="text-4xl rotate-0"
-			/>
+			<Icon icon="material-symbols:arrow-left-rounded" class="text-4xl rotate-0" />
 		</div>
 		<span></span>
 		<div
@@ -85,10 +73,7 @@ function toggleMarker(marker: TLinkMarkers) {
 			}"
 			@click="toggleMarker('Right')"
 		>
-			<Icon
-				icon="material-symbols:arrow-left-rounded"
-				class="text-4xl rotate-180"
-			/>
+			<Icon icon="material-symbols:arrow-left-rounded" class="text-4xl rotate-180" />
 		</div>
 		<div
 			class="cursor-pointer hover:text-accent-300"
@@ -97,10 +82,7 @@ function toggleMarker(marker: TLinkMarkers) {
 			}"
 			@click="toggleMarker('Bottom-Left')"
 		>
-			<Icon
-				icon="material-symbols:arrow-left-rounded"
-				class="text-4xl -rotate-45"
-			/>
+			<Icon icon="material-symbols:arrow-left-rounded" class="text-4xl -rotate-45" />
 		</div>
 		<div
 			class="cursor-pointer hover:text-accent-300"
@@ -109,10 +91,7 @@ function toggleMarker(marker: TLinkMarkers) {
 			}"
 			@click="toggleMarker('Bottom')"
 		>
-			<Icon
-				icon="material-symbols:arrow-left-rounded"
-				class="text-4xl -rotate-90"
-			/>
+			<Icon icon="material-symbols:arrow-left-rounded" class="text-4xl -rotate-90 ml-px" />
 		</div>
 		<div
 			class="cursor-pointer hover:text-accent-300"
@@ -121,10 +100,7 @@ function toggleMarker(marker: TLinkMarkers) {
 			}"
 			@click="toggleMarker('Bottom-Right')"
 		>
-			<Icon
-				icon="material-symbols:arrow-left-rounded"
-				class="text-4xl -rotate-135"
-			/>
+			<Icon icon="material-symbols:arrow-left-rounded" class="text-4xl -rotate-135" />
 		</div>
 	</div>
 </template>

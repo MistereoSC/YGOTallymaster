@@ -176,9 +176,10 @@ function onCardShiftLClick(card: TCardData) {
 						:show-release-info="settings?.showDescriptionReleases"
 					/>
 					<CardFilter
-						:search-while-typing="true"
 						v-else-if="activePanel === 'filter' || settings?.splitDatabaseView"
+						:search-while-typing="true"
 						:show-info-panel="true"
+						:show-staples-toggle="settings?.showStaplesSlider"
 					/>
 				</div>
 			</div>

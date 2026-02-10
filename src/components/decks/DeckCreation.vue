@@ -157,7 +157,7 @@ const cardPrices = computed(() => {
 		.concat(cards.value.extra)
 		.concat(cards.value.side)
 		.reduce((sum, card) => {
-			if(!card.misc_info[0]?.tcg_date) return sum
+			if (!card.misc_info[0]?.tcg_date) return sum
 			const prices = card.card_prices[0]
 			if (!prices) return sum
 			//@ts-ignore
@@ -465,7 +465,11 @@ const amountExtraFusion = computed(() => {
 					<div
 						class="max-h-[50vh] overflow-y-scroll scrollable border-b border-primary-500 p-2 pr-1"
 					>
-						<CardFilter :search-while-typing="true" :show-set-filter="true" />
+						<CardFilter
+							:search-while-typing="true"
+							:show-set-filter="true"
+							:show-staples-toggle="settings?.showStaplesSlider"
+						/>
 					</div>
 					<div class="h-full overflow-y-hidden">
 						<CardListVirtualList

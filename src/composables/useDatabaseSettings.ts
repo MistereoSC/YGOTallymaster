@@ -33,6 +33,10 @@ export const useDatabaseSettings = () => {
 		}, SAVE_DEBOUNCE_MS)
 	}
 
+	// ------------------------------------------------------------
+	// #region Toggle functions
+	// ------------------------------------------------------------
+
 	function displayAsList(to?: boolean) {
 		if (!settings.value) return
 		settings.value.displayAsList = to ?? !settings.value.displayAsList
@@ -108,6 +112,16 @@ export const useDatabaseSettings = () => {
 		settings.value.showDescriptionReleases = to ?? !settings.value.showDescriptionReleases
 		save()
 	}
+	function showStaplesSlider(to?: boolean) {
+		if (!settings.value) return
+		settings.value.showStaplesSlider = to ?? !settings.value.showStaplesSlider
+		save()
+	}
+
+	// #endregion
+	// ------------------------------------------------------------
+	// #region Select functions
+	// ------------------------------------------------------------
 
 	function listSize(to: TSizes) {
 		if (!settings.value) return
@@ -145,6 +159,11 @@ export const useDatabaseSettings = () => {
 		save()
 	}
 
+	// #endregion
+	// ------------------------------------------------------------
+	// #region Returns
+	// ------------------------------------------------------------
+
 	const toggleFns = {
 		displayAsList,
 		showOwnedNumbers,
@@ -161,6 +180,7 @@ export const useDatabaseSettings = () => {
 		setsShowOwnedHeart,
 		displayMDRarity,
 		showDescriptionReleases,
+		showStaplesSlider,
 	}
 	const setFns = {
 		listSize,
@@ -178,6 +198,9 @@ export const useDatabaseSettings = () => {
 		toggle: toggleFns,
 		set: setFns,
 	}
+
+	// #endregion
+	// ------------------------------------------------------------
 }
 
 export async function getSettings() {
@@ -220,6 +243,7 @@ export type TDatabaseSettings = {
 	setsDisplayAsList: boolean
 	setsShowOwnedNumbers: boolean
 	setsShowOwnedHeart: boolean
+	showStaplesSlider: boolean
 
 	cardLanguage: TLanguageCodes
 	descriptionHighlighting: boolean
@@ -248,6 +272,7 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	setsDisplayAsList: false,
 	setsShowOwnedNumbers: false,
 	setsShowOwnedHeart: false,
+	showStaplesSlider: false,
 
 	cardLanguage: 'en',
 	descriptionHighlighting: true,

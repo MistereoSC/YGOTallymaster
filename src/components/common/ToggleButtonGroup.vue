@@ -5,8 +5,7 @@ import ToggleButton from '@/components/common/ToggleButton.vue'
 const props = defineProps<{
 	options: T[] | Record<string, T>
 	modelValue: T[]
-	/** Fixed width class for items (e.g., 'w-8', 'w-13') */
-	itemWidth?: string
+	itemPtClass?: string
 }>()
 
 const emit = defineEmits<{
@@ -27,7 +26,7 @@ const optionsList = computed(() => {
 		@toggle="emit('toggle', option)"
 	>
 		<slot :option="option">
-			<span class="font-bold text-sm" :class="itemWidth">{{ option }}</span>
+			<span class="font-bold text-sm" :class="itemPtClass">{{ option }}</span>
 		</slot>
 	</ToggleButton>
 </template>

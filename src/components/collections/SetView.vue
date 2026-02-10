@@ -521,7 +521,11 @@ function onPasteImportApply(importedCards: TCardData[]) {
 					<div
 						class="max-h-[50vh] overflow-y-scroll scrollable border-b border-primary-500 p-2 pr-1"
 					>
-						<CardFilter :search-while-typing="true" :show-set-filter="true" />
+						<CardFilter
+							:search-while-typing="true"
+							:show-set-filter="true"
+							:show-staples-toggle="settings?.showStaplesSlider"
+						/>
 					</div>
 					<div class="h-full overflow-hidden">
 						<CardListVirtualList

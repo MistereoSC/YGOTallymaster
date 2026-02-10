@@ -116,6 +116,7 @@ const filteredCardList = computed(() => {
 						v-if="activePanel === 'filter'"
 						:search-while-typing="true"
 						:show-info-panel="true"
+						:show-staples-toggle="settings?.showStaplesSlider"
 					/>
 					<CardFullView
 						v-else-if="activeCard"

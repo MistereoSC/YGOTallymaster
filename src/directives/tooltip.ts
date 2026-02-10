@@ -16,6 +16,29 @@ const HIDE_DELAY = 100
 // Store tooltip state per element
 const tooltipStates = new WeakMap<HTMLElement, TooltipState>()
 
+// Track all active tooltip elements for global cleanup
+const activeTooltipElements = new Set<HTMLElement>()
+
+// Global handlers for edge cases where mouseleave doesn't fire
+function hideAllTooltips() {
+	activeTooltipElements.forEach((el) => {
+		hideTooltip(el)
+	})
+}
+
+// Set up global listeners once
+let globalListenersAttached = false
+function attachGlobalListeners() {
+	if (globalListenersAttached) return
+	globalListenersAttached = true
+
+	// Hide tooltips when window loses focus
+	window.addEventListener('blur', hideAllTooltips)
+
+	// Hide tooltips on any click (prevents stuck tooltips after navigation)
+	document.addEventListener('pointerdown', hideAllTooltips, {capture: true})
+}
+
 function getPosition(modifiers: DirectiveBinding['modifiers']): TooltipPosition {
 	if (modifiers.top) return 'top'
 	if (modifiers.bottom) return 'bottom'
@@ -170,6 +193,9 @@ function showTooltip(el: HTMLElement, binding: DirectiveBinding) {
 	const state = tooltipStates.get(el)
 	if (!state) return
 
+	// Track this element as having an active tooltip
+	activeTooltipElements.add(el)
+
 	// Clear any pending hide timeout
 	if (state.hideTimeout) {
 		clearTimeout(state.hideTimeout)
@@ -223,6 +249,9 @@ function hideTooltip(el: HTMLElement) {
 	const state = tooltipStates.get(el)
 	if (!state) return
 
+	// Remove from active tracking
+	activeTooltipElements.delete(el)
+
 	// Clear any pending show timeout
 	if (state.showTimeout) {
 		clearTimeout(state.showTimeout)
@@ -251,6 +280,9 @@ function destroyTooltip(el: HTMLElement) {
 	const state = tooltipStates.get(el)
 	if (!state) return
 
+	// Remove from active tracking
+	activeTooltipElements.delete(el)
+
 	if (state.showTimeout) {
 		clearTimeout(state.showTimeout)
 	}
@@ -269,6 +301,9 @@ function destroyTooltip(el: HTMLElement) {
 
 export const vTooltip: Directive<HTMLElement, string | null | undefined> = {
 	mounted(el, binding) {
+		// Ensure global listeners are attached
+		attachGlobalListeners()
+
 		// Initialize state for this element
 		tooltipStates.set(el, {
 			element: null,

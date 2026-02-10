@@ -483,7 +483,6 @@ function onPasteImportApply(importedCards: TCardData[]) {
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
 					:gray-unowned-reverse="settings?.setsGrayUnownedGridReverse"
-					:show-owned-number="settings?.setsShowOwnedNumbers"
 					:item-size="settings?.listSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:draggable="true"
@@ -498,7 +497,6 @@ function onPasteImportApply(importedCards: TCardData[]) {
 					:card-list="props.set.cards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
 					:gray-unowned-reverse="settings?.setsGrayUnownedGridReverse"
-					:show-owned-number="settings?.setsShowOwnedNumbers"
 					:item-size="settings?.gridSize || 'medium'"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:draggable="true"
@@ -511,7 +509,7 @@ function onPasteImportApply(importedCards: TCardData[]) {
 				/>
 			</div>
 			<div
-				class="border-l border-primary-600 max-w-180 w-[30vw] bg-primary-700 h-full overflow-hidden"
+				class="border-l border-primary-600 max-w-150 w-[30vw] bg-primary-700 h-full overflow-hidden"
 				v-if="activePanel !== 'none'"
 			>
 				<div

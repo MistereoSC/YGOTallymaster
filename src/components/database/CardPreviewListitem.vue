@@ -19,7 +19,6 @@ interface IProps {
 	grayUnowned?: boolean
 	grayOverride?: boolean
 	showOwnedHeart?: boolean
-	showOwnedNumber?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 }
 const props = withDefaults(defineProps<IProps>(), {
@@ -91,7 +90,7 @@ const styles = getCardStyles(props.card)
 
 <template>
 	<div
-		class="overflow-hidden select-none rounded-sm w-full px-1 hover:outline-2 hover:outline-accent-500 cursor-pointer cardItemContainer"
+		class="overflow-hidden select-none rounded-sm w-full px-1 hover:outline-2 hover:outline-accent-500 cursor-pointer cardItemContainer group"
 		:class="{
 			'outline-secondary-500 outline-2': props.active,
 		}"
@@ -271,18 +270,17 @@ const styles = getCardStyles(props.card)
 						:links="props.card.linkmarkers"
 						:size="props.size === 'tiny' ? 'tiny' : 'small'"
 					/>
-					<div
-						v-else-if="props.showOwnedNumber && !props.showOwnedHeart && numOwned > 0"
-						class="font-bold"
-					>
-						{{ numOwned }}
-					</div>
 				</div>
 			</div>
 
 			<!-- Controls -->
-			<div class="flex flex-col justify-evenly items-center">
-				<CardOwnHeart :card-id="props.card.id" v-if="props.showOwnedHeart" />
+			<div class="flex flex-col justify-evenly items-center ml-1">
+				<CardOwnHeart
+					v-if="props.showOwnedHeart"
+					class="opacity-0 group-hover:opacity-100"
+					:card-id="props.card.id"
+					:size="props.size === 'tiny' || props.size === 'small' ? 'small' : 'medium'"
+				/>
 			</div>
 		</div>
 	</div>

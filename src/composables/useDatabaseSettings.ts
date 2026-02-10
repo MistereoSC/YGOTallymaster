@@ -42,11 +42,6 @@ export const useDatabaseSettings = () => {
 		settings.value.displayAsList = to ?? !settings.value.displayAsList
 		save()
 	}
-	function showOwnedNumbers(to?: boolean) {
-		if (!settings.value) return
-		settings.value.showOwnedNumbers = to ?? !settings.value.showOwnedNumbers
-		save()
-	}
 	function grayUnowned(to?: boolean) {
 		if (!settings.value) return
 		settings.value.grayUnowned = to ?? !settings.value.grayUnowned
@@ -85,11 +80,6 @@ export const useDatabaseSettings = () => {
 	function splitDatabaseView(to?: boolean) {
 		if (!settings.value) return
 		settings.value.splitDatabaseView = to ?? !settings.value.splitDatabaseView
-		save()
-	}
-	function setsShowOwnedNumbers(to?: boolean) {
-		if (!settings.value) return
-		settings.value.setsShowOwnedNumbers = to ?? !settings.value.setsShowOwnedNumbers
 		save()
 	}
 	function setsGrayUnownedGridReverse(to?: boolean) {
@@ -166,7 +156,6 @@ export const useDatabaseSettings = () => {
 
 	const toggleFns = {
 		displayAsList,
-		showOwnedNumbers,
 		grayUnowned,
 		decklistGrayUnownedGrid,
 		setsGrayUnownedGrid,
@@ -175,7 +164,6 @@ export const useDatabaseSettings = () => {
 		descriptionHighlighting,
 		englishNameSearch,
 		splitDatabaseView,
-		setsShowOwnedNumbers,
 		setsGrayUnownedGridReverse,
 		setsShowOwnedHeart,
 		displayMDRarity,
@@ -231,7 +219,6 @@ export type TDatabaseSettings = {
 	grayUnownedSmallList: boolean
 
 	displayAsList: boolean
-	showOwnedNumbers: boolean
 	grayUnowned: boolean
 	listSize: TSizes
 	gridSize: TSizes
@@ -241,7 +228,6 @@ export type TDatabaseSettings = {
 	setsGrayUnownedGrid: boolean
 	setsGrayUnownedGridReverse: boolean
 	setsDisplayAsList: boolean
-	setsShowOwnedNumbers: boolean
 	setsShowOwnedHeart: boolean
 	showStaplesSlider: boolean
 
@@ -260,7 +246,6 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	grayUnownedSmallList: false,
 
 	displayAsList: false,
-	showOwnedNumbers: false,
 	grayUnowned: false,
 	listSize: 'small',
 	gridSize: 'small',
@@ -270,8 +255,7 @@ const DEFAULT_DATABASE_SETTINGS: Readonly<TDatabaseSettings> = {
 	setsGrayUnownedGrid: false,
 	setsGrayUnownedGridReverse: false,
 	setsDisplayAsList: false,
-	setsShowOwnedNumbers: false,
-	setsShowOwnedHeart: false,
+	setsShowOwnedHeart: true,
 	showStaplesSlider: false,
 
 	cardLanguage: 'en',

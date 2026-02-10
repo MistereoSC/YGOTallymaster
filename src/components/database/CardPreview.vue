@@ -3,10 +3,10 @@ import {computed, onMounted, ref, watch} from 'vue'
 import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {loadImage} from '@/libs/Images'
 import {Icon} from '@iconify/vue'
-import CardOwnHeart from '@/components/cards/CardOwnHeart.vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
 import CardBanIcon from '@/components/cards/CardBanIcon.vue'
 import CardMDRarityIcon from '../cards/CardMDRarityIcon.vue'
+import CardPreviewOwnCorner from '../cards/CardPreviewOwnCorner.vue'
 
 interface IProps {
 	card: TCardData
@@ -16,7 +16,6 @@ interface IProps {
 	grayOverride?: boolean
 
 	showOwnedHeart?: boolean
-	showOwnedNumber?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 	showMDRarity?: boolean
 }
@@ -25,7 +24,6 @@ const props = withDefaults(defineProps<IProps>(), {
 	grayUnowned: false,
 	showOwnedHeart: false,
 	active: false,
-	showOwnedNumber: false,
 	showMDRarity: false,
 })
 const emit = defineEmits<{
@@ -103,7 +101,7 @@ function onClick(e: PointerEvent) {
 
 <template>
 	<div
-		class="cardItemFrame bg-primary-700 rounded-sm overflow-hidden relative outline-0 outline-accent-500 hover:outline-4"
+		class="cardItemFrame bg-primary-700 rounded-sm overflow-hidden relative outline-0 outline-accent-500 hover:outline-4 group"
 		:class="{
 			'w-21.75 h-32': props.size === 'tiny',
 			'w-29.5 h-43': props.size === 'small',
@@ -144,26 +142,22 @@ function onClick(e: PointerEvent) {
 			<!-- Optional overlay with card name -->
 		</div>
 
-		<div class="absolute bottom-1 right-1" v-if="showOwnedHeart">
-			<CardOwnHeart
+		<div class="absolute bottom-0 left-0" v-if="props.showOwnedHeart">
+			<CardPreviewOwnCorner
 				:card-id="props.card.id"
-				class="opacity-0 transition-opacity duration-300"
+				:size="props.size === 'small' || props.size === 'tiny' ? 'small' : 'medium'"
+				class="group-hover:opacity-100 opacity-0"
 			/>
 		</div>
-		<div
-			v-if="showOwnedNumber && numOwned > 0"
-			class="absolute bottom-0 left-0 w-12 h-12 bg-[radial-gradient(circle_at_bottom_left,rgba(0,0,0,0.8),transparent_70%)]"
-		>
-			<div class="text-contrast-900 text-md font-bold absolute bottom-0.5 left-1.5">
-				{{ numOwned }}
-			</div>
-		</div>
-		<div class="absolute left-0 top-0 flex flex-col gap-1 cursor-pointer">
+
+		<div class="absolute left-0 top-0 flex flex-col cursor-pointer">
 			<CardMDRarityIcon
 				v-if="props.showMDRarity"
 				:md-rarity="props.card.misc_info[0]?.md_rarity"
+				:size="props.size === 'small' || props.size === 'tiny' ? 'small' : 'medium'"
 			/>
 			<CardBanIcon
+				class="mt-1 ml-1"
 				:show-banlist-for="props.showBanlistFor"
 				:banlist-info="props.card.banlist_info"
 				:size="props.size"
@@ -182,11 +176,6 @@ function onClick(e: PointerEvent) {
 		.cardItemImage {
 			filter: grayscale(0);
 		}
-	}
-}
-.cardItemFrame:hover {
-	.cardOwnHeart {
-		opacity: 1;
 	}
 }
 </style>

@@ -90,7 +90,6 @@ const filteredCardList = computed(() => {
 					:item-size="settings?.listSize || 'medium'"
 					:show-owned-heart="true"
 					:gray-unowned="settings?.grayUnowned"
-					:show-owned-number="settings?.showOwnedNumbers"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:show-card-context-menu="true"
 				/>
@@ -102,14 +101,13 @@ const filteredCardList = computed(() => {
 					:item-size="settings?.gridSize || 'medium'"
 					:show-owned-heart="true"
 					:gray-unowned="settings?.grayUnowned"
-					:show-owned-number="settings?.showOwnedNumbers"
 					:show-banlist-for="settings?.showBanlistFor || 'none'"
 					:show-card-context-menu="true"
 					:show-md-rarity="settings?.displayMDRarity"
 				/>
 			</div>
 			<div
-				class="border-l border-primary-600 min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+				class="border-l border-primary-600 min-w-116 w-[33vw] max-w-150 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
 				<div class="h-full overflow-y-auto scrollable p-3">
 					<CardFilter

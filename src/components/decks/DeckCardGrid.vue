@@ -9,7 +9,6 @@ interface IProps {
 	allowCardRemoval?: boolean
 	allowReorder?: boolean
 	grayUnowned?: boolean
-	showOwnedNumber?: boolean
 	showOwnedHeart?: boolean
 	cardSize?: 'tiny' | 'small' | 'medium' | 'large'
 	showBanlistFor?: TBanlistFormat | 'none'
@@ -20,7 +19,6 @@ const props = withDefaults(defineProps<IProps>(), {
 	allowCardRemoval: true,
 	allowReorder: true,
 	grayUnowned: false,
-	showOwnedNumber: false,
 	showOwnedHeart: false,
 	cardSize: 'tiny',
 	horizontal: false,
@@ -180,7 +178,6 @@ function onHorizontalWheel(event: WheelEvent) {
 				@shift-click="() => emit('cardShiftClick', card)"
 				:gray-override="grayedOutIndices.has(index)"
 				:show-banlist-for="props.showBanlistFor"
-				:show-owned-number="props.showOwnedNumber"
 				:class="{
 					'hover:z-10 -ml-8': props.horizontal,
 				}"

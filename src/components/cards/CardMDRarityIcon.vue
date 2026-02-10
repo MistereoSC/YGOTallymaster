@@ -1,30 +1,41 @@
 <script lang="ts" setup>
 import {TMDRarity} from '@/libs/interfaces/YGOProInterfaces'
 
-const props = defineProps<{
+interface IProps {
 	mdRarity: TMDRarity | undefined
-}>()
+	size?: 'small' | 'medium'
+}
+const props = withDefaults(defineProps<IProps>(), {
+	size: 'small',
+})
 </script>
 
 <template>
-	<div class="w-8 h-6 select-none">
+	<div
+		class="select-none font-bold overflow-hidden"
+		:class="
+			props.size === 'small'
+				? 'min-w-6 text-sm rounded-br-md'
+				: 'min-w-8 text-md rounded-br-lg'
+		"
+	>
 		<div
 			v-if="props.mdRarity == 'Rare'"
-			class="grid rounded-br-lg place-items-center bg-linear-to-br from-[#1b24c7] to-[#0180fe]"
+			class="grid place-items-center bg-linear-to-br from-[#1b24c7] to-[#0180fe]"
 		>
-			<span class="font-bold pr-1">R</span>
+			<span class="ml-1 mr-2 text-center w-[2ch]">R</span>
 		</div>
 		<div
 			v-else-if="props.mdRarity == 'Super Rare'"
-			class="grid rounded-br-lg place-items-center bg-linear-to-br from-[#fd5800] to-[#feaf3a]"
+			class="grid place-items-center bg-linear-to-br from-[#fd5800] to-[#feaf3a]"
 		>
-			<span class="font-bold pr-1">SR</span>
+			<span class="ml-1 mr-2 text-center w-[2ch]">SR</span>
 		</div>
 		<div
 			v-else-if="props.mdRarity == 'Ultra Rare'"
-			class="grid rounded-br-lg place-items-center bg-linear-to-br from-[#b12bf8] via-[#6d65e7] to-[#3feefb]"
+			class="grid place-items-center bg-linear-to-br from-[#b12bf8] via-[#6d65e7] to-[#3feefb]"
 		>
-			<span class="font-bold pr-1">UR</span>
+			<span class="ml-1 mr-2 text-center w-[2ch]">UR</span>
 		</div>
 	</div>
 </template>

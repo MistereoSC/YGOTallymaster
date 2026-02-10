@@ -49,16 +49,16 @@ watch(num, (newVal) => {
 
 <template>
 	<div
-		class="min-w-10 h-full bg-black/60 text-lg cursor-pointer select-none group/ownedHeart transition-opacity duration-300"
+		class="min-w-10 h-8 bg-black/60 rounded-tr-xl text-lg cursor-pointer select-none group/ownedHeart transition-opacity duration-300"
 		:class="{
-			'text-sm! min-w-8!': props.size === 'small',
+			'text-sm! h-6! min-w-8!': props.size === 'small',
 			'opacity-100': num > 0,
 		}"
 		@click.right.stop.prevent="onClickRight"
 		@click.left.stop.prevent="onClickLeft"
 		v-tooltip.bottom="'Owned Cards'"
 	>
-		<div class="flex items-center justify-center h-full w-full px-2">
+		<div class="flex items-center justify-center h-full w-full pl-1 pr-2">
 			<Icon
 				icon="material-symbols:favorite"
 				class="text-red-200 text-md mr-1 group-hover/ownedHeart:text-red-400 transition-colors"

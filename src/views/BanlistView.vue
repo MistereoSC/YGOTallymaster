@@ -155,7 +155,7 @@ const filteredBanlist = computed(() => {
 					:show-card-context-menu="true"
 				/>
 				<div
-					class="border-l border-primary-600 min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full overflow-hidden"
+					class="border-l border-primary-600 min-w-116 w-[33vw] max-w-150 bg-primary-700 ml-1 h-full overflow-hidden"
 				>
 					<div class="h-full overflow-y-auto scrollable p-3">
 						<CardFullView

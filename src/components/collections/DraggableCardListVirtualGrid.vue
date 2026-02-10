@@ -13,7 +13,6 @@ interface IProps {
 	containerPaddingPx?: number
 
 	showOwnedHeart?: boolean
-	showOwnedNumber?: boolean
 	grayUnowned?: boolean
 	grayUnownedReverse?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
@@ -341,7 +340,6 @@ defineExpose({
 						@shift-click="() => emit('cardShiftClicked', card)"
 						@mouseenter="() => onHoverEnter(card)"
 						:show-owned-heart="props.showOwnedHeart"
-						:show-owned-number="props.showOwnedNumber"
 						:gray-override="grayedOutIndices.has(index)"
 						:show-banlist-for="props.showBanlistFor"
 						:class="props.draggable ? 'cursor-grab active:cursor-grabbing' : ''"

@@ -322,7 +322,6 @@ const amountExtraFusion = computed(() => {
 							:card-size="settings?.decklistGridCardSize || 'tiny'"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@card-shift-click="(card) => onCardShiftLClick(card)"
-							:show-owned-number="settings?.setsShowOwnedNumbers"
 							:show-owned-heart="settings?.setsShowOwnedHeart"
 							:show-md-rarity="settings?.displayMDRarity"
 						/>
@@ -402,7 +401,6 @@ const amountExtraFusion = computed(() => {
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@card-shift-click="(card) => onCardShiftLClick(card)"
 							:horizontal="true"
-							:show-owned-number="settings?.setsShowOwnedNumbers"
 							:show-owned-heart="settings?.setsShowOwnedHeart"
 							:show-md-rarity="settings?.displayMDRarity"
 						/>
@@ -439,7 +437,6 @@ const amountExtraFusion = computed(() => {
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							@card-shift-click="(card) => onCardShiftLClick(card)"
 							:horizontal="true"
-							:show-owned-number="settings?.setsShowOwnedNumbers"
 							:show-owned-heart="settings?.setsShowOwnedHeart"
 							:show-md-rarity="settings?.displayMDRarity"
 						/>
@@ -448,7 +445,7 @@ const amountExtraFusion = computed(() => {
 			</div>
 			<div
 				v-if="activePanel !== 'none'"
-				class="border-l border-primary-600 max-w-180 w-[30vw] bg-primary-700 h-full overflow-hidden"
+				class="border-l border-primary-600 max-w-150 w-[30vw] bg-primary-700 h-full overflow-hidden"
 			>
 				<div class="h-full overflow-y-auto scrollable" v-if="activePanel === 'export'">
 					<DeckImportExportPanel

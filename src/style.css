@@ -191,19 +191,21 @@ body {
 
 .scrollable::-webkit-scrollbar,
 body::-webkit-scrollbar {
-	width: 6px;
-	height: 6px;
+	width: 10px;
+	height: 10px;
 }
 .scrollable::-webkit-scrollbar-track,
 body::-webkit-scrollbar-track {
 	background-color: transparent;
-	margin: 8px 0;
+	margin: 4px;
 }
 .scrollable::-webkit-scrollbar-thumb,
 body::-webkit-scrollbar-thumb {
-	transition: background-color 0.3s ease-out;
 	background-color: var(--color-accent-500);
 	border-radius: 4px;
+	border: 2px solid transparent;
+	background-clip: content-box;
+	min-height: 32px;
 }
 
 /* Tooltip Directive Styles */

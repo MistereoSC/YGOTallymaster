@@ -19,7 +19,6 @@ interface IProps {
 	showLimitedInfo?: boolean
 
 	showOwnedHeart?: boolean
-	showOwnedNumber?: boolean
 	grayUnowned?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 	showCardContextMenu?: boolean
@@ -206,7 +205,6 @@ defineExpose({
 							@click.right="() => emit('cardRightClicked', card)"
 							:show-limited-info="props.showLimitedInfo"
 							:show-owned-heart="props.showOwnedHeart"
-							:show-owned-number="props.showOwnedNumber"
 							:gray-unowned="props.grayUnowned"
 							:show-banlist-for="props.showBanlistFor"
 							:show-context-menu="props.showCardContextMenu"

@@ -154,25 +154,24 @@ function onCardShiftLClick(card: TCardData) {
 				:active-card-id="activeCard ? activeCard.id : null"
 				:item-size="settings?.gridSize || 'medium'"
 				:show-owned-heart="true"
-				:show-owned-number="settings?.showOwnedNumbers"
 				:gray-unowned="settings?.grayUnowned"
 				:show-banlist-for="settings?.showBanlistFor || 'none'"
 				:show-card-context-menu="true"
 				:show-refresh-image-button="true"
+				:show-md-rarity="settings?.displayMDRarity"
 			/>
 
 			<div
 				v-if="activePanel !== 'none'"
-				class="border-l border-primary-600 min-w-116 w-[33vw] max-w-174 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+				class="border-l border-primary-600 min-w-116 w-[33vw] max-w-150 bg-primary-700 ml-1 h-full grid grid-rows-[auto_1fr] overflow-hidden"
 			>
-				<div class="h-full overflow-y-scroll scrollable p-3 pr-2">
+				<div class="h-full overflow-y-scroll scrollable p-2 pr-2">
 					<CardFullView
 						v-if="activeCard && activePanel === 'card' && !settings?.splitDatabaseView"
 						:card="activeCard"
 						:description-highlighting="settings?.descriptionHighlighting"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 						:show-card-prices="settings?.cardPricesVendor !== 'none'"
-						:show-md-rarity="settings?.displayMDRarity"
 						:show-release-info="settings?.showDescriptionReleases"
 					/>
 					<CardFilter

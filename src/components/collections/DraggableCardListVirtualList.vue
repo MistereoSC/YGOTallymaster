@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {TBanlistFormat, TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue'
-import CardPreviewListitem from '../database/CardPreviewListitem.vue'
+import CardPreviewListitem from '@/components/database/CardPreviewListitem.vue'
 import {Icon} from '@iconify/vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
 
@@ -20,7 +20,6 @@ interface IProps {
 	showLimitedInfo?: boolean
 
 	showOwnedHeart?: boolean
-	showOwnedNumber?: boolean
 	grayUnowned?: boolean
 	grayUnownedReverse?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
@@ -303,7 +302,6 @@ defineExpose({
 						@click.right="() => emit('cardRightClicked', card)"
 						:show-limited-info="props.showLimitedInfo"
 						:show-owned-heart="props.showOwnedHeart"
-						:show-owned-number="props.showOwnedNumber"
 						:gray-override="grayedOutIndices.has(index)"
 						:show-banlist-for="props.showBanlistFor"
 						:class="props.draggable ? 'cursor-grab active:cursor-grabbing' : ''"

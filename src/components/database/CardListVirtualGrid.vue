@@ -21,7 +21,6 @@ interface IProps {
 	containerPaddingPx?: number
 
 	showOwnedHeart?: boolean
-	showOwnedNumber?: boolean
 	grayUnowned?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 	showCardContextMenu?: boolean
@@ -284,7 +283,6 @@ defineExpose({
 							@shift-click="() => emit('cardShiftClicked', card)"
 							@mouseenter="() => onHoverEnter(card)"
 							:show-owned-heart="props.showOwnedHeart"
-							:show-owned-number="props.showOwnedNumber"
 							:gray-unowned="props.grayUnowned"
 							:show-banlist-for="props.showBanlistFor"
 							:show-context-menu="props.showCardContextMenu"

@@ -49,7 +49,7 @@ function drawCards(n: number) {
 }
 function reset() {
 	mainDeckCards.value = shuffleDeck(props.deckData.main)
-	extraDeckCards.value = shuffleDeck(props.deckData.extra)
+	extraDeckCards.value = props.deckData.extra
 	handCards.value = []
 	playAreaCards.value = []
 	graveyardCards.value = []

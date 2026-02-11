@@ -14,9 +14,11 @@ type TItem = {
 	action: () => void
 	icon?: string
 	disabled?: boolean
+	hidden?: boolean
 }
 type TSeparator = {
 	separator: true
+	hidden?: boolean
 }
 type TMenuItem = TItem | TSeparator
 interface IProps {
@@ -40,11 +42,11 @@ function isSeparator(item: TMenuItem): item is TSeparator {
 			>
 				<template v-for="(item, index) in props.items" :key="index">
 					<ContextMenuSeparator
-						v-if="isSeparator(item)"
-						class="h-px bg-green6 m-1"
+						v-if="isSeparator(item) && !item.hidden"
+						class="h-px bg-primary-600 mx-1 my-1"
 					/>
 					<ContextMenuItem
-						v-else
+						v-else-if="!isSeparator(item) && !item.hidden"
 						class="group text-sm cursor-pointer leading-none color-green-600 rounded-[3px] flex items-center h-6 relative p-1 select-none outline-none data-disabled:text-contrast-500 data-disabled:pointer-events-none data-highlighted:bg-accent-500"
 						@click="() => item.action()"
 						:disabled="item.disabled"

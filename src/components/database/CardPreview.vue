@@ -18,6 +18,8 @@ interface IProps {
 	showOwnedHeart?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 	showMDRarity?: boolean
+
+	noHover?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'small',
@@ -108,6 +110,7 @@ function onClick(e: PointerEvent) {
 			'w-43.25 h-64.5': props.size === 'medium',
 			'w-59 h-86': props.size === 'large',
 			'outline-4 outline-secondary-500': props.active,
+			'select-none pointer-events-none': props.noHover,
 		}"
 		:style="{
 			transition: 'outline-width 0.1s ease-out, outline-color 0.1s ease-out',

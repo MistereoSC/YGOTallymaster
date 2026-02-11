@@ -14,6 +14,7 @@ import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {Icon} from '@iconify/vue'
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref} from 'vue'
 import DeckImportExportPanel from './DeckImportExportPanel.vue'
+import DeckTestView from '../decktest/DeckTestView.vue'
 
 const props = defineProps<{
 	deckData: TDeckData
@@ -194,10 +195,19 @@ const amountExtraFusion = computed(() => {
 		(c) => c.frameType === 'fusion' || c.frameType === 'fusion_pendulum'
 	).length
 })
+
+const deckCreationOpen = ref(false)
 </script>
 
 <template>
-	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden">
+	<DeckTestView
+		v-if="deckCreationOpen"
+		:deck-name="props.deckData.name"
+		@close="deckCreationOpen = false"
+		:deck-data="cards"
+	/>
+
+	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden" v-else>
 		<div
 			class="h-12 w-full grid grid-cols-[1fr_auto] gap-1 pl-4 pr-2 py-1 items-center bg-linear-to-r from-primary-800 via-primary-700 to-primary-800 border-b border-primary-600"
 		>
@@ -228,6 +238,13 @@ const amountExtraFusion = computed(() => {
 					v-tooltip.bottom="'Sort Deck'"
 				/>
 				<span class="w-px full bg-primary-600 mx-1"></span>
+				<Button
+					size="small"
+					rounded
+					icon="mdi:cards"
+					@click="deckCreationOpen = true"
+					v-tooltip.bottom="'Test Deck'"
+				/>
 				<Button
 					size="small"
 					rounded

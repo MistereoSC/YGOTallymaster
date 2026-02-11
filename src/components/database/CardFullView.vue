@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const filteredSets = computed(() => {
-	if(!props.card.card_sets) return null
+	if (!props.card.card_sets) return null
 	const seen = new Set<string>()
 	return props.card.card_sets.filter((set) => {
 		const code = set.set_code
@@ -40,12 +40,7 @@ const filteredSets = computed(() => {
 			<div
 				class="relative flex justify-center w-full p-4 bg-linear-to-b from-primary-600/30 to-transparent"
 			>
-				<CardReImage
-					:card="card"
-					size="cropped"
-					:no-hover="true"
-					class="shadow-lg shadow-black/50"
-				/>
+				<CardReImage :card="card" class="shadow-lg shadow-black/50" />
 			</div>
 
 			<!-- Card Name & Attribute Bar -->
@@ -174,7 +169,10 @@ const filteredSets = computed(() => {
 		</div>
 
 		<!-- Releases -->
-		<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600" v-if="props.showReleaseInfo">
+		<div
+			class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600"
+			v-if="props.showReleaseInfo"
+		>
 			<div class="px-4 py-2 bg-primary-700/50 border-b border-primary-600">
 				<span class="text-xs font-semibold text-contrast-400 uppercase tracking-wider"
 					>Releases</span

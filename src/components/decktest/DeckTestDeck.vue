@@ -185,7 +185,11 @@ const contextMenuItems = computed(() => [
 					></div>
 					<!-- Top card -->
 					<div class="relative">
-						<div v-if="props.faceUp && topCard">
+						<div
+							v-if="props.faceUp && topCard"
+							class="outline-0 transition-all outline-offset-1 duration-100 rounded-sm"
+							:class="{'outline-4 outline-secondary-400': isDropTarget}"
+						>
 							<CardPreview :card="topCard" />
 						</div>
 						<div

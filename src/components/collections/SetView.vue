@@ -27,6 +27,15 @@ const {settings, initialized: settingsInitialized} = useDatabaseSettings()
 const {resetSearch, fullCardList, searchResults, search, initialized} = useCardSearch()
 const {saveSet} = useCardCollections()
 
+// Set card search/filter
+const setSearchTerm = ref('')
+const selectedSort = ref('')
+const filteredSetCards = computed(() => {
+	if (!setSearchTerm.value.trim()) return props.set.cards
+	const term = setSearchTerm.value.toLowerCase().trim()
+	return props.set.cards.filter((card) => card.name.toLowerCase().includes(term))
+})
+
 const props = defineProps<{
 	collectionName: string
 	set: TFullSet
@@ -77,18 +86,21 @@ function onCardAdd(card: TCardData) {
 		}
 		props.set.cards.splice(firstIndex + 1, 0, card)
 	}
+	selectedSort.value = ''
 }
 function onCardRemove(card: TCardData) {
 	const index = props.set.cards.findIndex((c) => c.id === card.id)
 	if (index !== -1) {
 		props.set.cards.splice(index, 1)
 	}
+	selectedSort.value = ''
 }
 
 function onCardReorder(fromIndex: number, toIndex: number) {
 	if (fromIndex === toIndex) return
 	const [movedCard] = props.set.cards.splice(fromIndex, 1)
 	props.set.cards.splice(toIndex, 0, movedCard)
+	selectedSort.value = ''
 }
 
 function onCardShiftLClick(card: TCardData) {
@@ -190,15 +202,21 @@ watch(
 	{immediate: true}
 )
 
-function sortCards(sortBy: ESortBy | ESortByPriceCM | ESortByPriceTCGP) {
+function sortCards(sortBy: ESortBy | ESortByPriceCM | ESortByPriceTCGP | string) {
+	if (!sortBy) return
 	//@ts-ignore
 	if (sortBy === 'Deck Order') {
 		const sorted = sortByDeckOrder([...props.set.cards])
 		props.set.cards.splice(0, props.set.cards.length, ...sorted)
 		return
 	}
-	const sorted = _sort(sortBy, [...props.set.cards])
+	const sorted = _sort(sortBy as ESortBy, [...props.set.cards])
 	props.set.cards.splice(0, props.set.cards.length, ...sorted)
+}
+
+function onSortChange(sortBy: string) {
+	if (!sortBy) return
+	sortCards(sortBy)
 }
 
 function removeDuplicates() {
@@ -211,6 +229,7 @@ function removeDuplicates() {
 		}
 	}
 	props.set.cards.splice(0, props.set.cards.length, ...uniqueCards)
+	selectedSort.value = ''
 }
 // for every card in the set, add duplicates until there are 3 copies
 function addDuplicates() {
@@ -234,6 +253,7 @@ function addDuplicates() {
 			}
 		}
 	}
+	selectedSort.value = ''
 
 	// props.set.cards.push(...cardsToAdd)
 }
@@ -255,6 +275,7 @@ function removeOwned() {
 
 	const filteredCards = props.set.cards.filter((_, index) => !grayed.has(index))
 	props.set.cards.splice(0, props.set.cards.length, ...filteredCards)
+	selectedSort.value = ''
 }
 
 // #endregion
@@ -393,6 +414,7 @@ function onPasteImportApply(importedCards: TCardData[]) {
 		}
 	}
 	showPasteModal.value = false
+	selectedSort.value = ''
 	addToast(`Added ${importedCards.length} cards to set`, 'success', 3000)
 }
 // #endregion
@@ -401,10 +423,11 @@ function onPasteImportApply(importedCards: TCardData[]) {
 
 <template>
 	<div v-if="initialized === 'ready'" class="grid grid-rows-[auto_1fr] h-full overflow-hidden">
+		<!-- Header -->
 		<div
 			class="h-12 w-full flex justify-between px-4 py-1 items-center bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600"
 		>
-			<span class="flex gap-4 items-center">
+			<span class="flex gap-4 items-center justify-start">
 				<Button
 					size="small"
 					rounded
@@ -436,7 +459,52 @@ function onPasteImportApply(importedCards: TCardData[]) {
 					</div>
 				</div>
 			</span>
-			<span class="flex gap-2 items-center justify-end">
+			<span class="flex gap-2 items-center justify-center">
+				<!-- Search Field -->
+				<div class="relative flex-1 max-w-xs">
+					<Icon
+						icon="material-symbols:search-rounded"
+						class="absolute left-2.5 top-1/2 -translate-y-1/2 text-contrast-500 text-lg"
+					/>
+					<input
+						v-model="setSearchTerm"
+						type="text"
+						placeholder="Search in set..."
+						class="w-full bg-primary-800 text-contrast-700 placeholder-contrast-500 rounded-md pl-9 pr-8 py-1.5 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors"
+					/>
+					<button
+						v-if="setSearchTerm"
+						@click="setSearchTerm = ''"
+						class="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 hover:text-contrast-700 transition-colors"
+					>
+						<Icon icon="material-symbols:close-rounded" class="text-lg" />
+					</button>
+				</div>
+
+				<!-- Sort Dropdown -->
+				<div class="relative">
+					<select
+						v-model="selectedSort"
+						@change="onSortChange(selectedSort)"
+						class="bg-primary-800 text-contrast-700 rounded-md px-3 py-1.5 pr-8 text-sm border border-primary-500 focus:border-accent-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+					>
+						<option value="" disabled>Sort List</option>
+						<option
+							v-for="option in sortOptions"
+							:key="option.value"
+							:value="option.value"
+						>
+							{{ option.label }}
+						</option>
+					</select>
+					<Icon
+						icon="material-symbols:arrow-drop-down-rounded"
+						class="absolute right-2 top-1/2 -translate-y-1/2 text-contrast-500 pointer-events-none text-xl"
+					/>
+				</div>
+
+				<span class="h-8 w-px full bg-gray-600 mr-1 ml-2"></span>
+
 				<Button
 					rounded
 					size="small"
@@ -472,15 +540,17 @@ function onPasteImportApply(importedCards: TCardData[]) {
 			</div>
 			<div class="overflow-hidden h-full">
 				<div
-					v-if="props.set.cards.length === 0"
+					v-if="filteredSetCards.length === 0"
 					class="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400"
 				>
 					<Icon icon="material-symbols:credit-card-off-rounded" class="text-4xl" />
-					<p class="text-lg font-medium">No cards in this Set</p>
+					<p class="text-lg font-medium">
+						{{ setSearchTerm ? 'No matching cards' : 'No cards in this Set' }}
+					</p>
 				</div>
 				<DraggableCardListVirtualList
 					v-else-if="settings?.setsDisplayAsList"
-					:card-list="props.set.cards"
+					:card-list="filteredSetCards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
 					:gray-unowned-reverse="settings?.setsGrayUnownedGridReverse"
 					:item-size="settings?.listSize || 'medium'"
@@ -494,7 +564,7 @@ function onPasteImportApply(importedCards: TCardData[]) {
 				/>
 				<DraggableCardListVirtualGrid
 					v-else
-					:card-list="props.set.cards"
+					:card-list="filteredSetCards"
 					:gray-unowned="settings?.setsGrayUnownedGrid"
 					:gray-unowned-reverse="settings?.setsGrayUnownedGridReverse"
 					:item-size="settings?.gridSize || 'medium'"
@@ -544,51 +614,6 @@ function onPasteImportApply(importedCards: TCardData[]) {
 					class="h-full overflow-y-auto scrollable p-3"
 				>
 					<div class="space-y-4">
-						<!-- Sort Section -->
-						<SettingsSection
-							title="Sort Cards"
-							icon="material-symbols:sort"
-							:pt-classes="{content: 'gap-3!'}"
-						>
-							<button
-								v-for="option in sortOptions"
-								:key="option.value"
-								@click="sortCards(option.value)"
-								class="cursor-pointer flex items-center gap-2 px-3 py-2 text-sm text-left rounded-lg bg-primary-600 hover:bg-accent-500 text-contrast-600 hover:text-contrast-700 transition-colors"
-							>
-								<Icon :icon="option.icon" class="text-base opacity-70" />
-								{{ option.label }}
-							</button>
-						</SettingsSection>
-
-						<!-- Utilities Section -->
-						<SettingsSection title="Utilities" icon="material-symbols:build">
-							<SettingsItem
-								icon="material-symbols:file-copy-off-rounded"
-								title="Remove Duplicates"
-								class="cursor-pointer hover:bg-red-900"
-								description="Remove duplicate cards from the set"
-								icon-color-class="text-red-400"
-								@click="() => removeDuplicates()"
-							/>
-							<SettingsItem
-								icon="material-symbols:file-copy-rounded"
-								title="Add Duplicates"
-								class="cursor-pointer hover:bg-red-900"
-								description="Add duplicate cards to the set until there are 3 copies of each"
-								icon-color-class="text-red-400"
-								@click="() => addDuplicates()"
-							/>
-							<SettingsItem
-								icon="material-symbols:file-copy-off-rounded"
-								title="Remove Owned"
-								class="cursor-pointer hover:bg-red-900"
-								description="Remove cards that are already owned from the set"
-								icon-color-class="text-red-400"
-								@click="() => removeOwned()"
-							/>
-						</SettingsSection>
-
 						<!-- Import/Export Section -->
 						<SettingsSection title="Export" icon="tabler:package-export">
 							<SettingsItem
@@ -627,6 +652,34 @@ function onPasteImportApply(importedCards: TCardData[]) {
 								description="Paste card list in readable format."
 								class="cursor-pointer"
 								@click="() => (showPasteModal = true)"
+							/>
+						</SettingsSection>
+
+						<!-- Utilities Section -->
+						<SettingsSection title="Utilities" icon="material-symbols:build">
+							<SettingsItem
+								icon="material-symbols:file-copy-off-rounded"
+								title="Remove Duplicates"
+								class="cursor-pointer hover:bg-red-900"
+								description="Remove duplicate cards from the set"
+								icon-color-class="text-red-400"
+								@click="() => removeDuplicates()"
+							/>
+							<SettingsItem
+								icon="material-symbols:file-copy-rounded"
+								title="Add Duplicates"
+								class="cursor-pointer hover:bg-red-900"
+								description="Add duplicate cards to the set until there are 3 copies of each"
+								icon-color-class="text-red-400"
+								@click="() => addDuplicates()"
+							/>
+							<SettingsItem
+								icon="material-symbols:file-copy-off-rounded"
+								title="Remove Owned"
+								class="cursor-pointer hover:bg-red-900"
+								description="Remove cards that are already owned from the set"
+								icon-color-class="text-red-400"
+								@click="() => removeOwned()"
 							/>
 						</SettingsSection>
 					</div>

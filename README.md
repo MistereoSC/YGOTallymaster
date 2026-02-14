@@ -9,10 +9,12 @@
 - 🗂️ **Organize your cards** in Collections and Sets (use them directly in Deck creation!)
 - 💖 **Mark Owned Cards** for Deck Creation and Collection Management
 - 🏗️ **Create and manage Decks** with exports to various formats
+- 🧪 **Test your Decks** with an interactive, drag-and-drop play area
 - 🔍 **Browse and search** the entire Yu-Gi-Oh! card database (data from [YGOProDecks](https://ygoprodeck.com/api-guide/))
 - 🏆 **Banlists for all formats** - always up-to-date, so you can check card legality for any official format
 - 🧩 **Explore all Card Archetypes** - discover, filter, and learn about every archetype in the game
 - 📆 **Explore Cards by Release** - browse most releases, and see what cards they brought
+- 🗄️ **Import & Export** your deckst and sets to and from various formats
 - 💲 **Card Prices** - Check Cardmarket and TCGPlayer prices for your cards, decks and sets
 - 🖼️ **Images stored locally** after first download for fast, offline browsing
 - ⚡ Modern, responsive UI powered by Electron + Vue 3
@@ -78,6 +80,7 @@ Card and image data provided by [YGOProDecks](https://ygoprodeck.com/api-guide/)
 ## Decks
 ![Deck List](https://i.imgur.com/ittLo5b.png)
 ![Deck Creation](https://i.imgur.com/5FlpQB0.png)
+![Deck Tester](https://i.imgur.com/dGBmmh0.png)
 ![Deck Exports](https://i.imgur.com/SDKpxlo.png)
 ## Collections
 ![Collections](https://i.imgur.com/AuNM82d.png)

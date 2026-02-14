@@ -11,7 +11,13 @@ import NameInputModal from '@/components/common/NameInputModal.vue'
 const props = defineProps<{
 	collection: TFullCollection
 	searchQuery?: string
-	sortBy?: 'date_desc' | 'date_asc' | 'name_asc' | 'name_desc' | 'cardAmount_asc' | 'cardAmount_desc'
+	sortBy?:
+		| 'date_desc'
+		| 'date_asc'
+		| 'name_asc'
+		| 'name_desc'
+		| 'cardAmount_asc'
+		| 'cardAmount_desc'
 	allCollections?: TFullCollection[]
 }>()
 const emit = defineEmits<{
@@ -57,18 +63,18 @@ const filteredAndSortedSets = computed(() => {
 		sets.sort((a, b) => a.cards.length - b.cards.length)
 	} else if (props.sortBy === 'cardAmount_desc') {
 		sets.sort((a, b) => b.cards.length - a.cards.length)
-	} else if (props.sortBy === 'date_asc') {
-		sets.sort((a, b) => {
-			const dateA = new Date(a.created_at).getTime()
-			const dateB = new Date(b.created_at).getTime()
-			return dateA - dateB
-		})
-	} else {
-		// Default: sort by date (newest first)
+	} else if (props.sortBy === 'date_desc') {
 		sets.sort((a, b) => {
 			const dateA = new Date(a.created_at).getTime()
 			const dateB = new Date(b.created_at).getTime()
 			return dateB - dateA
+		})
+	} else {
+		// Default: sort by date (oldest first)
+		sets.sort((a, b) => {
+			const dateA = new Date(a.created_at).getTime()
+			const dateB = new Date(b.created_at).getTime()
+			return dateA - dateB
 		})
 	}
 

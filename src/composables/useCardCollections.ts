@@ -77,7 +77,7 @@ const useCardCollections = () => {
 					updated_at: setData.updated_at,
 					cards: setData.cards.map((card) => card.id),
 				})
-				collection.sets.unshift(JSON.parse(JSON.stringify(setData)))
+				collection.sets.push(JSON.parse(JSON.stringify(setData)))
 			}
 		}
 	}

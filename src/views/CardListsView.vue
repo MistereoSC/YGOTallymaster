@@ -24,11 +24,11 @@ const activeSet = ref<null | {collectionName: string; set: TFullSet}>(null)
 const searchQuery = ref('')
 const sortBy = ref<
 	'date_desc' | 'date_asc' | 'name_asc' | 'name_desc' | 'cardAmount_asc' | 'cardAmount_desc'
->('date_desc')
+>('date_asc')
 
 enum ESortBy {
-	'date_desc' = 'Date (New-Old)',
 	'date_asc' = 'Date (Old-New)',
+	'date_desc' = 'Date (New-Old)',
 	'name_asc' = 'Name (A-Z)',
 	'name_desc' = 'Name (Z-A)',
 	'cardAmount_desc' = 'Cards (Many-Few)',

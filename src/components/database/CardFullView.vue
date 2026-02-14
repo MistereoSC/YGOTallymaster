@@ -203,20 +203,16 @@ const filteredSets = computed(() => {
 						v-for="set in filteredSets"
 						class="leading-relaxed whitespace-pre-line font-semibold text-contrast-600 text-sm flex gap-2"
 					>
-						<span class="flex items-center font-mono">
+						<span class="flex flex-none items-center font-mono">
 							<p class="text-accent-300 text-base">
 								{{ set.set_code.split('-')[0] }}
 							</p>
 							<p class="text-xs text-gray-500">
-								-xx{{ set.set_code.split('-')[1].slice(2) }}
+								-xx{{ set.set_code.split('-')[1]?.slice(2) }}
 							</p>
 						</span>
-						<span>
-							<span>{{ set.set_name }}</span>
-							<!-- <span class="text-xs pl-1 text-gray-500">{{
-								set.set_rarity_code
-							}}</span> -->
-						</span>
+
+						<span class="truncate">{{ set.set_name }}</span>
 					</span>
 				</div>
 			</div>

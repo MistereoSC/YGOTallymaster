@@ -3,7 +3,7 @@ import {Icon} from '@iconify/vue'
 import {onMounted, ref, watch} from 'vue'
 import {useOwnedCards} from '@/composables/useOwnedCards'
 
-const {getOwned, setOwned, initialized} = useOwnedCards()
+const {getOwned, setOwned, initialized, ownedCards} = useOwnedCards()
 interface IProps {
 	cardId: number
 	size?: 'small' | 'medium'
@@ -34,17 +34,25 @@ function onClickLeft(e: MouseEvent) {
 		if (num.value >= 3) num.value++
 		else num.value = 3
 	} else num.value += 1
+
+	emit('change', num.value)
+	setOwned(props.cardId, num.value)
 }
 function onClickRight(e: MouseEvent) {
 	if (initialized.value !== 'ready') return
 	if (e.shiftKey) num.value = 0
 	else if (num.value > 0) num.value -= 1
+
+	emit('change', num.value)
+	setOwned(props.cardId, num.value)
 }
 
-watch(num, (newVal) => {
-	emit('change', newVal)
-	setOwned(props.cardId, newVal)
-})
+watch(
+	() => ownedCards.value?.[props.cardId],
+	() => {
+		num.value = getOwned(props.cardId)
+	}
+)
 </script>
 
 <template>

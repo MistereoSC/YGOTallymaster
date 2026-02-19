@@ -20,7 +20,13 @@ const props = withDefaults(defineProps<IProps>(), {
 		"
 	>
 		<div
-			v-if="props.mdRarity == 'Rare'"
+			v-if="props.mdRarity == 'Common'"
+			class="grid place-items-center bg-linear-to-br from-[#92959b] to-[#3c373f]"
+		>
+			<span class="ml-1 mr-2 text-center w-[2ch]">C</span>
+		</div>
+		<div
+			v-else-if="props.mdRarity == 'Rare'"
 			class="grid place-items-center bg-linear-to-br from-[#1b24c7] to-[#0180fe]"
 		>
 			<span class="ml-1 mr-2 text-center w-[2ch]">R</span>

@@ -535,6 +535,9 @@ function onPasteImportApply(importedCards: TCardData[]) {
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 						:show-card-prices="settings?.cardPricesVendor !== 'none'"
 						:show-release-info="settings?.showDescriptionReleases"
+						:show-add-remove-buttons="true"
+						@add-card="(card) => onCardAdd(card)"
+						@remove-card="(card) => onCardRemove(card)"
 					/>
 				</div>
 			</div>

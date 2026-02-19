@@ -67,9 +67,9 @@ onMounted(async () => {
 	window.addEventListener('keyup', onKeyUp)
 })
 
-const hoveredCard = ref<null | TCardData>(null)
-function onCardHover(card?: TCardData) {
-	hoveredCard.value = card || null
+const hoveredCard = ref<null | {card: TCardData; source: 'main' | 'extra' | 'side' | 'list'}>(null)
+function onCardHover(card?: TCardData, source?: 'main' | 'extra' | 'side' | 'list') {
+	hoveredCard.value = card ? {card, source: source ?? 'list'} : null
 }
 
 function onCardAdd(card: TCardData, addToSideDeck = false) {
@@ -83,21 +83,50 @@ function onCardAdd(card: TCardData, addToSideDeck = false) {
 		case 'link':
 			if (addToSideDeck) {
 				if (cards.value.side.length >= 15 || !checkDeckLimit(card.id)) return
-				cards.value.side.push(card)
+				const indexInSide = cards.value.side.findIndex((c) => c.id === card.id)
+				if (indexInSide !== -1) cards.value.side.splice(indexInSide + 1, 0, card)
+				else cards.value.side.push(card)
 			} else {
 				if (cards.value.extra.length >= 15 || !checkDeckLimit(card.id)) return
-				cards.value.extra.push(card)
+				const indexInExtra = cards.value.extra.findIndex((c) => c.id === card.id)
+				if (indexInExtra !== -1) cards.value.extra.splice(indexInExtra + 1, 0, card)
+				else cards.value.extra.push(card)
 			}
 			break
 		default:
 			if (addToSideDeck) {
 				if (cards.value.side.length >= 15 || !checkDeckLimit(card.id)) return
-				cards.value.side.push(card)
+				const indexInSide = cards.value.side.findIndex((c) => c.id === card.id)
+				if (indexInSide !== -1) cards.value.side.splice(indexInSide + 1, 0, card)
+				else cards.value.side.push(card)
 			} else {
 				if (cards.value.main.length >= 60 || !checkDeckLimit(card.id)) return
-				cards.value.main.push(card)
+				const indexInMain = cards.value.main.findIndex((c) => c.id === card.id)
+				if (indexInMain !== -1) cards.value.main.splice(indexInMain + 1, 0, card)
+				else cards.value.main.push(card)
 			}
 			break
+	}
+}
+
+function onCardRemove(card: TCardData, source: 'main' | 'extra' | 'side' | 'list' = 'list') {
+	let targetArray: TCardData[]
+	switch (source) {
+		case 'main':
+			targetArray = cards.value.main
+			break
+		case 'extra':
+			targetArray = cards.value.extra
+			break
+		case 'side':
+			targetArray = cards.value.side
+			break
+		default:
+			return
+	}
+	const index = targetArray.map((c) => c.id).lastIndexOf(card.id)
+	if (index !== -1) {
+		targetArray.splice(index, 1)
 	}
 }
 
@@ -209,6 +238,7 @@ const deckCreationOpen = ref(false)
 	/>
 
 	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden" v-else>
+		{{ hoveredCard?.source }}
 		<div
 			class="h-12 w-full grid grid-cols-[1fr_auto] gap-1 pl-4 pr-2 py-1 items-center bg-linear-to-r from-primary-800 via-primary-700 to-primary-800 border-b border-primary-600"
 		>
@@ -275,11 +305,14 @@ const deckCreationOpen = ref(false)
 				<div class="p-2 h-full overflow-y-scroll scrollable" ref="cardFullViewContainer">
 					<CardFullView
 						v-if="hoveredCard"
-						:card="hoveredCard"
+						:card="hoveredCard.card"
 						:description-highlighting="settings?.descriptionHighlighting"
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 						:show-card-prices="settings?.cardPricesVendor !== 'none'"
 						:show-release-info="settings?.showDescriptionReleases"
+						:show-add-remove-buttons="true"
+						@add-card="(card) => onCardAdd(card, hoveredCard?.source === 'side')"
+						@remove-card="(card) => onCardRemove(card, hoveredCard?.source)"
 					/>
 				</div>
 			</div>
@@ -335,7 +368,7 @@ const deckCreationOpen = ref(false)
 					<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-2">
 						<DeckCardGrid
 							v-model="cards.main"
-							@cardHover="onCardHover"
+							@cardHover="(card) => onCardHover(card, 'main')"
 							:gray-unowned="settings?.decklistGrayUnownedGrid"
 							:card-size="settings?.decklistGridCardSize || 'tiny'"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
@@ -413,7 +446,7 @@ const deckCreationOpen = ref(false)
 					<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-1">
 						<DeckCardGrid
 							v-model="cards.extra"
-							@cardHover="onCardHover"
+							@cardHover="(card) => onCardHover(card, 'extra')"
 							:gray-unowned="settings?.decklistGrayUnownedGrid"
 							:card-size="settings?.decklistGridCardSize || 'tiny'"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
@@ -449,7 +482,7 @@ const deckCreationOpen = ref(false)
 					<div class="h-full overflow-y-scroll scrollable pb-1 px-2 pt-1">
 						<DeckCardGrid
 							v-model="cards.side"
-							@cardHover="onCardHover"
+							@cardHover="(card) => onCardHover(card, 'side')"
 							:gray-unowned="settings?.decklistGrayUnownedGrid"
 							:card-size="settings?.decklistGridCardSize || 'tiny'"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
@@ -492,7 +525,7 @@ const deckCreationOpen = ref(false)
 							:show-limited-info="settings?.listSizeSmallList === 'tiny'"
 							:show-owned-heart="true"
 							:gray-unowned="settings?.grayUnownedSmallList"
-							@card-hovered="(card) => onCardHover(card)"
+							@card-hovered="(card) => onCardHover(card, 'list')"
 							@card-clicked="(card) => onCardAdd(card)"
 							@card-shift-clicked="(card) => onCardAdd(card, true)"
 							:item-size="settings?.listSizeSmallList || 'tiny'"

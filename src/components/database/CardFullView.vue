@@ -6,6 +6,7 @@ import AttributeIcon from './AttributeIcon.vue'
 import CardBanIcon from '@/components/cards/CardBanIcon.vue'
 import CardHighlightedDescription from './CardHighlightedDescription.vue'
 import {computed} from 'vue'
+import Button from '../common/Button.vue'
 
 const props = defineProps<{
 	card: TCardData
@@ -14,10 +15,13 @@ const props = defineProps<{
 	linkHighlighting?: boolean
 	showCardPrices?: boolean
 	showReleaseInfo?: boolean
+	showAddRemoveButtons?: boolean
 }>()
 
 const emit = defineEmits<{
 	(e: 'linkClick', text: string): void
+	(e: 'addCard', card: TCardData): void
+	(e: 'removeCard', card: TCardData): void
 }>()
 
 const filteredSets = computed(() => {
@@ -165,6 +169,25 @@ const filteredSets = computed(() => {
 				>
 					{{ card.desc }}
 				</span>
+			</div>
+		</div>
+
+		<!-- Controls -->
+		<div
+			class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600"
+			v-if="props.showAddRemoveButtons"
+		>
+			<div class="flex items-center justify-center gap-2 p-2">
+				<Button
+					@click="$emit('addCard', card)"
+					icon="material-symbols:add-card"
+					v-tooltip.bottom="'Add Card'"
+				/>
+				<Button
+					@click="$emit('removeCard', card)"
+					icon="material-symbols:credit-card-off"
+					v-tooltip.bottom="'Remove Card'"
+				/>
 			</div>
 		</div>
 

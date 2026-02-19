@@ -18,6 +18,7 @@ import DeckTestView from '../decktest/DeckTestView.vue'
 
 const props = defineProps<{
 	deckData: TDeckData
+	folderName?: string
 }>()
 const emit = defineEmits<{
 	(e: 'save'): void
@@ -26,7 +27,7 @@ const emit = defineEmits<{
 
 const {settings} = useDatabaseSettings()
 const {resetSearch, fullCardList, searchResults, search} = useCardSearch()
-const {saveDeck} = useDeckList()
+const {saveDeck, DEFAULT_DECK_FOLDER} = useDeckList()
 const cards = ref<TDeckCardsPopulated>({
 	main: [],
 	extra: [],
@@ -121,7 +122,7 @@ onBeforeUnmount(async () => {
 	newDeckData.main = cards.value.main.map((c) => c.id)
 	newDeckData.extra = cards.value.extra.map((c) => c.id)
 	newDeckData.side = cards.value.side.map((c) => c.id)
-	await saveDeck(newDeckData, props.deckData.name)
+	await saveDeck(newDeckData, props.folderName || DEFAULT_DECK_FOLDER, props.deckData.name)
 })
 
 function onReturnClick() {

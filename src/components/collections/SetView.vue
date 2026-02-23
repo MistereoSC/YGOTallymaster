@@ -419,6 +419,11 @@ function onPasteImportApply(importedCards: TCardData[]) {
 }
 // #endregion
 // ----------------------------------------------
+
+function onLinkClick(name: string) {
+	resetSearch()
+	search({term: name})
+}
 </script>
 
 <template>
@@ -538,6 +543,8 @@ function onPasteImportApply(importedCards: TCardData[]) {
 						:show-add-remove-buttons="true"
 						@add-card="(card) => onCardAdd(card)"
 						@remove-card="(card) => onCardRemove(card)"
+						:link-highlighting="true"
+						@link-click="(name) => onLinkClick(name)"
 					/>
 				</div>
 			</div>

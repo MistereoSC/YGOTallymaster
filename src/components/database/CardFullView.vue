@@ -34,6 +34,11 @@ const filteredSets = computed(() => {
 		return true
 	})
 })
+
+function onCardLinkClick(name: string) {
+	// if(name === props.card?.name) return
+	emit('linkClick', name)
+}
 </script>
 
 <template>
@@ -161,7 +166,7 @@ const filteredSets = computed(() => {
 					:description="card.desc"
 					:frame-type="card.frameType"
 					:display-links="props.linkHighlighting"
-					@link-click="(v) => emit('linkClick', v)"
+					@link-click="(v) => onCardLinkClick(v)"
 				/>
 				<span
 					v-else

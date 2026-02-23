@@ -78,6 +78,10 @@ function onCardShiftLClick(card: TCardData) {
 	search({term: searchTerm})
 }
 
+function onLinkClick(name: string) {
+	resetSearch()
+	search({term: name})
+}
 // #endregion
 // ----------------------------------------------
 </script>
@@ -129,6 +133,8 @@ function onCardShiftLClick(card: TCardData) {
 						:show-banlist-for="settings?.showBanlistFor || 'none'"
 						:show-card-prices="settings?.cardPricesVendor !== 'none'"
 						:show-release-info="settings?.showDescriptionReleases"
+						:link-highlighting="true"
+						@link-click="(name) => onLinkClick(name)"
 					/>
 				</div>
 			</div>

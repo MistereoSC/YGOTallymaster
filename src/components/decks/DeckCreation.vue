@@ -14,7 +14,7 @@ import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import {Icon} from '@iconify/vue'
 import {computed, onBeforeMount, onBeforeUnmount, onMounted, ref} from 'vue'
 import DeckImportExportPanel from './DeckImportExportPanel.vue'
-import DeckTestView from '../decktest/DeckTestView.vue'
+import DeckTestView from '@/components/decktest/DeckTestView.vue'
 
 const props = defineProps<{
 	deckData: TDeckData
@@ -227,6 +227,11 @@ const amountExtraFusion = computed(() => {
 })
 
 const deckCreationOpen = ref(false)
+
+function onLinkClick(name: string) {
+	resetSearch()
+	search({term: name})
+}
 </script>
 
 <template>
@@ -313,6 +318,8 @@ const deckCreationOpen = ref(false)
 						:show-add-remove-buttons="true"
 						@add-card="(card) => onCardAdd(card, hoveredCard?.source === 'side')"
 						@remove-card="(card) => onCardRemove(card, hoveredCard?.source)"
+						:link-highlighting="true"
+						@link-click="(name) => onLinkClick(name)"
 					/>
 				</div>
 			</div>

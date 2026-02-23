@@ -127,7 +127,7 @@ function getDescriptionWithHighlights(): string {
 
 	// 3. Highlight cost sentences (sentences ending with : or ;)
 	description = description.replace(
-		/(^|[.!?\n])([^.!?\n:;\x00]*?[:;])/g,
+		/(?:^|(?<=[.!?\n:;]))(\s*)((?:[^.!?\n:;\x00"]|"[^"]*")*?[:;])/g,
 		`$1${MARKERS.COST_START}$2${MARKERS.COST_END}`
 	)
 
@@ -144,9 +144,13 @@ function getDescriptionWithHighlights(): string {
 		}
 	)
 
-	description = description.replace(/\. /g, `.\n${MARKERS.SPACER}`)
+	// 6. Added Spacers after end of sentences
+	description = description.replace(/"[^"]*"|\.(\s+)/g, (match, space) => {
+		if (space === undefined) return match
+		return `.\n${MARKERS.SPACER}`
+	})
 
-	// 6. Replace quoted text with clickable links (before escaping)
+	// 7. Replace quoted text with clickable links (before escaping)
 	description = replaceQuotedCardNames(description, MARKERS)
 
 	description = escapeHtml(description)
@@ -167,7 +171,7 @@ function getDescriptionWithHighlights(): string {
 		description += `<i class="desc-flavor">${pendulumFlavorText}</i>`
 	}
 
-	if (props.displayLinks)
+	if (props.displayLinks) {
 		description = description
 			.replace(
 				new RegExp(
@@ -177,7 +181,7 @@ function getDescriptionWithHighlights(): string {
 				'<a href="javascript:void(0)" class="desc-card-link" data-card-name="$1">'
 			)
 			.replace(new RegExp(MARKERS.LINK_END, 'g'), '</a>')
-	else
+	} else {
 		description = description
 			.replace(
 				new RegExp(
@@ -187,6 +191,7 @@ function getDescriptionWithHighlights(): string {
 				'<span class="desc-card-quote">'
 			)
 			.replace(new RegExp(MARKERS.LINK_END, 'g'), '</span>')
+	}
 
 	description = description
 		.replace(/\[ Monster Effect \]/g, 'Monster Effect')

@@ -20,6 +20,7 @@ interface IProps {
 	grayOverride?: boolean
 	showOwnedHeart?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
+	pips?: number
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'medium',
@@ -143,6 +144,13 @@ const styles = getCardStyles(props.card)
 						:alt="card.name"
 						class="w-full h-full object-cover object-top cardItemImage"
 					/>
+				</div>
+				<!-- Pips -->
+				<div v-if="props.pips" class="absolute bottom-0.5 left-0.5 right-0 flex gap-0.75">
+					<div
+						v-for="_ in pips"
+						class="w-1.5 h-1.5 rounded-full bg-accent-50 outline outline-black"
+					></div>
 				</div>
 			</div>
 

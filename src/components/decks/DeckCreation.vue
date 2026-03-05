@@ -232,6 +232,14 @@ function onLinkClick(name: string) {
 	resetSearch()
 	search({term: name})
 }
+
+const cardListReduced = computed(() => {
+	const counts: Record<number, number> = {}
+	for (const card of cards.value.main.concat(cards.value.extra).concat(cards.value.side)) {
+		counts[card.id] = (counts[card.id] || 0) + 1
+	}
+	return counts
+})
 </script>
 
 <template>
@@ -538,6 +546,7 @@ function onLinkClick(name: string) {
 							:item-size="settings?.listSizeSmallList || 'tiny'"
 							:show-banlist-for="settings?.showBanlistFor || 'none'"
 							:show-card-context-menu="true"
+							:pip-list="cardListReduced"
 						/>
 					</div>
 				</div>

@@ -35,6 +35,13 @@ const filteredSetCards = computed(() => {
 	const term = setSearchTerm.value.toLowerCase().trim()
 	return props.set.cards.filter((card) => card.name.toLowerCase().includes(term))
 })
+const cardListReduced = computed(() => {
+	const counts: Record<number, number> = {}
+	for (const card of props.set.cards) {
+		counts[card.id] = (counts[card.id] || 0) + 1
+	}
+	return counts
+})
 
 const props = defineProps<{
 	collectionName: string
@@ -52,6 +59,8 @@ onMounted(() => {
 	}
 	window.addEventListener('keydown', onKeyDown)
 	window.addEventListener('keyup', onKeyUp)
+
+	
 })
 onBeforeUnmount(async () => {
 	await saveSet(props.collectionName, props.set)
@@ -616,6 +625,7 @@ function onLinkClick(name: string) {
 							@card-clicked="(card) => onCardAdd(card)"
 							:item-size="settings?.listSizeSmallList || 'tiny'"
 							:show-card-context-menu="true"
+							:pip-list="cardListReduced"
 						/>
 					</div>
 				</div>

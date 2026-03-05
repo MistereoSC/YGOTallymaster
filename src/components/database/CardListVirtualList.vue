@@ -22,6 +22,7 @@ interface IProps {
 	grayUnowned?: boolean
 	showBanlistFor?: TBanlistFormat | 'none'
 	showCardContextMenu?: boolean
+	pipList?: Record<number, number> // card ID to pip count mapping
 }
 const props = withDefaults(defineProps<IProps>(), {
 	itemSize: 'medium',
@@ -208,6 +209,7 @@ defineExpose({
 							:gray-unowned="props.grayUnowned"
 							:show-banlist-for="props.showBanlistFor"
 							:show-context-menu="props.showCardContextMenu"
+							:pips="props.pipList ? props.pipList[card.id] : 0"
 						/>
 					</CardContextMenu>
 				</div>

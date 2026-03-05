@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {TCardData, TFrameType} from '@/libs/interfaces/YGOProInterfaces'
+import {TFrameType} from '@/libs/interfaces/YGOProInterfaces'
 
 const props = defineProps<{
 	description: string

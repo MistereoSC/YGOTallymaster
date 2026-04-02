@@ -693,6 +693,15 @@ function _sort(by: ESortBy | ESortByPriceCM | ESortByPriceTCGP, cardList: TCardD
 				const priceComparison = priceB - priceA
 				return priceComparison === 0 ? a.name.localeCompare(b.name) : priceComparison
 			})
+		case ESortBy.Owned_Count_Desc: {
+			const ownedCards = getReadyCardIds()
+			return cardList.sort((a, b) => {
+				const ownedA = ownedCards[a.id] ?? 0
+				const ownedB = ownedCards[b.id] ?? 0
+				const ownedComparison = ownedB - ownedA
+				return ownedComparison === 0 ? a.name.localeCompare(b.name) : ownedComparison
+			})
+		}
 
 		default:
 			return cardList

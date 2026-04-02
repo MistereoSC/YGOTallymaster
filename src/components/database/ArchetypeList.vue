@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import Button from '@/components/common/Button.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
-import {ref, computed, onBeforeMount} from 'vue'
+import {ref, computed, onBeforeMount, watch} from 'vue'
 import {TCardData} from '@/libs/interfaces/YGOProInterfaces'
 import CardFullView from './CardFullView.vue'
 import CardListVirtualGrid from './CardListVirtualGrid.vue'
 import CardListVirtualList from './CardListVirtualList.vue'
 import CardFilter from './CardFilter.vue'
-import {useCardSearch} from '@/composables/useCardSearch'
+import {useCardSearch, _sort} from '@/composables/useCardSearch'
 
 interface IProps {
 	cardList: TCardData[]
@@ -27,17 +27,30 @@ function toggleFilter() {
 	activePanel.value = activePanel.value === 'filter' ? 'card' : 'filter'
 }
 
-const {searchResults, resetSearch} = useCardSearch()
+const {searchResults, resetSearch, sortedBy} = useCardSearch()
 onBeforeMount(() => {
 	resetSearch()
 })
 
+const sortTrigger = ref(0)
+watch(sortedBy, () => {
+	sortTrigger.value++
+})
 const filteredCardList = computed(() => {
+	sortTrigger.value
+
+	let result: TCardData[]
+
 	if (searchResults.value === null) {
-		return props.cardList
+		result = [...props.cardList]
+	} else {
+		const cardMap = new Map(props.cardList.map((card) => [card.id, card]))
+		result = searchResults.value
+			.filter((card) => cardMap.has(card.id))
+			.map((card) => cardMap.get(card.id)!)
 	}
-	const searchResultIds = new Set(searchResults.value.map((card) => card.id))
-	return props.cardList.filter((card) => searchResultIds.has(card.id))
+
+	return _sort(sortedBy.value, result)
 })
 </script>
 

@@ -12,6 +12,7 @@ export enum ESortBy {
 	DEF_Desc = 'DEF (High-Low)',
 	Type = 'Card Type',
 	Search_Score = 'Text Search Score',
+	Owned_Count_Desc = 'Owned Count',
 }
 
 export enum ESortByPriceCM {

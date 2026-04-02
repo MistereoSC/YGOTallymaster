@@ -59,8 +59,6 @@ onMounted(() => {
 	}
 	window.addEventListener('keydown', onKeyDown)
 	window.addEventListener('keyup', onKeyUp)
-
-	
 })
 onBeforeUnmount(async () => {
 	await saveSet(props.collectionName, props.set)
@@ -175,6 +173,11 @@ const sortOptions = ref([
 	{value: ESortBy.DEF_Desc, label: 'DEF (High-Low)', icon: 'material-symbols:shield'},
 	{value: ESortBy.Type, label: 'Card Type', icon: 'material-symbols:category'},
 	{value: 'Deck Order' as ESortBy, label: 'Deck Order', icon: 'material-symbols:view-list'},
+	{
+		value: 'Owned Count' as ESortBy.Owned_Count_Desc,
+		label: 'Owned Count',
+		icon: 'material-symbols:view-list',
+	},
 ] as Array<{value: ESortBy | ESortByPriceCM | ESortByPriceTCGP; label: string; icon: string}>)
 watch(
 	() => settingsInitialized.value,

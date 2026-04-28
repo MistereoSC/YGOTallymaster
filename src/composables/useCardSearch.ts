@@ -239,14 +239,14 @@ export type TSearchQuery = {
 	term?: string
 	coreCardType?: TCoreCardType
 	attributes?: TMonsterAttribute[]
-	monsterTypes?: {terms: TMonsterType[]; operand: 'AND' | 'OR'}
+	monsterTypes?: {terms: TMonsterType[]; operand: 'AND' | 'OR' | 'NOT'}
 
 	atk?: {lte?: number | null; gte?: number | null}
 	def?: {lte?: number | null; gte?: number | null}
 	levels?: number[]
 	scales?: number[]
 	linkvals?: number[]
-	links?: {terms: TLinkMarkers[]; operand: 'AND' | 'OR'}
+	links?: {terms: TLinkMarkers[]; operand: 'AND' | 'OR' | 'NOT'}
 
 	monsterRaces?: TMonsterRace[]
 	spellTypes?: TSpellTypes[]
@@ -462,12 +462,17 @@ function _searchCoreCardType(type: TCoreCardType, cardList: TCardData[]) {
 }
 
 function _searchMonsterType(
-	monsterType: {terms: TMonsterType[]; operand: 'AND' | 'OR'},
+	monsterType: {terms: TMonsterType[]; operand: 'AND' | 'OR' | 'NOT'},
 	cardList: TCardData[]
 ) {
 	if (monsterType.operand === 'OR') {
 		return cardList.filter((card) => {
 			return card.typeline?.some((line) => monsterType.terms.includes(line as TMonsterType))
+		})
+	}
+	if (monsterType.operand === 'NOT') {
+		return cardList.filter((card) => {
+			return !monsterType.terms.some((term) => card.typeline?.includes(term))
 		})
 	}
 	// 'AND'
@@ -477,12 +482,17 @@ function _searchMonsterType(
 }
 
 function _searchLinkmarkers(
-	links: {terms: TLinkMarkers[]; operand: 'AND' | 'OR'},
+	links: {terms: TLinkMarkers[]; operand: 'AND' | 'OR' | 'NOT'},
 	cardList: TCardData[]
 ) {
 	if (links.operand === 'OR') {
 		return cardList.filter((card) => {
 			return card.linkmarkers?.some((marker) => links.terms.includes(marker as TLinkMarkers))
+		})
+	}
+	if (links.operand === 'NOT') {
+		return cardList.filter((card) => {
+			return !links.terms.some((term) => card.linkmarkers?.includes(term))
 		})
 	}
 	// 'AND'

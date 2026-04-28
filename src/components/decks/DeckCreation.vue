@@ -251,7 +251,6 @@ const cardListReduced = computed(() => {
 	/>
 
 	<div class="h-full grid grid-rows-[auto_1fr] overflow-hidden" v-else>
-		{{ hoveredCard?.source }}
 		<div
 			class="h-12 w-full grid grid-cols-[1fr_auto] gap-1 pl-4 pr-2 py-1 items-center bg-linear-to-r from-primary-800 via-primary-700 to-primary-800 border-b border-primary-600"
 		>
@@ -313,7 +312,7 @@ const cardListReduced = computed(() => {
 			@wheel="onDeckAreaWheel"
 		>
 			<div
-				class="border-r border-primary-600 min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+				class="border-r border-primary-600 min-w-86 w-[25vw] max-w-132 bg-primary-700 h-full overflow-hidden"
 			>
 				<div class="p-2 h-full overflow-y-scroll scrollable" ref="cardFullViewContainer">
 					<CardFullView
@@ -329,6 +328,21 @@ const cardListReduced = computed(() => {
 						:link-highlighting="true"
 						@link-click="(name) => onLinkClick(name)"
 					/>
+
+					<div class="h-full grid place-items-center p-6" v-else>
+						<div
+							class="flex items-center gap-2 border rounded-lg p-2 border-primary-500"
+						>
+							<Icon
+								icon="material-symbols:info-rounded"
+								class="text-3xl text-accent-300"
+							/>
+							<span class="text-sm text-primary-400 leading-none italic">
+								Select a card to view details or use the filter to narrow down
+								results.
+							</span>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="h-full grid grid-rows-[1fr_auto_auto] overflow-hidden">

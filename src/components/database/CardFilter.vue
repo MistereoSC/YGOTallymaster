@@ -113,9 +113,9 @@ function onSearchInput(e: KeyboardEvent) {
 // #region Toggle Array Helper
 // -----------------------------------------
 
-function useToggleArray<T>(defaultOperand: 'AND' | 'OR' = 'AND') {
+function useToggleArray<T>(defaultOperand: 'AND' | 'OR' | 'NOT' = 'AND') {
 	const items = ref<T[]>([]) as Ref<T[]>
-	const operand = ref<'AND' | 'OR'>(defaultOperand)
+	const operand = ref<'AND' | 'OR' | 'NOT'>(defaultOperand)
 
 	const toggle = (item: T) => {
 		const idx = items.value.indexOf(item)
@@ -134,8 +134,12 @@ function useToggleArray<T>(defaultOperand: 'AND' | 'OR' = 'AND') {
 		onSearch()
 	}
 
-	const toggleOperand = () => {
-		operand.value = operand.value === 'AND' ? 'OR' : 'AND'
+	const toggleOperand = (newOperand?: 'AND' | 'OR' | 'NOT') => {
+		if (newOperand) {
+			operand.value = newOperand
+		} else {
+			operand.value = operand.value === 'AND' ? 'OR' : 'AND'
+		}
 		if (items.value.length > 0) onSearch()
 	}
 
@@ -421,9 +425,9 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 			<FilterSection
 				title="Card Type"
 				:operand="monsterTypes.operand.value"
-				has-operand-toggle
+				:operand-toggles="['AND', 'OR', 'NOT']"
 				@reset="monsterTypes.resetAndSearch"
-				@toggle-operand="monsterTypes.toggleOperand"
+				@toggle-operand="(e) => monsterTypes.toggleOperand(e as 'AND' | 'OR' | 'NOT')"
 			>
 				<ToggleButtonGroup
 					:options="EMonsterType"
@@ -495,14 +499,14 @@ const selectedSort = ref<ESortBy>(sortedBy.value ?? ESortBy.Name_Asc)
 			<FilterSection
 				title="Links"
 				:operand="linkMarkers.operand.value"
-				has-operand-toggle
+				:operand-toggles="['AND', 'OR', 'NOT']"
 				@reset="
 					() => {
 						linkMarkers.reset()
 						linkvals.resetAndSearch()
 					}
 				"
-				@toggle-operand="linkMarkers.toggleOperand"
+				@toggle-operand="(e) => linkMarkers.toggleOperand(e as 'AND' | 'OR' | 'NOT')"
 			>
 				<div class="grid grid-cols-[auto_1fr] gap-8">
 					<div class="bg-primary-700 rounded-md">

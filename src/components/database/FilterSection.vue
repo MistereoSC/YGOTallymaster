@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import Button from '@/components/common/Button.vue'
-import ToggleSwitch from '@/components/common/ToggleSwitch.vue'
+import NWayToggleButton from '../common/NWayToggleButton.vue'
 
 const props = defineProps<{
 	title: string
-	operand?: 'AND' | 'OR' | null
-	hasOperandToggle?: boolean
+	operand?: 'AND' | 'OR' | 'NOT' | null
+	operandToggles?: ('AND' | 'OR' | 'NOT')[]
 }>()
 
 const emit = defineEmits<{
 	(e: 'reset'): void
-	(e: 'toggle-operand'): void
+	(e: 'toggle-operand', value: string): void
 }>()
 </script>
 
@@ -18,22 +18,28 @@ const emit = defineEmits<{
 	<div class="rounded-lg bg-primary-800 overflow-hidden border border-primary-600">
 		<div
 			class="px-3 py-1 bg-linear-to-r from-primary-700 to-primary-800 border-b border-primary-600 flex items-center justify-between"
-			:class="{'grid grid-cols-[1fr_auto_1fr]': props.hasOperandToggle && props.operand}"
+			:class="{'grid grid-cols-[1fr_auto_1fr]': props.operandToggles && props.operand}"
 		>
 			<div class="flex items-center gap-2">
 				<span class="font-semibold text-contrast-600">{{ title }}</span>
 				<span
-					v-if="props.operand && !props.hasOperandToggle"
+					v-if="props.operand && !props.operandToggles"
 					class="text-xs px-1.5 py-0.5 rounded bg-primary-600 text-contrast-400"
 				>
 					{{ props.operand }}
 				</span>
 			</div>
-			<ToggleSwitch
-				v-if="props.hasOperandToggle && props.operand"
+			<!-- <ToggleSwitch
+				v-if="props.operandToggles && props.operand"
 				:duo-labels="['AND', 'OR']"
 				:model-value="props.operand === 'AND'"
-				@toggle="emit('toggle-operand')"
+				@toggle="emit('toggle-operand', props.operand)"
+			/> -->
+			<NWayToggleButton
+				v-if="props.operandToggles && props.operand"
+				:model-value="props.operand"
+				:values="['AND', 'OR', 'NOT']"
+				@toggle="(e) => emit('toggle-operand', e)"
 			/>
 			<span class="flex justify-end">
 				<Button

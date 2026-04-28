@@ -558,6 +558,21 @@ function onLinkClick(name: string) {
 						:link-highlighting="true"
 						@link-click="(name) => onLinkClick(name)"
 					/>
+
+					<div class="h-full grid place-items-center p-6" v-else>
+						<div
+							class="flex items-center gap-2 border rounded-lg p-2 border-primary-500"
+						>
+							<Icon
+								icon="material-symbols:info-rounded"
+								class="text-3xl text-accent-300"
+							/>
+							<span class="text-sm text-primary-400 leading-none italic">
+								Select a card to view details or use the filter to narrow down
+								results.
+							</span>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="overflow-hidden h-full">

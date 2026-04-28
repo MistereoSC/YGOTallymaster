@@ -10,9 +10,23 @@ import CardListVirtualList from '@/components/database/CardListVirtualList.vue'
 import {useDatabaseSettings} from '@/composables/useDatabaseSettings'
 import Button from '@/components/common/Button.vue'
 import Spinner from '@/components/common/Spinner.vue'
+import {Icon} from '@iconify/vue'
 
 const {settings} = useDatabaseSettings()
 const {searchResults, fullCardList, resetSearch, search} = useCardSearch()
+
+// const ownedStats = computed(() => {
+// 	if (!ownedCards.value) return {uniqueOwned: 0, totalOwned: 0}
+// 	let uniqueOwned = 0
+// 	let totalOwned = 0
+// 	for (const [_id, count] of Object.entries(ownedCards.value)) {
+// 		if (count > 0) {
+// 			uniqueOwned++
+// 			totalOwned += count
+// 		}
+// 	}
+// 	return {uniqueOwned, totalOwned}
+// })
 
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
 onBeforeMount(() => {
@@ -103,6 +117,9 @@ function onLinkClick(name: string) {
 						<span v-if="searchResults !== null"> of </span>
 						<span class="font-medium">{{ fullCardList.length }}</span>
 						cards
+						<!-- <span class="text-accent-400 font-medium">{{ ownedStats.uniqueOwned }}</span>
+						unique owned
+						(<span class="font-medium">{{ ownedStats.totalOwned }}</span> total) -->
 					</p>
 				</div>
 			</div>
@@ -124,7 +141,7 @@ function onLinkClick(name: string) {
 		>
 			<div
 				v-if="settings?.splitDatabaseView"
-				class="border-r border-primary-600 min-w-96 w-[25vw] max-w-116 bg-primary-700 h-full grid grid-rows-[auto_1fr] overflow-hidden"
+				class="border-r border-primary-600 min-w-96 w-[25vw] max-w-116 bg-primary-700 overflow-hidden"
 			>
 				<div class="h-full overflow-y-scroll scrollable p-3 pr-2" v-if="activeCard">
 					<CardFullView
@@ -136,6 +153,18 @@ function onLinkClick(name: string) {
 						:link-highlighting="true"
 						@link-click="(name) => onLinkClick(name)"
 					/>
+				</div>
+
+				<div class="h-full grid place-items-center p-6" v-else>
+					<div class="flex items-center gap-2 border rounded-lg p-2 border-primary-500">
+						<Icon
+							icon="material-symbols:info-rounded"
+							class="text-3xl text-accent-300"
+						/>
+						<span class="text-sm text-primary-400 leading-none italic">
+							Select a card to view details or use the filter to narrow down results.
+						</span>
+					</div>
 				</div>
 			</div>
 			<CardListVirtualList

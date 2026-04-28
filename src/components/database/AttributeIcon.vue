@@ -3,6 +3,7 @@ import {TMonsterAttribute, TSpellTrapAttribute} from '@/libs/interfaces/YGOProIn
 interface IProps {
 	attribute: TMonsterAttribute | TSpellTrapAttribute | string
 	size?: 'tiny' | 'small' | 'normal' | 'large'
+	hideTooltip?: boolean
 }
 const props = withDefaults(defineProps<IProps>(), {
 	size: 'normal',
@@ -45,7 +46,7 @@ function getAttributeIconPath(attribute: TMonsterAttribute | TSpellTrapAttribute
 </script>
 
 <template>
-	<div v-tooltip.bottom="props.attribute">
+	<div v-tooltip.bottom="props.hideTooltip ? undefined : props.attribute">
 		<img
 			v-if="getAttributeIconPath(props.attribute)"
 			:src="getAttributeIconPath(props.attribute)"

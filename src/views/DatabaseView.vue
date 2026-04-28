@@ -15,19 +15,6 @@ import {Icon} from '@iconify/vue'
 const {settings} = useDatabaseSettings()
 const {searchResults, fullCardList, resetSearch, search} = useCardSearch()
 
-// const ownedStats = computed(() => {
-// 	if (!ownedCards.value) return {uniqueOwned: 0, totalOwned: 0}
-// 	let uniqueOwned = 0
-// 	let totalOwned = 0
-// 	for (const [_id, count] of Object.entries(ownedCards.value)) {
-// 		if (count > 0) {
-// 			uniqueOwned++
-// 			totalOwned += count
-// 		}
-// 	}
-// 	return {uniqueOwned, totalOwned}
-// })
-
 const cardGrid = ref<InstanceType<typeof CardListVirtualGrid> | null>(null)
 onBeforeMount(() => {
 	resetSearch()
@@ -117,9 +104,6 @@ function onLinkClick(name: string) {
 						<span v-if="searchResults !== null"> of </span>
 						<span class="font-medium">{{ fullCardList.length }}</span>
 						cards
-						<!-- <span class="text-accent-400 font-medium">{{ ownedStats.uniqueOwned }}</span>
-						unique owned
-						(<span class="font-medium">{{ ownedStats.totalOwned }}</span> total) -->
 					</p>
 				</div>
 			</div>

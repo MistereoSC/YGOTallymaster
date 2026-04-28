@@ -55,6 +55,12 @@ const activeRoute = computed(() => route.name as string)
 					route-name="Lists"
 					:active="activeRoute === 'Lists'"
 				/>
+				<AppMainMenuLink
+					label="Statistics"
+					icon="material-symbols:bar-chart-rounded"
+					route-name="Statistics"
+					:active="activeRoute === 'Statistics'"
+				/>
 			</div>
 			<div>
 				<!-- <div class="w-full h-px bg-primary-500 my-2"></div> -->

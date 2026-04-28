@@ -36,10 +36,15 @@ const routes = [
 		name: 'Banlist',
 		component: () => import('../views/BanlistView.vue'),
 	},
-		{
+	{
 		path: '/Releases',
 		name: 'Releases',
 		component: () => import('../views/ReleasesView.vue'),
+	},
+	{
+		path: '/Statistics',
+		name: 'Statistics',
+		component: () => import('../views/OwnedStatsView.vue'),
 	},
 
 	// #endregion

@@ -1,1 +1,1 @@
-export type TLanguageCodes = 'en' | 'de' | 'fr' | 'it' | 'pt'
+export type TLanguageCodes = 'en' | 'de' | 'fr' | 'it' | 'pt' | 'zh' | 'ja'

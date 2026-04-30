@@ -1,4 +1,4 @@
-import {getCardList} from '@/libs/CardData'
+﻿import {getCardList} from '@/libs/CardData'
 import {IMarkedCards} from '@/libs/interfaces/CardSets'
 import {
 	TCardData,
@@ -21,6 +21,8 @@ import {getSettings} from './useDatabaseSettings'
 // -----------------------------------------------------------
 
 const MIN_SCORE_THRESHOLD: Readonly<number> = 2
+const SEARCH_QUOTE_BRACKET_REGEX = /["'`\u201C\u201D\u201E\u201F\u201A\u2018\u2019\u300C\u300D\u300E\u300F\u3010\u3011\u300A\u300B\u3008\u3009()\uFF08\uFF09\[\]{}]/g
+const SEARCH_DASH_VARIANTS_REGEX = /[\u2010-\u2015\u2212\uFF0D]/g
 const STOP_WORDS = new Set([
 	'and',
 	'or',
@@ -63,33 +65,23 @@ const STORE_FIELDS = [
 	'typeline',
 	// TCardDataMisc fields
 	'misc_info',
+	'name_en',
+	'searchAliases',
+	'searchAliasesText',
+	'searchCorpusNormalized',
 ]
 const TOKENIZE_FN = (text: string) => {
-	// Custom tokenizer with bigram support that preserves D/D/D/D patterns
-	const baseTokens = text
-		.toLowerCase()
-		// Normalize special characters and symbols to common equivalents
-		.replace(/☆/g, '-')
-		.replace(/★/g, '-')
-		.replace(/"/g, ' " ')
+	const normalized = normalizeSearchText(text)
+	if (!normalized) return []
 
-		// First, protect D/D/D/D patterns by replacing slashes with a placeholder
-		.replace(/\bd(\/d)+\b/g, (match) => match.replace(/\//g, '___SLASH___'))
-		// Also protect other slash-separated terms that might be important
-		.replace(/\b\w+\/\w+(?:\/\w+)*\b/g, (match) => match.replace(/\//g, '___SLASH___'))
-		// Split on whitespace and hyphens
-		.split(/[\s-]+/)
-		// Restore the slashes
-		.map((token) => token.replace(/___SLASH___/g, '/'))
-		// Filter out empty tokens
+	const slashProtected = normalized.replace(/([a-z0-9])\/(?=[a-z0-9])/gi, '$1__slash__')
+	const baseTokens = (slashProtected.match(/[\p{L}\p{N}_-]+/gu) || [])
+		.map((token) => token.replace(/__slash__/g, '/'))
 		.filter((token) => token.length > 0)
 
-	const tokens = [...baseTokens] // Start with individual tokens
-
-	// Add bigrams (pairs of adjacent tokens)
+	const tokens = [...baseTokens]
 	for (let i = 0; i < baseTokens.length - 1; i++) {
-		const bigram = `${baseTokens[i]} ${baseTokens[i + 1]}`
-		tokens.push(bigram)
+		tokens.push(`${baseTokens[i]} ${baseTokens[i + 1]}`)
 	}
 
 	return tokens
@@ -103,7 +95,12 @@ export {ESortBy, ESortByPriceCM, ESortByPriceTCGP} from '@/libs/interfaces/searc
 // #region Singleton useCardSearch
 // -----------------------------------------------------------
 
-let miniSearchIndex = null as null | MiniSearch<TCardData>
+type TSearchDocument = TCardData & {
+	searchAliasesText?: string
+	searchCorpusNormalized?: string
+}
+
+let miniSearchIndex = null as null | MiniSearch<TSearchDocument>
 const initialized = ref('uninitialized' as 'ready' | 'uninitialized' | 'loading')
 const searchResults = ref(null as TCardData[] | null)
 const activeQuery = ref<TSearchQuery>({})
@@ -117,14 +114,12 @@ const useCardSearch = () => {
 	}
 
 	async function _init() {
-		let cardData = [] as TCardData[]
+		let cardData = [] as TSearchDocument[]
 		const settings = await getSettings()
 		const language = settings.cardLanguage || 'en'
-		const includeEnglishName = settings.englishNameSearch && language !== 'en'
-
-		cardData = _initialFilterCardData(await getCardList(language))
+		cardData = _initialFilterCardData(_prepareSearchCards(await getCardList(language)))
 		fullCardList.value = cardData
-		miniSearchIndex = _createMinisearchIndex(cardData, includeEnglishName)
+		miniSearchIndex = _createMinisearchIndex(cardData)
 
 		activeQuery.value = {}
 		searchResults.value = null
@@ -274,23 +269,74 @@ function _initialFilterCardData(cardData: TCardData[]) {
 	})
 }
 
-function _createMinisearchIndex(cardData: TCardData[], includeEnglishName = false) {
-	const searchableFields = ['name', 'desc', 'archetype']
-	if (includeEnglishName) searchableFields.push('name_en')
+function _createMinisearchIndex(cardData: TSearchDocument[]) {
+	const searchableFields = [
+		'name',
+		'desc',
+		'archetype',
+		'searchAliases',
+		'name_en',
+		'searchAliasesText',
+		'searchCorpusNormalized',
+	]
 	const miniSearch = new MiniSearch({
 		fields: searchableFields,
 		storeFields: STORE_FIELDS,
 		searchOptions: {
 			fuzzy: 0.1,
 			prefix: true,
-			boost: {name: 6, archetype: 3, desc: 1},
+			boost: {name: 6, archetype: 3, desc: 1, searchAliasesText: 6, searchCorpusNormalized: 4},
 			combineWith: 'AND',
 		},
 		processTerm: (term, _fieldName) => (STOP_WORDS.has(term) ? null : term.toLowerCase()),
 		tokenize: TOKENIZE_FN,
 	})
-	miniSearch.addAll(cardData as TCardData[])
+	miniSearch.addAll(cardData as TSearchDocument[])
 	return miniSearch
+}
+
+function _prepareSearchCards(cardData: TCardData[]): TSearchDocument[] {
+	return cardData.map((card) => {
+		const searchAliases = _uniqueNonEmpty([
+			...(card.searchAliases || []),
+			card.name,
+			card.name_en,
+			card.misc_info?.[0]?.name_en,
+		])
+		const searchAliasesText = searchAliases.join(' ')
+		const searchCorpusNormalized = normalizeSearchText(
+			[card.name, card.desc, card.archetype, card.name_en, searchAliasesText].join(' ')
+		)
+		return {
+			...card,
+			searchAliases,
+			searchAliasesText,
+			searchCorpusNormalized,
+		}
+	})
+}
+
+function _uniqueNonEmpty(values: Array<string | undefined>): string[] {
+	const seen = new Set<string>()
+	const out: string[] = []
+	for (const value of values) {
+		const normalized = value?.trim()
+		if (!normalized || seen.has(normalized)) continue
+		seen.add(normalized)
+		out.push(normalized)
+	}
+	return out
+}
+
+function normalizeSearchText(value: string | undefined): string {
+	if (!value) return ''
+	return value
+		.normalize('NFKC')
+		.toLowerCase()
+		.replace(SEARCH_DASH_VARIANTS_REGEX, '-')
+		.replace(SEARCH_QUOTE_BRACKET_REGEX, '')
+		.replace(/\s+/g, ' ')
+		.trim()
 }
 
 // #endregion
@@ -510,16 +556,77 @@ function _searchSpellTrapType(types: TSpellTypes[] | TTrapTypes[], cardList: TCa
 function _searchTerm(term: string, cardList?: TCardData[]) {
 	if (!miniSearchIndex) return []
 
-	let results = miniSearchIndex
-		.search(term)
-		.filter((result) => result.score >= MIN_SCORE_THRESHOLD)
+	const normalizedTerm = normalizeSearchText(term)
+	const allowedIds = cardList && cardList.length > 0 ? new Set(cardList.map((card) => card.id)) : null
+	const resultsById = new Map<number, TSearchResultCardData>()
 
-	if (cardList && cardList.length > 0) {
-		const filteredCardIds = new Set(cardList.map((card) => card.id))
-		results = results.filter((result) => filteredCardIds.has(result.id))
+	const appendResults = (results: TSearchResultCardData[]) => {
+		for (const result of results) {
+			if (allowedIds && !allowedIds.has(result.id)) continue
+			const previous = resultsById.get(result.id)
+			if (!previous || result.score > previous.score) {
+				resultsById.set(result.id, result)
+			}
+		}
 	}
 
-	return results as unknown as TSearchResultCardData[]
+	const miniSearchRaw = miniSearchIndex
+		.search(term)
+		.filter((result) => result.score >= MIN_SCORE_THRESHOLD) as unknown as TSearchResultCardData[]
+	appendResults(miniSearchRaw)
+
+	if (normalizedTerm && normalizedTerm !== term.toLowerCase()) {
+		const miniSearchNormalized = miniSearchIndex
+			.search(normalizedTerm)
+			.filter((result) => result.score >= MIN_SCORE_THRESHOLD) as unknown as TSearchResultCardData[]
+		appendResults(miniSearchNormalized)
+	}
+
+	if (/^\d+$/.test(term.trim())) {
+		const cardId = Number.parseInt(term.trim(), 10)
+		const exactCard = fullCardList.value.find((card) => card.id === cardId)
+		if (exactCard && (!allowedIds || allowedIds.has(exactCard.id))) {
+			resultsById.set(exactCard.id, {
+				...(exactCard as TSearchResultCardData),
+				score: Number.MAX_SAFE_INTEGER,
+				terms: [],
+				queryTerms: [],
+				match: {},
+			})
+		}
+	}
+
+	if (normalizedTerm) {
+		const fallbackMatches = fullCardList.value.filter((card) => {
+			if (allowedIds && !allowedIds.has(card.id)) return false
+			const searchDocument = card as TSearchDocument
+			const corpus =
+				searchDocument.searchCorpusNormalized ||
+				normalizeSearchText(
+					[
+						card.name,
+						card.desc,
+						card.archetype,
+						card.name_en,
+						...(card.searchAliases || []),
+						card.misc_info?.[0]?.name_en,
+					].join(' ')
+				)
+			return corpus.includes(normalizedTerm)
+		})
+
+		appendResults(
+			fallbackMatches.map((card) => ({
+				...(card as TSearchResultCardData),
+				score: MIN_SCORE_THRESHOLD + 1,
+				terms: [],
+				queryTerms: [],
+				match: {},
+			}))
+		)
+	}
+
+	return Array.from(resultsById.values())
 }
 
 function _searchOwnedCards(cardList: TCardData[], markedCardIds?: IMarkedCards) {
@@ -727,3 +834,5 @@ function _sortBySearchScore(cardList: TSearchResultCardData[]) {
 }
 // #endregion
 // -----------------------------------------------------------
+
+

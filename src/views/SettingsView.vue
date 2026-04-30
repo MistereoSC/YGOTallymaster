@@ -57,6 +57,8 @@ enum ELanguageCodes {
 	'fr' = 'French (fr)',
 	'it' = 'Italian (it)',
 	'pt' = 'Portuguese (pt)',
+	'zh' = 'Chinese (zh)',
+	'ja' = 'Japanese (ja)',
 }
 enum ECardPriceVendors {
 	'none' = 'None',

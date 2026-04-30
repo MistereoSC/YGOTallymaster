@@ -93,7 +93,7 @@ app.whenReady().then(() => {
 			  "style-src 'self' 'unsafe-inline'; " +
 			  "img-src 'self' data: https://images.ygoprodeck.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; " +
 			  "font-src 'self' data:; " +
-			  "connect-src 'self' ws: https://db.ygoprodeck.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; " +
+			  "connect-src 'self' ws: https://db.ygoprodeck.com https://ygocdb.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; " +
 			  "object-src 'none'"
 			: // Production
 			  "default-src 'self'; " +
@@ -101,7 +101,7 @@ app.whenReady().then(() => {
 			  "style-src 'self' 'unsafe-inline'; " +
 			  "img-src 'self' data: https://images.ygoprodeck.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; " +
 			  "font-src 'self'; " +
-			  "connect-src 'self' https://db.ygoprodeck.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; " +
+			  "connect-src 'self' https://db.ygoprodeck.com https://ygocdb.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com; " +
 			  "object-src 'none'"
 
 		callback({

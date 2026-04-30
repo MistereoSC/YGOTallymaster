@@ -7,6 +7,8 @@ const DEFAULT_CONFIG: Readonly<TConfig> = {
 		fr: '0',
 		it: '0',
 		pt: '0',
+		zh: '0',
+		ja: '0',
 	},
 	autoUpdate: true,
 	theme: 'dark' as TTheme,
@@ -68,6 +70,8 @@ export type TConfig = {
 		fr: string
 		it: string
 		pt: string
+		zh: string
+		ja: string
 	}
 	autoUpdate: boolean
 	theme: TTheme

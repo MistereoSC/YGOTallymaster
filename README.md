@@ -16,6 +16,7 @@
 - 📆 **Explore Cards by Release** - browse most releases, and see what cards they brought
 - 🗄️ **Import & Export** your deckst and sets to and from various formats
 - 💲 **Card Prices** - Check Cardmarket and TCGPlayer prices for your cards, decks and sets
+- 📊 **Collection Statistics** - View detailed statistics about your collection, ranging from By Release Year to Archetype Breakdowns
 - 🖼️ **Images stored locally** after first download for fast, offline browsing
 - ⚡ Modern, responsive UI powered by Electron + Vue 3
 
@@ -84,5 +85,6 @@ Card and image data provided by [YGOProDecks](https://ygoprodeck.com/api-guide/)
 ![Deck Exports](https://i.imgur.com/SDKpxlo.png)
 ## Collections
 ![Collections](https://i.imgur.com/AuNM82d.png)
+![Statistics](https://i.imgur.com/c0CVFVn.png)
 ## Settings
 ![Settings](https://i.imgur.com/RjIJdUt.png)

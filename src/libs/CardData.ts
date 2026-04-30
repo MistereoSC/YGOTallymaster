@@ -4,16 +4,24 @@ import {TLanguageCodes} from './interfaces/Localization'
 
 export async function getCardList(language = 'en' as TLanguageCodes) {
 	console.debug(`CardData::getCardList::Loading card data for language: ${language}`)
-	if ((await Files.exists(`data/carddata_${language}.json`)).exists) {
-		const f = await Files.read<{data: Array<TCardData>}>(`data/carddata_${language}.json`)
-		if (f) {
-			return f.data
-		} else {
-			return []
-		}
-	} else {
-		return []
+	const cards = await readCardDataFile(language)
+	if (cards.length > 0) return cards
+
+	if (language !== 'en') {
+		console.warn(
+			`CardData::getCardList::Missing or invalid carddata_${language}.json. Falling back to English card data.`
+		)
+		return await readCardDataFile('en')
 	}
+	return []
+}
+
+async function readCardDataFile(language: TLanguageCodes): Promise<TCardData[]> {
+	const path = `data/carddata_${language}.json`
+	if (!(await Files.exists(path)).exists) return []
+	const fileContent = await Files.read<{data: Array<TCardData>}>(path)
+	if (!fileContent || !Array.isArray(fileContent.data)) return []
+	return fileContent.data
 }
 
 export function getCardStyles(card: TCardData): TCardStyles {

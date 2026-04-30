@@ -41,6 +41,8 @@ type TGeneralCardData = {
 
 	archetype?: string
 	misc_info: TCardDataMisc[]
+	name_en?: string
+	searchAliases?: string[]
 }
 
 type TMonsterCardData = {

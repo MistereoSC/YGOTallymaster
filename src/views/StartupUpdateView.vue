@@ -4,6 +4,7 @@ import {getConfig} from '@/libs/Config'
 import {
 	appNeedsUpdating,
 	dbNeedsUpdating,
+	getMissingCardDataLanguages,
 	performDBUpdate,
 	runVersionMigrations,
 } from '@/libs/Updater'
@@ -33,6 +34,7 @@ async function checkSetupState() {
 	const settings = await getSettings()
 	const language = settings.cardLanguage || 'en'
 	console.debug('INIT::Check Setup::Current Language:', language)
+	const missingLanguageFiles = await getMissingCardDataLanguages()
 
 	if (!cfg.dbVer[language] || cfg.dbVer[language] === '0') {
 		console.debug(
@@ -41,6 +43,11 @@ async function checkSetupState() {
 		)
 		neededSetup = true
 		state.value = 'needs-setup'
+	} else if (missingLanguageFiles.length > 0) {
+		console.debug(
+			`INIT::Check Setup::Missing local card data files: ${missingLanguageFiles.join(', ')}`
+		)
+		await startSetup()
 	} else if (cfg?.autoUpdate && (await dbNeedsUpdating(language))) {
 		console.debug('INIT::Check Setup::Update Available')
 		state.value = 'update-available'
